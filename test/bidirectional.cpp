@@ -61,16 +61,17 @@ using const_bidirectional = bidirectional_iter<int const>;
 
 #if 0 // TODO: Call ranges algorithms with this.
 struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_facade<
-                                      basic_proxy_bidirectional_iter,
-                                      std::bidirectional_iterator_tag,
-                                      int>
+                                            basic_proxy_bidirectional_iter,
+                                            std::bidirectional_iterator_tag,
+                                            int,
+                                            int>
 {
     basic_proxy_bidirectional_iter() : it_(nullptr) {}
     basic_proxy_bidirectional_iter(int * it) : it_(it) {}
 
 private:
     friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
+    int dereference() const { return *it_; }
     void prev() { --it_; }
     void next() { ++it_; }
     bool equals(basic_proxy_bidirectional_iter other) const

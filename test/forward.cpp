@@ -57,6 +57,7 @@ using const_forward = forward_iter<int const>;
 struct basic_proxy_forward_iter : boost::iterator_facade::iterator_facade<
                                       basic_proxy_forward_iter,
                                       std::forward_iterator_tag,
+                                      int,
                                       int>
 {
     basic_proxy_forward_iter() : it_(nullptr) {}
@@ -64,7 +65,7 @@ struct basic_proxy_forward_iter : boost::iterator_facade::iterator_facade<
 
 private:
     friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
+    int dereference() const { return *it_; }
     void next() { ++it_; }
     bool equals(basic_proxy_forward_iter other) const
     {

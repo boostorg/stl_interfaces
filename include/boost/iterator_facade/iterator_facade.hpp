@@ -72,6 +72,33 @@ namespace boost { namespace iterator_facade {
             typename Reference,
             typename Pointer,
             typename DifferenceType>
+        constexpr static auto compare(
+            iterator_facade<
+                Derived,
+                IteratorCategory,
+                ValueType,
+                Reference,
+                Pointer,
+                DifferenceType> const & lhs,
+            iterator_facade<
+                Derived,
+                IteratorCategory,
+                ValueType,
+                Reference,
+                Pointer,
+                DifferenceType> const &
+                rhs) noexcept(noexcept(derived(lhs).compare(derived(rhs))))
+        {
+            return derived(lhs).compare(derived(rhs));
+        }
+
+        template<
+            typename Derived,
+            typename IteratorCategory,
+            typename ValueType,
+            typename Reference,
+            typename Pointer,
+            typename DifferenceType>
         constexpr static void
         next(iterator_facade<
              Derived,
@@ -121,33 +148,6 @@ namespace boost { namespace iterator_facade {
             DifferenceType diff) noexcept(noexcept(derived(it).advance(diff)))
         {
             derived(it).advance(diff);
-        }
-
-        template<
-            typename Derived,
-            typename IteratorCategory,
-            typename ValueType,
-            typename Reference,
-            typename Pointer,
-            typename DifferenceType>
-        constexpr static auto compare(
-            iterator_facade<
-                Derived,
-                IteratorCategory,
-                ValueType,
-                Reference,
-                Pointer,
-                DifferenceType> & it1,
-            iterator_facade<
-                Derived,
-                IteratorCategory,
-                ValueType,
-                Reference,
-                Pointer,
-                DifferenceType> & it2) noexcept(noexcept(derived(it1)
-                                                             .compare(it2)))
-        {
-            derived(it1).compare(it2);
         }
 
         template<
@@ -389,7 +389,7 @@ namespace boost { namespace iterator_facade {
         constexpr reference operator[](difference_type i) const
             noexcept(noexcept(
                 Derived(access::derived(*this)),
-                access::advance(*this, i),
+                access::advance(std::declval<Derived &>(), i),
                 access::dereference(*this)))
         {
             Derived copy = access::derived(*this);
@@ -415,7 +415,7 @@ namespace boost { namespace iterator_facade {
             noexcept(access::advance(*this, i)))
         {
             access::advance(*this, i);
-            return *this;
+            return access::derived(*this);
         }
 
         constexpr Derived operator+(difference_type i) noexcept(noexcept(
@@ -426,12 +426,9 @@ namespace boost { namespace iterator_facade {
             return copy;
         }
         friend constexpr Derived
-        operator+(difference_type i, Derived it) noexcept(
-            noexcept(Derived(access::derived(it)), access::advance(it, i)))
+        operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
         {
-            Derived copy = access::derived(it);
-            access::advance(copy, i);
-            return copy;
+            return it + i;
         }
 
         constexpr Derived & operator--() noexcept(
@@ -452,7 +449,7 @@ namespace boost { namespace iterator_facade {
             noexcept(access::advance(*this, -i)))
         {
             access::advance(*this, -i);
-            return *this;
+            return access::derived(*this);
         }
 
         constexpr Derived operator-(difference_type i) noexcept(noexcept(
@@ -463,39 +460,39 @@ namespace boost { namespace iterator_facade {
             return copy;
         }
 
-        friend constexpr Derived
+        friend constexpr difference_type
         operator-(Derived it1, Derived it2) noexcept(noexcept(it1.comp(it2)))
         {
             return it1.comp(it2);
         }
 
         friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
-            noexcept((lhs.comp(rhs) == difference_type(0))))
+            noexcept(lhs.comp(rhs) == difference_type(0)))
         {
             return lhs.comp(rhs) == difference_type(0);
         }
         friend constexpr auto operator!=(Derived lhs, Derived rhs) noexcept(
-            noexcept((lhs.comp(rhs) != difference_type(0))))
+            noexcept(lhs.comp(rhs) != difference_type(0)))
         {
             return lhs.comp(rhs) != difference_type(0);
         }
         friend constexpr auto operator<(Derived lhs, Derived rhs) noexcept(
-            noexcept((lhs.comp(rhs) < difference_type(0))))
+            noexcept(lhs.comp(rhs) < difference_type(0)))
         {
             return lhs.comp(rhs) < difference_type(0);
         }
         friend constexpr auto operator<=(Derived lhs, Derived rhs) noexcept(
-            noexcept((lhs.comp(rhs) <= difference_type(0))))
+            noexcept(lhs.comp(rhs) <= difference_type(0)))
         {
             return lhs.comp(rhs) <= difference_type(0);
         }
         friend constexpr auto operator>(Derived lhs, Derived rhs) noexcept(
-            noexcept((lhs.comp(rhs) > difference_type(0))))
+            noexcept(lhs.comp(rhs) > difference_type(0)))
         {
             return lhs.comp(rhs) > difference_type(0);
         }
         friend constexpr auto operator>=(Derived lhs, Derived rhs) noexcept(
-            noexcept((lhs.comp(rhs) >= difference_type(0))))
+            noexcept(lhs.comp(rhs) >= difference_type(0)))
         {
             return lhs.comp(rhs) >= difference_type(0);
         }
@@ -503,7 +500,7 @@ namespace boost { namespace iterator_facade {
     private:
         friend boost::iterator_facade::access;
 
-        constexpr difference_type comp(iterator_facade it2) const
+        constexpr auto comp(Derived it2) const
             noexcept(noexcept(access::compare(*this, it2)))
         {
             return access::compare(*this, it2);
