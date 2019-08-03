@@ -25,7 +25,7 @@ namespace boost { namespace iterator_facade {
             typename Reference,
             typename Pointer,
             typename DifferenceType>
-        constexpr static auto
+        constexpr static decltype(auto)
         dereference(iterator_facade<
                     Derived,
                     IteratorCategory,
@@ -72,7 +72,7 @@ namespace boost { namespace iterator_facade {
             typename Reference,
             typename Pointer,
             typename DifferenceType>
-        constexpr static auto
+        constexpr static void
         next(iterator_facade<
              Derived,
              IteratorCategory,
@@ -91,7 +91,7 @@ namespace boost { namespace iterator_facade {
             typename Reference,
             typename Pointer,
             typename DifferenceType>
-        constexpr static auto
+        constexpr static void
         prev(iterator_facade<
              Derived,
              IteratorCategory,
@@ -110,7 +110,7 @@ namespace boost { namespace iterator_facade {
             typename Reference,
             typename Pointer,
             typename DifferenceType>
-        constexpr static auto advance(
+        constexpr static void advance(
             iterator_facade<
                 Derived,
                 IteratorCategory,

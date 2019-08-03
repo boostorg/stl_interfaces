@@ -44,3 +44,4 @@ macro(add_test_executable name)
 endmacro()
 
 add_test_executable(input)
+add_test_executable(forward)

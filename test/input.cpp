@@ -7,9 +7,11 @@
 #include <type_traits>
 
 
-struct basic_proxy_input_iter
-    : boost::iterator_facade::
-          iterator_facade<basic_proxy_input_iter, std::input_iterator_tag, int>
+struct basic_proxy_input_iter : boost::iterator_facade::iterator_facade<
+                                    basic_proxy_input_iter,
+                                    std::input_iterator_tag,
+                                    int,
+                                    int>
 {
     basic_proxy_input_iter(int * it) : it_(it) {}
 
@@ -26,6 +28,7 @@ template<typename ValueType>
 struct proxy_input_iter : boost::iterator_facade::iterator_facade<
                               proxy_input_iter<ValueType>,
                               std::input_iterator_tag,
+                              ValueType,
                               ValueType>
 {
     proxy_input_iter(ValueType * it) : it_(it) {}
@@ -55,6 +58,9 @@ using const_proxy_input = proxy_input_iter<int const>;
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
 
+// TODO: Call std::ranges::copy below too.
+
+
 TEST(input, basic_proxy_std_copy)
 {
     basic_proxy_input_iter first(ints.data());
@@ -65,8 +71,6 @@ TEST(input, basic_proxy_std_copy)
         std::copy(first, last, ints_copy.begin());
         EXPECT_EQ(ints_copy, ints);
     }
-
-    // TODO
 }
 
 
@@ -89,8 +93,6 @@ TEST(input, proxy_std_copy)
         std::copy(first, last, ints_copy.begin());
         EXPECT_EQ(ints_copy, ints);
     }
-
-    // TODO
 }
 
 TEST(input, const_proxy_std_copy)
@@ -103,6 +105,4 @@ TEST(input, const_proxy_std_copy)
         std::copy(first, last, ints_copy.begin());
         EXPECT_EQ(ints_copy, ints);
     }
-
-    // TODO
 }
