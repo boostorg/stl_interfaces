@@ -45,3 +45,4 @@ endmacro()
 
 add_test_executable(input)
 add_test_executable(forward)
+add_test_executable(bidirectional)

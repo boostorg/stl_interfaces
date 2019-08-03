@@ -232,7 +232,6 @@ namespace boost { namespace iterator_facade {
             return retval;
         }
 
-        // TODO: noexcept throughout.
         friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
             noexcept(access::equals(lhs, rhs)))
         {
@@ -244,6 +243,8 @@ namespace boost { namespace iterator_facade {
             return !(lhs == rhs);
         }
     };
+
+    // TODO: output iterator
 
     template<
         typename Derived,
