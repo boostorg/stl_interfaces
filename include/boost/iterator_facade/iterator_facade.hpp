@@ -232,15 +232,14 @@ namespace boost { namespace iterator_facade {
             return retval;
         }
 
-        // TODO: iterator_facade -> Derived throughout.
         // TODO: noexcept throughout.
-        friend constexpr auto
-        operator==(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
+            noexcept(access::equals(lhs, rhs)))
         {
             return access::equals(lhs, rhs);
         }
         friend constexpr auto
-        operator!=(iterator_facade const & lhs, iterator_facade const & rhs)
+        operator!=(Derived lhs, Derived rhs) noexcept(noexcept(lhs == rhs))
         {
             return !(lhs == rhs);
         }
@@ -285,13 +284,13 @@ namespace boost { namespace iterator_facade {
             return retval;
         }
 
-        friend constexpr auto
-        operator==(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
+            noexcept(access::equals(lhs, rhs)))
         {
             return access::equals(lhs, rhs);
         }
         friend constexpr auto
-        operator!=(iterator_facade const & lhs, iterator_facade const & rhs)
+        operator!=(Derived lhs, Derived rhs) noexcept(noexcept(lhs == rhs))
         {
             return !(lhs == rhs);
         }
@@ -349,19 +348,18 @@ namespace boost { namespace iterator_facade {
             return retval;
         }
 
-        friend constexpr auto
-        operator==(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
+            noexcept(access::equals(lhs, rhs)))
         {
             return access::equals(lhs, rhs);
         }
         friend constexpr auto
-        operator!=(iterator_facade const & lhs, iterator_facade const & rhs)
+        operator!=(Derived lhs, Derived rhs) noexcept(noexcept(lhs == rhs))
         {
             return !(lhs == rhs);
         }
     };
 
-    // TODO
     template<
         typename Derived,
         typename ValueType,
@@ -427,7 +425,7 @@ namespace boost { namespace iterator_facade {
             return copy;
         }
         friend constexpr Derived
-        operator+(difference_type i, iterator_facade const & it) noexcept(
+        operator+(difference_type i, Derived it) noexcept(
             noexcept(Derived(access::derived(it)), access::advance(it, i)))
         {
             Derived copy = access::derived(it);
@@ -464,46 +462,46 @@ namespace boost { namespace iterator_facade {
             return copy;
         }
 
-        friend constexpr Derived operator-(
-            iterator_facade const & it1,
-            iterator_facade const & it2) noexcept(noexcept(it1.comp(it2)))
+        friend constexpr Derived
+        operator-(Derived it1, Derived it2) noexcept(noexcept(it1.comp(it2)))
         {
             return it1.comp(it2);
         }
 
-        friend constexpr auto
-        operator==(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
+            noexcept((lhs.comp(rhs) == difference_type(0))))
         {
             return lhs.comp(rhs) == difference_type(0);
         }
-        friend constexpr auto
-        operator!=(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator!=(Derived lhs, Derived rhs) noexcept(
+            noexcept((lhs.comp(rhs) != difference_type(0))))
         {
             return lhs.comp(rhs) != difference_type(0);
         }
-        friend constexpr auto
-        operator<(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator<(Derived lhs, Derived rhs) noexcept(
+            noexcept((lhs.comp(rhs) < difference_type(0))))
         {
             return lhs.comp(rhs) < difference_type(0);
         }
-        friend constexpr auto
-        operator<=(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator<=(Derived lhs, Derived rhs) noexcept(
+            noexcept((lhs.comp(rhs) <= difference_type(0))))
         {
             return lhs.comp(rhs) <= difference_type(0);
         }
-        friend constexpr auto
-        operator>(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator>(Derived lhs, Derived rhs) noexcept(
+            noexcept((lhs.comp(rhs) > difference_type(0))))
         {
             return lhs.comp(rhs) > difference_type(0);
         }
-        friend constexpr auto
-        operator>=(iterator_facade const & lhs, iterator_facade const & rhs)
+        friend constexpr auto operator>=(Derived lhs, Derived rhs) noexcept(
+            noexcept((lhs.comp(rhs) >= difference_type(0))))
         {
             return lhs.comp(rhs) >= difference_type(0);
         }
 
     private:
         friend boost::iterator_facade::access;
+
         constexpr difference_type comp(iterator_facade it2) const
             noexcept(noexcept(access::compare(*this, it2)))
         {
