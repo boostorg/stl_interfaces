@@ -1,0 +1,8 @@
+{
+    "key": "iterator_facade",
+    "name": "iterator_facade",
+    "authors": [ "T. Zachary Laine" ],
+    "maintainers": [ "Zach Laine <whatwasthataddress -at- gmail.com>" ],
+    "description": "A C++14 and later CRTP template for defining iterators.",
+    "category": [ "Generic" ]
+}
