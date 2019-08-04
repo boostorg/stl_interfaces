@@ -35,7 +35,7 @@ struct back_insert_iter : boost::iterator_facade::iterator_facade<
                               typename Container::value_type,
                               back_insert_iter<Container> &>
 {
-    back_insert_iter(Container & c) : c_(std::addressof(c)) { assert(c_); }
+    back_insert_iter(Container & c) : c_(std::addressof(c)) {}
 
     back_insert_iter & operator=(typename Container::value_type const & v)
     {
