@@ -8,6 +8,8 @@
 
 namespace boost { namespace iterator_facade {
 
+    /** A CRTP template that one may derive from to make defining iterators
+        easier. */
     template<
         typename Derived,
         typename IteratorCategory,
@@ -17,6 +19,8 @@ namespace boost { namespace iterator_facade {
         typename DifferenceType = std::ptrdiff_t>
     struct iterator_facade;
 
+    /** A type for granting access to the private members of an iterator
+        derived from iterator_facade. */
     struct access
     {
         template<
@@ -211,6 +215,7 @@ namespace boost { namespace iterator_facade {
     };
 
     namespace detail {
+        // The return type of operator->() in proxy iterators.
         template<typename T>
         struct arrow
         {
@@ -641,6 +646,8 @@ namespace boost { namespace iterator_facade {
         }
     };
 
+    /** A template alias useful for defining proxy iterators.  \see
+        iterator_facade. */
     template<
         typename Derived,
         typename IteratorCategory,
