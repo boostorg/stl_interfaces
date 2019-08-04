@@ -214,8 +214,11 @@ namespace boost { namespace iterator_facade {
         template<typename T>
         struct arrow
         {
-            arrow(T const & value) : value_(value) {}
-            arrow(T && value) : value_(std::move(value)) {}
+            arrow(T const & value) noexcept(noexcept(T(value))) : value_(value)
+            {}
+            arrow(T && value) noexcept(noexcept(T(std::move(value)))) :
+                value_(std::move(value))
+            {}
 
             T const * operator->() const noexcept { return &value_; }
             T * operator->() noexcept { return &value_; }
@@ -389,6 +392,11 @@ namespace boost { namespace iterator_facade {
         {
             return access::dereference(*this);
         }
+        constexpr pointer operator->() const noexcept(
+            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        {
+            return detail::make_pointer<pointer>(access::dereference(*this));
+        }
 
         constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
         {
@@ -439,6 +447,11 @@ namespace boost { namespace iterator_facade {
             noexcept(noexcept(access::dereference(*this)))
         {
             return access::dereference(*this);
+        }
+        constexpr pointer operator->() const noexcept(
+            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        {
+            return detail::make_pointer<pointer>(access::dereference(*this));
         }
 
         constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
@@ -503,6 +516,11 @@ namespace boost { namespace iterator_facade {
             noexcept(noexcept(access::dereference(*this)))
         {
             return access::dereference(*this);
+        }
+        constexpr pointer operator->() const noexcept(
+            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        {
+            return detail::make_pointer<pointer>(access::dereference(*this));
         }
         constexpr reference operator[](difference_type i) const
             noexcept(noexcept(
@@ -623,7 +641,6 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-    // TODO: Needs testing.
     template<
         typename Derived,
         typename IteratorCategory,
