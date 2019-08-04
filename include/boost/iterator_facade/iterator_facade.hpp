@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <iterator>
+#include <type_traits>
 
 
 namespace boost { namespace iterator_facade {
@@ -209,7 +210,43 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-    // TODO: In which category do we introduce operator->?
+    namespace detail {
+        template<typename T>
+        struct arrow
+        {
+            arrow(T const & value) : value_(value) {}
+            arrow(T && value) : value_(std::move(value)) {}
+
+            T const * operator->() const noexcept { return &value_; }
+            T * operator->() noexcept { return &value_; }
+
+        private:
+            T value_;
+        };
+
+        template<typename Pointer, typename T>
+        struct ptr_and_ref : std::is_same<
+                                 std::add_pointer_t<std::remove_reference_t<T>>,
+                                 Pointer>
+        {
+        };
+
+        template<typename Pointer, typename T>
+        auto make_pointer(
+            T && value,
+            std::enable_if_t<ptr_and_ref<Pointer, T>::value, int> = 0)
+        {
+            return std::addressof(value);
+        }
+
+        template<typename Pointer, typename T>
+        auto make_pointer(
+            T && value,
+            std::enable_if_t<!ptr_and_ref<Pointer, T>::value, int> = 0)
+        {
+            return Pointer((T &&) value);
+        }
+    }
 
     template<
         typename Derived,
@@ -232,13 +269,18 @@ namespace boost { namespace iterator_facade {
         using iterator_category = std::input_iterator_tag;
         using value_type = ValueType;
         using reference = Reference;
-        using pointer = void;
+        using pointer = Pointer;
         using difference_type = DifferenceType;
 
         constexpr reference operator*() const
             noexcept(noexcept(access::dereference(*this)))
         {
             return access::dereference(*this);
+        }
+        constexpr pointer operator->() const noexcept(
+            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        {
+            return detail::make_pointer<pointer>(access::dereference(*this));
         }
 
         constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
@@ -574,14 +616,27 @@ namespace boost { namespace iterator_facade {
         }
 
     private:
-        friend boost::iterator_facade::access;
-
         constexpr auto comp(Derived it2) const
             noexcept(noexcept(access::compare(*this, it2)))
         {
             return access::compare(*this, it2);
         }
     };
+
+    // TODO: Needs testing.
+    template<
+        typename Derived,
+        typename IteratorCategory,
+        typename ValueType,
+        typename Reference = ValueType,
+        typename DifferenceType = std::ptrdiff_t>
+    using proxy_iterator_facade = iterator_facade<
+        Derived,
+        IteratorCategory,
+        ValueType,
+        Reference,
+        detail::arrow<Reference>,
+        DifferenceType>;
 
 }}
 
