@@ -44,6 +44,7 @@ macro(add_test_executable name)
 endmacro()
 
 add_test_executable(input)
+add_test_executable(output)
 add_test_executable(forward)
 add_test_executable(bidirectional)
 add_test_executable(random_access)

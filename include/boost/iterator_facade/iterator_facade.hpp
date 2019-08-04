@@ -38,6 +38,28 @@ namespace boost { namespace iterator_facade {
             return derived(it).dereference();
         }
 
+        // This overload takes a non-const facade parameter, to support output
+        // iterators like std::back_insert_iterator.
+        template<
+            typename Derived,
+            typename IteratorCategory,
+            typename ValueType,
+            typename Reference,
+            typename Pointer,
+            typename DifferenceType>
+        constexpr static decltype(auto)
+        dereference(iterator_facade<
+                    Derived,
+                    IteratorCategory,
+                    ValueType,
+                    Reference,
+                    Pointer,
+                    DifferenceType> & it) noexcept(noexcept(derived(it)
+                                                                .dereference()))
+        {
+            return derived(it).dereference();
+        }
+
         template<
             typename Derived,
             typename IteratorCategory,
@@ -213,7 +235,7 @@ namespace boost { namespace iterator_facade {
         using pointer = void;
         using difference_type = DifferenceType;
 
-        constexpr value_type operator*() const
+        constexpr reference operator*() const
             noexcept(noexcept(access::dereference(*this)))
         {
             return access::dereference(*this);
@@ -244,7 +266,61 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-    // TODO: output iterator
+    // TODO: Compile-fail tests and associated static_asserts in these
+    // specializations to help catch common errors.
+
+    // TODO: Examples that implement certain common iterator patterns, like
+    // back_inserter.
+
+    // TODO: Tests that cover iterator_traits for uses of these facades.
+
+    template<
+        typename Derived,
+        typename ValueType,
+        typename Reference,
+        typename Pointer,
+        typename DifferenceType>
+    struct iterator_facade<
+        Derived,
+        std::output_iterator_tag,
+        ValueType,
+        Reference,
+        Pointer,
+        DifferenceType>
+    {
+        using iterator_category = std::output_iterator_tag;
+        using value_type = ValueType;
+        using reference = Reference;
+        using pointer = void;
+        using difference_type = DifferenceType;
+
+        constexpr reference operator*() const
+            noexcept(noexcept(access::dereference(*this)))
+        {
+            return access::dereference(*this);
+        }
+
+        // This non-const overload exists to support output iterators like
+        // std::back_insert_iterator.
+        constexpr reference
+        operator*() noexcept(noexcept(access::dereference(*this)))
+        {
+            return access::dereference(*this);
+        }
+
+        constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
+        {
+            access::next(*this);
+            return access::derived(*this);
+        }
+        constexpr Derived operator++(int)noexcept(
+            noexcept(Derived(access::derived(*this)), access::next(*this)))
+        {
+            Derived retval = access::derived(*this);
+            access::next(*this);
+            return retval;
+        }
+    };
 
     template<
         typename Derived,
