@@ -6,7 +6,7 @@
 [library Boost.IteratorFacade (Proposed)
     [quickbook 1.3]
     [authors [Laine, Zach]]
-    [copyright 2018 T. Zachary Laine]
+    [copyright 2019 T. Zachary Laine]
     [category template]
     [id iterator_facade]
     [dirname iterator_facade]
@@ -24,7 +24,7 @@
 
 [/ Imports ]
 
-[/ TODO (examples, etc.) ]
+[import ../example/repeated_chars_iterator.cpp]
 
 [/ Images ]
 
@@ -36,11 +36,17 @@
 
 [/ Links ]
 
-[def _IteratorFacade_      Boost.IteratorFacade]
+[def _Facade_              Boost.IteratorFacade]
+[def _iter_facade_         [classref boost::iterator_facade::iterator_facade `iterator_facade`]]
+
+[def _CRTP_                [@https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern CRTP]]
+[def _Iterator_            [@https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html Boost.Iterator]]
 
 [def _emdash_              \u2014]
 
 [include intro.qbk]
+[/ include tutorial.qbk]
+[/ include examples.qbk]
 
 [xinclude iterator_facade_reference.xml]
 

@@ -1,0 +1,247 @@
+[section Tutorial]
+
+[heading The _iter_facade_ Template]
+
+Though a given iterator may have a large number of operations associated with
+it, there are only a few basis operations that the iterator needs to define;
+the full set of operations it supports can be defined in terms of that much
+smaller basis.
+
+It is possible to define any iterator `Iter` in terms of a subset of
+user-supplied member functions.  By deriving `Iter` from _iter_facade_ using
+_CRTP_, we can generate the full set of operations.  Here is the declaration
+of _iter_facade_:
+
+[iterator_facade_decl]
+
+Let's break that down.
+
+`Derived` is the type that you're deriving _iter_facade_ from.
+
+`IteratorConcept` defines the iterator category/concept.  This must be one of
+the C++ standard iterator tag types, like `std::forward_iterator_tag`.  In
+C++20 and later, `std::contiguous_iterator_tag` is a valid tag to use.
+
+`ValueType` is used to define the iterator's `value_type` typedef.  Likewise,
+`Reference` and `Pointer` are used to define the iterator's `reference` and
+`pointer` typedefs, respectively.
+
+[tip `Reference` does not need to be a reference type, and `Pointer` does not
+need to be a pointer type.  This fact is very useful when making proxy
+iterators. ]
+
+`DifferenceType` is used to define the iterator's `difference_type`.  Don't be
+a weirdo; just leave this as the default type, `std::ptrdiff_t`.
+
+When defining a proxy iterator, you can use a template alias that provides
+reasonable defaults for _iter_facade_'s parameters:
+
+[proxy_iterator_alias_decl]
+
+
+[heading User-Defined Iterator Operations]
+
+Now, let's get back to the user-defined basis members.
+
+In the table below, `Iter` is a user-defined type derived from _iter_facade_;
+`i` and `i2` are objects of type `Iter`; `ci` is an object of type `Iter
+const`; `reference` is the type passed as the `Reference` template parameter
+to _iter_facade_; `pointer` is the type passed as the `Pointer` template
+parameter to _iter_facade_; and `n` is a value of type `difference_type`.
+
+[table User-Supplied Operations
+    [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
+    [
+        [ `ci.dereference()` ]
+        [ Convertible to `reference`. ]
+        [ Dereferences `ci` and returns the result. ]
+        [ ['Expects:] ci is dereferenceable. ]
+    ]
+    [
+        [ `ci.equals(i2)` ]
+        [ Contextually convertible to `bool`. ]
+        [ Returns true if and only if `ci` and `i2` refer to the same value. ]
+        [ ['Expects:] `(ci, i2)` is in the domain of `==`. ]
+    ]
+    [
+        [ `ci.compare(i2)` ]
+        [ Convertible to `difference_type`. ]
+        [ Returns `n`. ]
+        [ ['Expects:] there exists a value `n` of type `difference_type` such that `a + n == b`.
+        `b == a + (b - a)`. ]
+    ]
+    [
+        [ `i.next()` ]
+        [ `void` ]
+        [ Increments `i`. ]
+        [ ]
+    ]
+    [
+        [ `i.prev()` ]
+        [ `void` ]
+        [ Decrements `i`. ]
+        [ ]
+    ]
+    [
+        [ `i.advance(n)` ]
+        [ `void` ]
+        [
+``difference_type m = n;
+  if (m >= 0)
+    while (m--) ++i;
+  else
+    while (m++) --i;`` ]
+        [ ]
+    ]
+]
+
+[tip The table above leaves a lot of implementation freedom.  In `advance()`,
+you could take `n` as a value or as a reference; `compare()` can return a
+`difference_type` or just something convertible to one; etc.  In particular,
+your operations can be `constexpr` or `noexcept` as you see fit.]
+
+Not all the iterator concepts require all teh operations above.  Here are the
+operations used with each iterator cocept:
+
+[table Operations Required for Each Concept
+    [[Concept]   [Operations]]
+    [
+        [ `input_iterator` ]
+        [
+``dereference()
+equals()
+next()`` ]
+    ]
+    [
+        [ `output_iterator` ]
+        [
+``dereference()
+next()`` ]
+    ]
+    [
+        [ `forward_iterator` ]
+        [
+``dereference()
+equals()
+next()`` ]
+    ]
+    [
+        [ `bidirectional_iterator` ]
+        [
+``dereference()
+equals()
+next()
+prev()`` ]
+    ]
+    [
+        [ `random_access_iterator`/`continguous_iterator` ]
+        [
+``dereference()
+compare()
+advance()`` ]
+    ]
+]
+
+[heading Putting it All Together]
+
+Ok, let's actually define a simple iterator.  Let's say you need to interact
+with some legacy code that has a hand-written linked list:
+
+TODO: Make a real example out of this.
+
+    template<typename T>
+    struct node
+    {
+        T value_;
+        node * next_; // == nullptr in the tail node
+    };
+
+We can't change this code to use `std::list`, but it would be nice to be able
+to reuse all of the standard algorithms with this type.  Defining an iterator
+will get us there:
+
+    template<typename T>
+    struct node_iterator
+        : boost::iterator_facade::
+              iterator_facade<node_iterator<T>, std::forward_iterator_tag, T>
+    {
+        constexpr node_iterator() noexcept : it_(nullptr) {}
+        constexpr node_iterator(node<T> * it) noexcept : it_(it) {}
+
+    private:
+        friend boost::iterator_facade::access;
+        constexpr T & dereference() const noexcept { return *it_; }
+        constexpr void next() noexcept { it_ = it_->next_; }
+        constexpr bools equals(node_iterator other) noexcept
+        {
+            return it_ == other.it_;
+        }
+
+        node<T> * it_;
+    };
+
+Let's break that down.
+
+[node_iterator_class_head]
+
+We are deriving `node_iterator` from _iter_facade_, and because we're using
+_CRTP_, we first have to pass `node_iterator` for the `Derived` template
+parameter, so that _iter_facade_ knows what derived type to cast to in order
+to get at the user-defined operations.  Then, we pass
+`std::forward_iterator_tag` for `IteratorConcept`, since that's appropriate
+for a forward linked list.  Finally, we pass `T` to let _iter_facade_ know
+what the `value_type` is for our iterator.
+
+We leave the rest of the template parameters at their defaults: `T &` for
+`Reference`, `T *` for `Pointer`, and `std::ptrdiff_t` for `DifferenceType`.
+This is what you will do for almost all iterators.  The most common exceptions
+to this are usually some kind of proxy iterator.  Another exception is when
+for better code generation you want to return small builtin values instead of
+references for constant iterators.  To see an example of the latter, see the
+`repeated_chars_iterator` in the introduction.
+
+[node_iterator_ctors]
+
+Next, we define two constructors -- a default constructor, and one that takes
+a `node` pointer.  A default constructor is required by the `forward_iterator`
+concept, but _iter_facade_ cannot supply this, since constructors are not
+visible in derived types without user intervention.
+
+[node_iterator_private]
+
+Next, we define the user-defined operations that _iter_facade_ requires to do
+its work.  As you might expect, the three required operations are very
+straightfoward.
+
+[note Above I've made all of those private, and `friend`ed
+`boost::iterator_facade::access`.  This is recommended, but it is not strictly
+necessary.  If you makw all of the user-defined operations public, there's no
+need to `friend` `boost::iterator_facade::access`.]
+
+TODO: C++98 algorithm usage exmaple.
+
+We can also define an end-sentinel for `node_iterator` that will automatically
+get picked up by the _iter_facade_ machinery.  This makes _iter_facade_-based
+iterators compatible with the iterator-sentinel pairs used in `std::ranges`.
+
+    // TODO: This needs support in the iterator_facade code.
+    struct end_node_sentinel
+    {
+        template<typename T>
+        friend bool operator==(node<T> * n, end_node_sentinel)
+        {
+            return n == nullptr;
+        }
+        template<typename T>
+        friend bool operator!=(node<T> * n, end_node_sentinel)
+        {
+            return !(n == end_node_sentinel);
+        }
+    };
+
+TODO: C++20 algorithm usage example.
+
+
+TODO: static_assert(Concept<Iter>)
+
+[endsect]

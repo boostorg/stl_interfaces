@@ -80,6 +80,5 @@ endif ()
 #endif ()
 
 add_subdirectory(test)
-#add_subdirectory(perf)
-#add_subdirectory(example)
+add_subdirectory(example)
 #add_subdirectory(doc)

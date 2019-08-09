@@ -17,7 +17,7 @@ namespace boost { namespace iterator_facade {
         easier. */
     template<
         typename Derived,
-        typename IteratorCategory,
+        typename IteratorConcept,
         typename ValueType,
         typename Reference = ValueType &,
         typename Pointer = ValueType *,
@@ -30,14 +30,14 @@ namespace boost { namespace iterator_facade {
     {
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
             typename DifferenceType>
         constexpr static Derived & derived(iterator_facade<
                                            Derived,
-                                           IteratorCategory,
+                                           IteratorConcept,
                                            ValueType,
                                            Reference,
                                            Pointer,
@@ -47,7 +47,7 @@ namespace boost { namespace iterator_facade {
         }
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -55,7 +55,7 @@ namespace boost { namespace iterator_facade {
         constexpr static Derived const &
         derived(iterator_facade<
                 Derived,
-                IteratorCategory,
+                IteratorConcept,
                 ValueType,
                 Reference,
                 Pointer,
@@ -67,7 +67,7 @@ namespace boost { namespace iterator_facade {
 
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -75,7 +75,7 @@ namespace boost { namespace iterator_facade {
         constexpr static decltype(auto)
         dereference(iterator_facade<
                     Derived,
-                    IteratorCategory,
+                    IteratorConcept,
                     ValueType,
                     Reference,
                     Pointer,
@@ -89,7 +89,7 @@ namespace boost { namespace iterator_facade {
         // iterators like std::back_insert_iterator.
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -97,7 +97,7 @@ namespace boost { namespace iterator_facade {
         constexpr static decltype(auto)
         dereference(iterator_facade<
                     Derived,
-                    IteratorCategory,
+                    IteratorConcept,
                     ValueType,
                     Reference,
                     Pointer,
@@ -109,7 +109,7 @@ namespace boost { namespace iterator_facade {
 
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -117,14 +117,14 @@ namespace boost { namespace iterator_facade {
         constexpr static auto equals(
             iterator_facade<
                 Derived,
-                IteratorCategory,
+                IteratorConcept,
                 ValueType,
                 Reference,
                 Pointer,
                 DifferenceType> const & lhs,
             iterator_facade<
                 Derived,
-                IteratorCategory,
+                IteratorConcept,
                 ValueType,
                 Reference,
                 Pointer,
@@ -136,7 +136,7 @@ namespace boost { namespace iterator_facade {
 
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -144,14 +144,14 @@ namespace boost { namespace iterator_facade {
         constexpr static auto compare(
             iterator_facade<
                 Derived,
-                IteratorCategory,
+                IteratorConcept,
                 ValueType,
                 Reference,
                 Pointer,
                 DifferenceType> const & lhs,
             iterator_facade<
                 Derived,
-                IteratorCategory,
+                IteratorConcept,
                 ValueType,
                 Reference,
                 Pointer,
@@ -163,7 +163,7 @@ namespace boost { namespace iterator_facade {
 
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -171,7 +171,7 @@ namespace boost { namespace iterator_facade {
         constexpr static void
         next(iterator_facade<
              Derived,
-             IteratorCategory,
+             IteratorConcept,
              ValueType,
              Reference,
              Pointer,
@@ -182,7 +182,7 @@ namespace boost { namespace iterator_facade {
 
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -190,7 +190,7 @@ namespace boost { namespace iterator_facade {
         constexpr static void
         prev(iterator_facade<
              Derived,
-             IteratorCategory,
+             IteratorConcept,
              ValueType,
              Reference,
              Pointer,
@@ -201,7 +201,7 @@ namespace boost { namespace iterator_facade {
 
         template<
             typename Derived,
-            typename IteratorCategory,
+            typename IteratorConcept,
             typename ValueType,
             typename Reference,
             typename Pointer,
@@ -209,7 +209,7 @@ namespace boost { namespace iterator_facade {
         constexpr static void advance(
             iterator_facade<
                 Derived,
-                IteratorCategory,
+                IteratorConcept,
                 ValueType,
                 Reference,
                 Pointer,
@@ -220,24 +220,31 @@ namespace boost { namespace iterator_facade {
         }
     };
 
+    /** The return type of operator->() in a proxy iterator.
+
+        This template is used as the default Pointer template parameter in the
+        proxy_iterator_facade template alias.  Note that the use of this
+        template implies a copy or move of the underlying object of type T. */
+    template<typename T>
+    struct proxy_arrow_result
+    {
+        constexpr proxy_arrow_result(T const & value) noexcept(
+            noexcept(T(value))) :
+            value_(value)
+        {}
+        constexpr proxy_arrow_result(T && value) noexcept(
+            noexcept(T(std::move(value)))) :
+            value_(std::move(value))
+        {}
+
+        constexpr T const * operator->() const noexcept { return &value_; }
+        constexpr T * operator->() noexcept { return &value_; }
+
+    private:
+        T value_;
+    };
+
     namespace detail {
-        // The return type of operator->() in proxy iterators.
-        template<typename T>
-        struct arrow
-        {
-            arrow(T const & value) noexcept(noexcept(T(value))) : value_(value)
-            {}
-            arrow(T && value) noexcept(noexcept(T(std::move(value)))) :
-                value_(std::move(value))
-            {}
-
-            T const * operator->() const noexcept { return &value_; }
-            T * operator->() noexcept { return &value_; }
-
-        private:
-            T value_;
-        };
-
         template<typename Pointer, typename T>
         struct ptr_and_ref : std::is_same<
                                  std::add_pointer_t<std::remove_reference_t<T>>,
@@ -262,6 +269,7 @@ namespace boost { namespace iterator_facade {
         }
     }
 
+    /** A specialization of iterator_facade specific to input iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -330,6 +338,7 @@ namespace boost { namespace iterator_facade {
 
     // TODO: Tests that cover iterator_traits for uses of these facades.
 
+    /** A specialization of iterator_facade specific to output iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -381,6 +390,7 @@ namespace boost { namespace iterator_facade {
         }
     };
 
+    /** A specialization of iterator_facade specific to forward iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -441,6 +451,8 @@ namespace boost { namespace iterator_facade {
         }
     };
 
+    /** A specialization of iterator_facade specific to bidirectional
+        iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -516,6 +528,8 @@ namespace boost { namespace iterator_facade {
         }
     };
 
+    /** A specialization of iterator_facade specific to random access
+        iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -673,6 +687,8 @@ namespace boost { namespace iterator_facade {
 
 #if 201703L < __cplusplus
 
+    /** A specialization of iterator_facade specific to contiguous
+        iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -834,16 +850,16 @@ namespace boost { namespace iterator_facade {
         iterator_facade. */
     template<
         typename Derived,
-        typename IteratorCategory,
+        typename IteratorConcept,
         typename ValueType,
         typename Reference = ValueType,
         typename DifferenceType = std::ptrdiff_t>
     using proxy_iterator_facade = iterator_facade<
         Derived,
-        IteratorCategory,
+        IteratorConcept,
         ValueType,
         Reference,
-        detail::arrow<Reference>,
+        proxy_arrow_result<Reference>,
         DifferenceType>;
 
 }}
