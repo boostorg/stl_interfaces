@@ -4,7 +4,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 ################################################## 
 # C++ standard version selection
 ################################################## 
-set(CXX_STD 17 CACHE STRING "Set to X to enable C++X builds.")
+set(CXX_STD 14 CACHE INT "Set to X to enable C++X builds.")
 message("-- Using -std=c++${CXX_STD}")
 
 
