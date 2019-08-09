@@ -66,17 +66,17 @@ using const_random_access = random_access_iter<int const>;
 struct zip_iter : boost::iterator_facade::proxy_iterator_facade<
                       zip_iter,
                       std::random_access_iterator_tag,
-                      std::pair<int, int>,
-                      std::pair<int &, int &>>
+                      std::tuple<int, int>,
+                      std::tuple<int &, int &>>
 {
     zip_iter() : it1_(nullptr), it2_(nullptr) {}
     zip_iter(int * it1, int * it2) : it1_(it1), it2_(it2) {}
 
 private:
     friend boost::iterator_facade::access;
-    std::pair<int &, int &> dereference() const
+    std::tuple<int &, int &> dereference() const
     {
-        return std::pair<int &, int &>{*it1_, *it2_};
+        return std::tuple<int &, int &>{*it1_, *it2_};
     }
     void advance(std::ptrdiff_t i)
     {
@@ -112,17 +112,17 @@ struct int_t
 struct udt_zip_iter : boost::iterator_facade::proxy_iterator_facade<
                           udt_zip_iter,
                           std::random_access_iterator_tag,
-                          std::pair<int_t, int>,
-                          std::pair<int_t &, int &>>
+                          std::tuple<int_t, int>,
+                          std::tuple<int_t &, int &>>
 {
     udt_zip_iter() : it1_(nullptr), it2_(nullptr) {}
     udt_zip_iter(int_t * it1, int * it2) : it1_(it1), it2_(it2) {}
 
 private:
     friend boost::iterator_facade::access;
-    std::pair<int_t &, int &> dereference() const
+    std::tuple<int_t &, int &> dereference() const
     {
-        return std::pair<int_t &, int &>{*it1_, *it2_};
+        return std::tuple<int_t &, int &>{*it1_, *it2_};
     }
     void advance(std::ptrdiff_t i)
     {
@@ -142,26 +142,26 @@ private:
 // it needs to go in std.
 namespace std {
     // Required for std::sort to work with zip_iter.  If zip_iter::reference
-    // were not a std::pair with builtin types as its template parameters, we
+    // were not a std::tuple with builtin types as its template parameters, we
     // could have put this in another namespace.
     void swap(zip_iter::reference && lhs, zip_iter::reference && rhs)
     {
         using std::swap;
-        swap(lhs.first, rhs.first);
-        swap(lhs.second, rhs.second);
+        swap(std::get<0>(lhs), std::get<0>(rhs));
+        swap(std::get<1>(lhs), std::get<1>(rhs));
     }
 }
 
 void swap(udt_zip_iter::reference && lhs, udt_zip_iter::reference && rhs)
 {
     using std::swap;
-    swap(lhs.first, rhs.first);
-    swap(lhs.second, rhs.second);
+    swap(std::get<0>(lhs), std::get<0>(rhs));
+    swap(std::get<1>(lhs), std::get<1>(rhs));
 }
 
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 std::array<int, 10> ones = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-std::array<std::pair<int, int>, 10> pairs = {{
+std::array<std::tuple<int, int>, 10> tuples = {{
     {0, 1},
     {1, 1},
     {2, 1},
@@ -176,7 +176,7 @@ std::array<std::pair<int, int>, 10> pairs = {{
 
 std::array<int_t, 10> udts = {
     {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}}};
-std::array<std::pair<int_t, int>, 10> udt_pairs = {{
+std::array<std::tuple<int_t, int>, 10> udt_tuples = {{
     {{0}, 1},
     {{1}, 1},
     {{2}, 1},
@@ -425,7 +425,7 @@ TEST(random_access, zip)
     {
         zip_iter first(ints.data(), ones.data());
         zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
-        EXPECT_TRUE(std::equal(first, last, pairs.begin(), pairs.end()));
+        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
@@ -436,16 +436,16 @@ TEST(random_access, zip)
         zip_iter last(
             ints_copy.data() + ints_copy.size(),
             ones_copy.data() + ones_copy.size());
-        EXPECT_FALSE(std::equal(first, last, pairs.begin(), pairs.end()));
+        EXPECT_FALSE(std::equal(first, last, tuples.begin(), tuples.end()));
         std::sort(first, last);
-        EXPECT_TRUE(std::equal(first, last, pairs.begin(), pairs.end()));
+        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
         udt_zip_iter first(udts.data(), ones.data());
         udt_zip_iter last(udts.data() + udts.size(), ones.data() + ones.size());
         EXPECT_TRUE(
-            std::equal(first, last, udt_pairs.begin(), udt_pairs.end()));
+            std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
 
     {
@@ -457,9 +457,9 @@ TEST(random_access, zip)
             udts_copy.data() + udts_copy.size(),
             ones_copy.data() + ones_copy.size());
         EXPECT_FALSE(
-            std::equal(first, last, udt_pairs.begin(), udt_pairs.end()));
+            std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
         std::sort(first, last);
         EXPECT_TRUE(
-            std::equal(first, last, udt_pairs.begin(), udt_pairs.end()));
+            std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
 }

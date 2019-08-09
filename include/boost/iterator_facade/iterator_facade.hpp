@@ -35,6 +35,43 @@ namespace boost { namespace iterator_facade {
             typename Reference,
             typename Pointer,
             typename DifferenceType>
+        constexpr static Derived & derived(iterator_facade<
+                                           Derived,
+                                           IteratorCategory,
+                                           ValueType,
+                                           Reference,
+                                           Pointer,
+                                           DifferenceType> & if_) noexcept
+        {
+            return static_cast<Derived &>(if_);
+        }
+        template<
+            typename Derived,
+            typename IteratorCategory,
+            typename ValueType,
+            typename Reference,
+            typename Pointer,
+            typename DifferenceType>
+        constexpr static Derived const &
+        derived(iterator_facade<
+                Derived,
+                IteratorCategory,
+                ValueType,
+                Reference,
+                Pointer,
+                DifferenceType> const & if_) noexcept
+        {
+            return static_cast<Derived const &>(if_);
+        }
+
+
+        template<
+            typename Derived,
+            typename IteratorCategory,
+            typename ValueType,
+            typename Reference,
+            typename Pointer,
+            typename DifferenceType>
         constexpr static decltype(auto)
         dereference(iterator_facade<
                     Derived,
@@ -181,42 +218,6 @@ namespace boost { namespace iterator_facade {
         {
             derived(it).advance(diff);
         }
-
-        template<
-            typename Derived,
-            typename IteratorCategory,
-            typename ValueType,
-            typename Reference,
-            typename Pointer,
-            typename DifferenceType>
-        constexpr static Derived & derived(iterator_facade<
-                                           Derived,
-                                           IteratorCategory,
-                                           ValueType,
-                                           Reference,
-                                           Pointer,
-                                           DifferenceType> & if_) noexcept
-        {
-            return static_cast<Derived &>(if_);
-        }
-        template<
-            typename Derived,
-            typename IteratorCategory,
-            typename ValueType,
-            typename Reference,
-            typename Pointer,
-            typename DifferenceType>
-        constexpr static Derived const &
-        derived(iterator_facade<
-                Derived,
-                IteratorCategory,
-                ValueType,
-                Reference,
-                Pointer,
-                DifferenceType> const & if_) noexcept
-        {
-            return static_cast<Derived const &>(if_);
-        }
     };
 
     namespace detail {
@@ -285,24 +286,27 @@ namespace boost { namespace iterator_facade {
         using pointer = Pointer;
         using difference_type = DifferenceType;
 
-        constexpr reference operator*() const
-            noexcept(noexcept(access::dereference(*this)))
+        constexpr reference operator*() const noexcept(
+            noexcept(access::dereference(std::declval<iterator_facade &>())))
         {
             return access::dereference(*this);
         }
-        constexpr pointer operator->() const noexcept(
-            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        constexpr pointer operator->() const
+            noexcept(noexcept(detail::make_pointer<pointer>(
+                access::dereference(std::declval<iterator_facade &>()))))
         {
             return detail::make_pointer<pointer>(access::dereference(*this));
         }
 
-        constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
+        constexpr Derived & operator++() noexcept(
+            noexcept(access::next(std::declval<iterator_facade &>())))
         {
             access::next(*this);
             return access::derived(*this);
         }
-        constexpr Derived operator++(int)noexcept(
-            noexcept(Derived(access::derived(*this)), access::next(*this)))
+        constexpr Derived operator++(int)noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::next(std::declval<iterator_facade &>())))
         {
             Derived retval = access::derived(*this);
             access::next(*this);
@@ -349,27 +353,29 @@ namespace boost { namespace iterator_facade {
         using pointer = void;
         using difference_type = DifferenceType;
 
-        constexpr reference operator*() const
-            noexcept(noexcept(access::dereference(*this)))
+        constexpr reference operator*() const noexcept(
+            noexcept(access::dereference(std::declval<iterator_facade &>())))
         {
             return access::dereference(*this);
         }
 
         // This non-const overload exists to support output iterators like
         // std::back_insert_iterator.
-        constexpr reference
-        operator*() noexcept(noexcept(access::dereference(*this)))
+        constexpr reference operator*() noexcept(
+            noexcept(access::dereference(std::declval<iterator_facade &>())))
         {
             return access::dereference(*this);
         }
 
-        constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
+        constexpr Derived & operator++() noexcept(
+            noexcept(access::next(std::declval<iterator_facade &>())))
         {
             access::next(*this);
             return access::derived(*this);
         }
-        constexpr Derived operator++(int)noexcept(
-            noexcept(Derived(access::derived(*this)), access::next(*this)))
+        constexpr Derived operator++(int)noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::next(std::declval<iterator_facade &>())))
         {
             Derived retval = access::derived(*this);
             access::next(*this);
@@ -397,24 +403,27 @@ namespace boost { namespace iterator_facade {
         using pointer = Pointer;
         using difference_type = DifferenceType;
 
-        constexpr reference operator*() const
-            noexcept(noexcept(access::dereference(*this)))
+        constexpr reference operator*() const noexcept(
+            noexcept(access::dereference(std::declval<iterator_facade &>())))
         {
             return access::dereference(*this);
         }
-        constexpr pointer operator->() const noexcept(
-            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        constexpr pointer operator->() const
+            noexcept(noexcept(detail::make_pointer<pointer>(
+                access::dereference(std::declval<iterator_facade &>()))))
         {
             return detail::make_pointer<pointer>(access::dereference(*this));
         }
 
-        constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
+        constexpr Derived & operator++() noexcept(
+            noexcept(access::next(std::declval<iterator_facade &>())))
         {
             access::next(*this);
             return access::derived(*this);
         }
-        constexpr Derived operator++(int)noexcept(
-            noexcept(Derived(access::derived(*this)), access::next(*this)))
+        constexpr Derived operator++(int)noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::next(std::declval<iterator_facade &>())))
         {
             Derived retval = access::derived(*this);
             access::next(*this);
@@ -453,37 +462,42 @@ namespace boost { namespace iterator_facade {
         using pointer = Pointer;
         using difference_type = DifferenceType;
 
-        constexpr reference operator*() const
-            noexcept(noexcept(access::dereference(*this)))
+        constexpr reference operator*() const noexcept(
+            noexcept(access::dereference(std::declval<iterator_facade &>())))
         {
             return access::dereference(*this);
         }
-        constexpr pointer operator->() const noexcept(
-            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        constexpr pointer operator->() const
+            noexcept(noexcept(detail::make_pointer<pointer>(
+                access::dereference(std::declval<iterator_facade &>()))))
         {
             return detail::make_pointer<pointer>(access::dereference(*this));
         }
 
-        constexpr Derived & operator++() noexcept(noexcept(access::next(*this)))
+        constexpr Derived & operator++() noexcept(
+            noexcept(access::next(std::declval<iterator_facade &>())))
         {
             access::next(*this);
             return access::derived(*this);
         }
-        constexpr Derived operator++(int)noexcept(
-            noexcept(Derived(access::derived(*this)), access::next(*this)))
+        constexpr Derived operator++(int)noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::next(std::declval<iterator_facade &>())))
         {
             Derived retval = access::derived(*this);
             access::next(*this);
             return retval;
         }
 
-        constexpr Derived & operator--() noexcept(noexcept(access::prev(*this)))
+        constexpr Derived & operator--() noexcept(
+            noexcept(access::prev(std::declval<iterator_facade &>())))
         {
             access::prev(*this);
             return access::derived(*this);
         }
-        constexpr Derived operator--(int)noexcept(
-            noexcept(Derived(access::derived(*this)), access::prev(*this)))
+        constexpr Derived operator--(int)noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::prev(std::declval<iterator_facade &>())))
         {
             Derived retval = access::derived(*this);
             access::prev(*this);
@@ -522,50 +536,53 @@ namespace boost { namespace iterator_facade {
         using pointer = Pointer;
         using difference_type = DifferenceType;
 
-        constexpr reference operator*() const
-            noexcept(noexcept(access::dereference(*this)))
+        constexpr reference operator*() const noexcept(
+            noexcept(access::dereference(std::declval<iterator_facade &>())))
         {
             return access::dereference(*this);
         }
-        constexpr pointer operator->() const noexcept(
-            noexcept(detail::make_pointer<pointer>(access::dereference(*this))))
+        constexpr pointer operator->() const
+            noexcept(noexcept(detail::make_pointer<pointer>(
+                access::dereference(std::declval<iterator_facade &>()))))
         {
             return detail::make_pointer<pointer>(access::dereference(*this));
         }
         constexpr reference operator[](difference_type i) const
             noexcept(noexcept(
-                Derived(access::derived(*this)),
+                Derived(access::derived(std::declval<iterator_facade &>())),
                 access::advance(std::declval<Derived &>(), i),
-                access::dereference(*this)))
+                access::dereference(std::declval<iterator_facade &>())))
         {
             Derived copy = access::derived(*this);
             access::advance(copy, i);
             return access::dereference(copy);
         }
 
-        constexpr Derived & operator++() noexcept(
-            noexcept(access::advance(*this, difference_type(1))))
+        constexpr Derived & operator++() noexcept(noexcept(access::advance(
+            std::declval<iterator_facade &>(), difference_type(1))))
         {
             access::advance(*this, difference_type(1));
             return access::derived(*this);
         }
         constexpr Derived operator++(int)noexcept(noexcept(
-            Derived(access::derived(*this)),
-            access::advance(*this, difference_type(1))))
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(
+                std::declval<iterator_facade &>(), difference_type(1))))
         {
             Derived retval = access::derived(*this);
             access::advance(*this, difference_type(1));
             return retval;
         }
         constexpr Derived & operator+=(difference_type i) noexcept(
-            noexcept(access::advance(*this, i)))
+            noexcept(access::advance(std::declval<iterator_facade &>(), i)))
         {
             access::advance(*this, i);
             return access::derived(*this);
         }
 
         constexpr Derived operator+(difference_type i) noexcept(noexcept(
-            Derived(access::derived(*this)), access::advance(*this, i)))
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(std::declval<iterator_facade &>(), i)))
         {
             Derived copy = access::derived(*this);
             access::advance(copy, i);
@@ -577,29 +594,31 @@ namespace boost { namespace iterator_facade {
             return it + i;
         }
 
-        constexpr Derived & operator--() noexcept(
-            noexcept(access::advance(*this, difference_type(-1))))
+        constexpr Derived & operator--() noexcept(noexcept(access::advance(
+            std::declval<iterator_facade &>(), difference_type(-1))))
         {
             access::advance(*this, difference_type(-1));
             return access::derived(*this);
         }
         constexpr Derived operator--(int)noexcept(noexcept(
-            Derived(access::derived(*this)),
-            access::advance(*this, difference_type(-1))))
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(
+                std::declval<iterator_facade &>(), difference_type(-1))))
         {
             Derived retval = access::derived(*this);
             access::advance(*this, difference_type(-1));
             return retval;
         }
         constexpr Derived & operator-=(difference_type i) noexcept(
-            noexcept(access::advance(*this, -i)))
+            noexcept(access::advance(std::declval<iterator_facade &>(), -i)))
         {
             access::advance(*this, -i);
             return access::derived(*this);
         }
 
         constexpr Derived operator-(difference_type i) noexcept(noexcept(
-            Derived(access::derived(*this)), access::advance(*this, -i)))
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(std::declval<iterator_facade &>(), -i)))
         {
             Derived copy = access::derived(*this);
             access::advance(copy, -i);
@@ -644,8 +663,8 @@ namespace boost { namespace iterator_facade {
         }
 
     private:
-        constexpr auto comp(Derived it2) const
-            noexcept(noexcept(access::compare(*this, it2)))
+        constexpr auto comp(Derived it2) const noexcept(
+            noexcept(access::compare(std::declval<iterator_facade &>(), it2)))
         {
             return access::compare(*this, it2);
         }
