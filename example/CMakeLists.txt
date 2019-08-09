@@ -17,3 +17,4 @@ macro(add_sample name)
 endmacro()
 
 add_sample(repeated_chars_iterator)
+add_sample(node_iterator)

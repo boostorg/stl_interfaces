@@ -147,38 +147,13 @@ advance()`` ]
 Ok, let's actually define a simple iterator.  Let's say you need to interact
 with some legacy code that has a hand-written linked list:
 
-TODO: Make a real example out of this.
-
-    template<typename T>
-    struct node
-    {
-        T value_;
-        node * next_; // == nullptr in the tail node
-    };
+[node_defn]
 
 We can't change this code to use `std::list`, but it would be nice to be able
 to reuse all of the standard algorithms with this type.  Defining an iterator
 will get us there:
 
-    template<typename T>
-    struct node_iterator
-        : boost::iterator_facade::
-              iterator_facade<node_iterator<T>, std::forward_iterator_tag, T>
-    {
-        constexpr node_iterator() noexcept : it_(nullptr) {}
-        constexpr node_iterator(node<T> * it) noexcept : it_(it) {}
-
-    private:
-        friend boost::iterator_facade::access;
-        constexpr T & dereference() const noexcept { return *it_; }
-        constexpr void next() noexcept { it_ = it_->next_; }
-        constexpr bools equals(node_iterator other) noexcept
-        {
-            return it_ == other.it_;
-        }
-
-        node<T> * it_;
-    };
+[node_iterator]
 
 Let's break that down.
 
@@ -196,16 +171,20 @@ We leave the rest of the template parameters at their defaults: `T &` for
 `Reference`, `T *` for `Pointer`, and `std::ptrdiff_t` for `DifferenceType`.
 This is what you will do for almost all iterators.  The most common exceptions
 to this are usually some kind of proxy iterator.  Another exception is when
-for better code generation you want to return small builtin values instead of
+for better code generation you want to return builtin values instead of
 references for constant iterators.  To see an example of the latter, see the
-`repeated_chars_iterator` in the introduction.
+`repeated_chars_iterator` in the introduction; it's `Reference` template
+parameter is `char const` for this reason.
 
 [node_iterator_ctors]
 
-Next, we define two constructors -- a default constructor, and one that takes
-a `node` pointer.  A default constructor is required by the `forward_iterator`
+Next, we define two constructors: a default constructor, and one that takes a
+`node` pointer.  A default constructor is required by the `forward_iterator`
 concept, but _iter_facade_ cannot supply this, since constructors are not
 visible in derived types without user intervention.
+
+[important A default constructor is required for every iterator concept except
+`input_iterator` and `output_iterator`.]
 
 [node_iterator_private]
 
@@ -218,30 +197,31 @@ straightfoward.
 necessary.  If you makw all of the user-defined operations public, there's no
 need to `friend` `boost::iterator_facade::access`.]
 
-TODO: C++98 algorithm usage exmaple.
+Finally, we're ready to use our forward iterator:
 
-We can also define an end-sentinel for `node_iterator` that will automatically
-get picked up by the _iter_facade_ machinery.  This makes _iter_facade_-based
-iterators compatible with the iterator-sentinel pairs used in `std::ranges`.
+[node_iterator_usage]
 
-    // TODO: This needs support in the iterator_facade code.
-    struct end_node_sentinel
-    {
-        template<typename T>
-        friend bool operator==(node<T> * n, end_node_sentinel)
-        {
-            return n == nullptr;
-        }
-        template<typename T>
-        friend bool operator!=(node<T> * n, end_node_sentinel)
-        {
-            return !(n == end_node_sentinel);
-        }
-    };
+[heading Checking Your Work]
 
-TODO: C++20 algorithm usage example.
+_Facade_ is able to check that some of the code that you write is compatible
+with the concept for the iterator you're writing.  It cannot check everything.
+For instance, _Facade_ does not know if your derived type includes a default
+constructor, which is required by all the iterators except `input_iterator`
+and `output_iterator`.  In particular, _iter_facade_ cannot `static_assert` on
+the wellformedness of `Derived()`, since `Derived` is an incomplete type
+within the body of _iter_facade_ _emdash_ _iter_facade_ is the base class for
+`Derived`, not the other way round.
 
+Since you can easily `static_assert` that a concept is satisfied by a
+particular type, a good practice is to put such a `static_assert` after you
+define your iterator type.
 
-TODO: static_assert(Concept<Iter>)
+For instance, after `node_iterator` you'll find this code:
+
+[node_iterator_concept_check]
+
+Consider this good code hygiene.  Without this simple check, you'll probably
+eventually find yourself looking at an error message with a very long template
+instantiation stack.
 
 [endsect]

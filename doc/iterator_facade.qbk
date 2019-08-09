@@ -25,6 +25,7 @@
 [/ Imports ]
 
 [import ../example/repeated_chars_iterator.cpp]
+[import ../example/node_iterator.cpp]
 
 [/ Images ]
 
@@ -45,7 +46,7 @@
 [def _emdash_              \u2014]
 
 [include intro.qbk]
-[/ include tutorial.qbk]
+[include tutorial.qbk]
 [/ include examples.qbk]
 
 [xinclude iterator_facade_reference.xml]
