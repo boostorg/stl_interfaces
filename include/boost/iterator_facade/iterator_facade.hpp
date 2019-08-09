@@ -276,10 +276,7 @@ namespace boost { namespace iterator_facade {
         Pointer,
         DifferenceType>
     {
-#if 0 // TODO: Define these, or just let the machinery of ITER_CONCEPT() pick
-      // them up?
         using iterator_concept = std::input_iterator_tag;
-#endif
         using iterator_category = std::input_iterator_tag;
         using value_type = ValueType;
         using reference = Reference;
@@ -347,6 +344,7 @@ namespace boost { namespace iterator_facade {
         Pointer,
         DifferenceType>
     {
+        using iterator_concept = std::output_iterator_tag;
         using iterator_category = std::output_iterator_tag;
         using value_type = ValueType;
         using reference = Reference;
@@ -397,6 +395,7 @@ namespace boost { namespace iterator_facade {
         Pointer,
         DifferenceType>
     {
+        using iterator_concept = std::forward_iterator_tag;
         using iterator_category = std::forward_iterator_tag;
         using value_type = ValueType;
         using reference = Reference;
@@ -456,6 +455,7 @@ namespace boost { namespace iterator_facade {
         Pointer,
         DifferenceType>
     {
+        using iterator_concept = std::bidirectional_iterator_tag;
         using iterator_category = std::bidirectional_iterator_tag;
         using value_type = ValueType;
         using reference = Reference;
@@ -530,6 +530,7 @@ namespace boost { namespace iterator_facade {
         Pointer,
         DifferenceType>
     {
+        using iterator_concept = std::random_access_iterator_tag;
         using iterator_category = std::random_access_iterator_tag;
         using value_type = ValueType;
         using reference = Reference;
@@ -669,6 +670,165 @@ namespace boost { namespace iterator_facade {
             return access::compare(*this, it2);
         }
     };
+
+#if 201703L < __cplusplus
+
+    template<
+        typename Derived,
+        typename ValueType,
+        typename Reference,
+        typename Pointer,
+        typename DifferenceType>
+    struct iterator_facade<
+        Derived,
+        std::contiguous_iterator_tag,
+        ValueType,
+        Reference,
+        Pointer,
+        DifferenceType>
+    {
+        using iterator_concept = std::contiguous_iterator_tag;
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = ValueType;
+        using reference = Reference;
+        using pointer = Pointer;
+        using difference_type = DifferenceType;
+
+        constexpr reference operator*() const noexcept(
+            noexcept(access::dereference(std::declval<iterator_facade &>())))
+        {
+            return access::dereference(*this);
+        }
+        constexpr pointer operator->() const
+            noexcept(noexcept(detail::make_pointer<pointer>(
+                access::dereference(std::declval<iterator_facade &>()))))
+        {
+            return detail::make_pointer<pointer>(access::dereference(*this));
+        }
+        constexpr reference operator[](difference_type i) const
+            noexcept(noexcept(
+                Derived(access::derived(std::declval<iterator_facade &>())),
+                access::advance(std::declval<Derived &>(), i),
+                access::dereference(std::declval<iterator_facade &>())))
+        {
+            Derived copy = access::derived(*this);
+            access::advance(copy, i);
+            return access::dereference(copy);
+        }
+
+        constexpr Derived & operator++() noexcept(noexcept(access::advance(
+            std::declval<iterator_facade &>(), difference_type(1))))
+        {
+            access::advance(*this, difference_type(1));
+            return access::derived(*this);
+        }
+        constexpr Derived operator++(int)noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(
+                std::declval<iterator_facade &>(), difference_type(1))))
+        {
+            Derived retval = access::derived(*this);
+            access::advance(*this, difference_type(1));
+            return retval;
+        }
+        constexpr Derived & operator+=(difference_type i) noexcept(
+            noexcept(access::advance(std::declval<iterator_facade &>(), i)))
+        {
+            access::advance(*this, i);
+            return access::derived(*this);
+        }
+
+        constexpr Derived operator+(difference_type i) noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(std::declval<iterator_facade &>(), i)))
+        {
+            Derived copy = access::derived(*this);
+            access::advance(copy, i);
+            return copy;
+        }
+        friend constexpr Derived
+        operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
+        {
+            return it + i;
+        }
+
+        constexpr Derived & operator--() noexcept(noexcept(access::advance(
+            std::declval<iterator_facade &>(), difference_type(-1))))
+        {
+            access::advance(*this, difference_type(-1));
+            return access::derived(*this);
+        }
+        constexpr Derived operator--(int)noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(
+                std::declval<iterator_facade &>(), difference_type(-1))))
+        {
+            Derived retval = access::derived(*this);
+            access::advance(*this, difference_type(-1));
+            return retval;
+        }
+        constexpr Derived & operator-=(difference_type i) noexcept(
+            noexcept(access::advance(std::declval<iterator_facade &>(), -i)))
+        {
+            access::advance(*this, -i);
+            return access::derived(*this);
+        }
+
+        constexpr Derived operator-(difference_type i) noexcept(noexcept(
+            Derived(access::derived(std::declval<iterator_facade &>())),
+            access::advance(std::declval<iterator_facade &>(), -i)))
+        {
+            Derived copy = access::derived(*this);
+            access::advance(copy, -i);
+            return copy;
+        }
+
+        friend constexpr difference_type
+        operator-(Derived it1, Derived it2) noexcept(noexcept(it1.comp(it2)))
+        {
+            return it1.comp(it2);
+        }
+
+        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
+            noexcept(lhs.comp(rhs) == difference_type(0)))
+        {
+            return lhs.comp(rhs) == difference_type(0);
+        }
+        friend constexpr auto operator!=(Derived lhs, Derived rhs) noexcept(
+            noexcept(lhs.comp(rhs) != difference_type(0)))
+        {
+            return lhs.comp(rhs) != difference_type(0);
+        }
+        friend constexpr auto operator<(Derived lhs, Derived rhs) noexcept(
+            noexcept(lhs.comp(rhs) < difference_type(0)))
+        {
+            return lhs.comp(rhs) < difference_type(0);
+        }
+        friend constexpr auto operator<=(Derived lhs, Derived rhs) noexcept(
+            noexcept(lhs.comp(rhs) <= difference_type(0)))
+        {
+            return lhs.comp(rhs) <= difference_type(0);
+        }
+        friend constexpr auto operator>(Derived lhs, Derived rhs) noexcept(
+            noexcept(lhs.comp(rhs) > difference_type(0)))
+        {
+            return lhs.comp(rhs) > difference_type(0);
+        }
+        friend constexpr auto operator>=(Derived lhs, Derived rhs) noexcept(
+            noexcept(lhs.comp(rhs) >= difference_type(0)))
+        {
+            return lhs.comp(rhs) >= difference_type(0);
+        }
+
+    private:
+        constexpr auto comp(Derived it2) const noexcept(
+            noexcept(access::compare(std::declval<iterator_facade &>(), it2)))
+        {
+            return access::compare(*this, it2);
+        }
+    };
+
+#endif
 
     /** A template alias useful for defining proxy iterators.  \see
         iterator_facade. */
