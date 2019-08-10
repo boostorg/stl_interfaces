@@ -333,9 +333,6 @@ namespace boost { namespace iterator_facade {
     // TODO: Compile-fail tests and associated static_asserts in these
     // specializations to help catch common errors.
 
-    // TODO: Examples that implement certain common iterator patterns, like
-    // back_inserter.
-
     // TODO: Tests that cover iterator_traits for uses of these facades.
 
     /** A specialization of iterator_facade specific to output iterators. */

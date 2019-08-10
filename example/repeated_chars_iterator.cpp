@@ -29,9 +29,15 @@ struct repeated_chars_iterator : boost::iterator_facade::iterator_facade<
 
 private:
     friend boost::iterator_facade::access;
-    char const dereference() const { return first_[n_ % size_]; }
-    void advance(std::ptrdiff_t i) { n_ += i; }
-    auto compare(repeated_chars_iterator other) const { return n_ - other.n_; }
+    constexpr char const dereference() const noexcept
+    {
+        return first_[n_ % size_];
+    }
+    constexpr void advance(std::ptrdiff_t i) noexcept { n_ += i; }
+    constexpr auto compare(repeated_chars_iterator other) const noexcept
+    {
+        return n_ - other.n_;
+    }
 
     char const * first_;
     difference_type size_;

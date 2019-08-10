@@ -26,6 +26,11 @@
 
 [import ../example/repeated_chars_iterator.cpp]
 [import ../example/node_iterator.cpp]
+[import ../example/random_access_iterator.cpp]
+[import ../example/interoperability.cpp]
+[import ../example/zip_proxy_iterator.cpp]
+[import ../example/back_insert_iterator.cpp]
+[import ../example/reverse_iterator.cpp]
 
 [/ Images ]
 

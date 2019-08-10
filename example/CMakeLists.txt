@@ -18,3 +18,8 @@ endmacro()
 
 add_sample(repeated_chars_iterator)
 add_sample(node_iterator)
+add_sample(random_access_iterator)
+add_sample(interoperability)
+add_sample(zip_proxy_iterator)
+add_sample(back_insert_iterator)
+add_sample(reverse_iterator)

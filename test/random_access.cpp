@@ -17,7 +17,7 @@ struct basic_random_access_iter : boost::iterator_facade::iterator_facade<
                                       std::random_access_iterator_tag,
                                       int>
 {
-    basic_random_access_iter() : it_(nullptr) {}
+    basic_random_access_iter() {}
     basic_random_access_iter(int * it) : it_(it) {}
 
 private:
@@ -38,6 +38,7 @@ struct random_access_iter : boost::iterator_facade::iterator_facade<
                                 std::random_access_iterator_tag,
                                 ValueType>
 {
+    random_access_iter() {}
     random_access_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
