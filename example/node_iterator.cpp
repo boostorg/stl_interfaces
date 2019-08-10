@@ -21,7 +21,6 @@ struct node
 };
 //]
 
-//[ node_iterator
 //[ node_iterator_class_head
 template<typename T>
 struct node_iterator
@@ -45,7 +44,6 @@ private:
     }
 
     node<T> * it_;
-    //]
 };
 //]
 

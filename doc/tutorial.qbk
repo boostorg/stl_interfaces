@@ -86,7 +86,7 @@ parameter to _iter_facade_; and `n` is a value of type `difference_type`.
         [ `i.advance(n)` ]
         [ `void` ]
         [
-``difference_type m = n;
+``  difference_type m = n;
   if (m >= 0)
     while (m--) ++i;
   else
@@ -100,7 +100,7 @@ you could take `n` as a value or as a reference; `compare()` can return a
 `difference_type` or just something convertible to one; etc.  In particular,
 your operations can be `constexpr` or `noexcept` as you see fit.]
 
-Not all the iterator concepts require all teh operations above.  Here are the
+Not all the iterator concepts require all the operations above.  Here are the
 operations used with each iterator cocept:
 
 [table Operations Required for Each Concept
@@ -151,11 +151,7 @@ with some legacy code that has a hand-written linked list:
 
 We can't change this code to use `std::list`, but it would be nice to be able
 to reuse all of the standard algorithms with this type.  Defining an iterator
-will get us there:
-
-[node_iterator]
-
-Let's break that down.
+will get us there.
 
 [node_iterator_class_head]
 
@@ -194,7 +190,7 @@ straightfoward.
 
 [note Above I've made all of those private, and `friend`ed
 `boost::iterator_facade::access`.  This is recommended, but it is not strictly
-necessary.  If you makw all of the user-defined operations public, there's no
+necessary.  If you make all of the user-defined operations public, there's no
 need to `friend` `boost::iterator_facade::access`.]
 
 Finally, we're ready to use our forward iterator:

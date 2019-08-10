@@ -46,41 +46,35 @@ we have to write it.  This library seeks to turn what we write from this:
             return first_[(n_ + n) % size_];
         }
 
-        BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator &
-        operator++() noexcept
+        constexpr repeated_chars_iterator & operator++() noexcept
         {
             ++n_;
             return *this;
         }
-        BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator
-        operator++(int)noexcept
+        constexpr repeated_chars_iterator operator++(int)noexcept
         {
             repeated_chars_iterator retval = *this;
             ++*this;
             return retval;
         }
-        BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator &
-        operator+=(difference_type n) noexcept
+        constexpr repeated_chars_iterator & operator+=(difference_type n) noexcept
         {
             n_ += n;
             return *this;
         }
 
-        BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator &
-        operator--() noexcept
+        constexpr repeated_chars_iterator & operator--() noexcept
         {
             --n_;
             return *this;
         }
-        BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator
-        operator--(int)noexcept
+        constexpr repeated_chars_iterator operator--(int)noexcept
         {
             repeated_chars_iterator retval = *this;
             --*this;
             return retval;
         }
-        BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator &
-        operator-=(difference_type n) noexcept
+        constexpr repeated_chars_iterator & operator-=(difference_type n) noexcept
         {
             n_ -= n;
             return *this;
@@ -117,22 +111,22 @@ we have to write it.  This library seeks to turn what we write from this:
             return lhs <= rhs;
         }
 
-        friend BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator
+        friend constexpr repeated_chars_iterator
         operator+(repeated_chars_iterator lhs, difference_type rhs) noexcept
         {
             return lhs += rhs;
         }
-        friend BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator
+        friend constexpr repeated_chars_iterator
         operator+(difference_type lhs, repeated_chars_iterator rhs) noexcept
         {
             return rhs += lhs;
         }
-        friend BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator
+        friend constexpr repeated_chars_iterator
         operator-(repeated_chars_iterator lhs, difference_type rhs) noexcept
         {
             return lhs -= rhs;
         }
-        friend BOOST_TEXT_CXX14_CONSTEXPR repeated_chars_iterator
+        friend constexpr repeated_chars_iterator
         operator-(difference_type lhs, repeated_chars_iterator rhs) noexcept
         {
             return rhs -= lhs;
