@@ -34,6 +34,7 @@ struct forward_iter : boost::iterator_facade::iterator_facade<
                           std::forward_iterator_tag,
                           ValueType>
 {
+    forward_iter() : it_(nullptr) {}
     forward_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,

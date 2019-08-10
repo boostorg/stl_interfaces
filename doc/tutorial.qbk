@@ -179,8 +179,7 @@ Next, we define two constructors: a default constructor, and one that takes a
 concept, but _iter_facade_ cannot supply this, since constructors are not
 visible in derived types without user intervention.
 
-[important A default constructor is required for every iterator concept except
-`input_iterator` and `output_iterator`.]
+[important A default constructor is required for every iterator concept.]
 
 [node_iterator_private]
 
@@ -202,11 +201,11 @@ Finally, we're ready to use our forward iterator:
 _Facade_ is able to check that some of the code that you write is compatible
 with the concept for the iterator you're writing.  It cannot check everything.
 For instance, _Facade_ does not know if your derived type includes a default
-constructor, which is required by all the iterators except `input_iterator`
-and `output_iterator`.  In particular, _iter_facade_ cannot `static_assert` on
-the wellformedness of `Derived()`, since `Derived` is an incomplete type
-within the body of _iter_facade_ _emdash_ _iter_facade_ is the base class for
-`Derived`, not the other way round.
+constructor, which is required by all the iterators.  In particular,
+_iter_facade_ cannot `static_assert` on the wellformedness of `Derived()`,
+since `Derived` is an incomplete type within the body of _iter_facade_
+_emdash_ _iter_facade_ is the base class for `Derived`, not the other way
+round.
 
 Since you can easily `static_assert` that a concept is satisfied by a
 particular type, a good practice is to put such a `static_assert` after you

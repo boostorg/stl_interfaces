@@ -20,9 +20,9 @@ struct simple_random_access_iterator : boost::iterator_facade::iterator_facade<
                                            int>
 {
     // This default constructor does not initialize it_, since that's how int *
-    // works as well.  This allows optimum performance in the paths where
-    // initializing a single pointer may be measurable.  It is also a reasonable
-    // choice to initialize with nullptr.
+    // works as well.  This allows optimum performance in code paths where
+    // initializing a single pointer may be measurable.  It is also a
+    // reasonable choice to initialize with nullptr.
     simple_random_access_iterator() noexcept {}
     simple_random_access_iterator(int * it) noexcept : it_(it) {}
 

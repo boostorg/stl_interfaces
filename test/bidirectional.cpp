@@ -39,6 +39,7 @@ struct bidirectional_iter : boost::iterator_facade::iterator_facade<
                                 std::bidirectional_iterator_tag,
                                 ValueType>
 {
+    bidirectional_iter() : it_(nullptr) {}
     bidirectional_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,

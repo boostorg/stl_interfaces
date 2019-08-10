@@ -24,6 +24,9 @@ struct back_insert_iterator : boost::iterator_facade::iterator_facade<
                                   typename Container::value_type,
                                   back_insert_iterator<Container> &>
 {
+    // For concept requirements.
+    back_insert_iterator() : c_(nullptr) {}
+
     // Construct from a container.
     explicit back_insert_iterator(Container & c) : c_(std::addressof(c)) {}
 

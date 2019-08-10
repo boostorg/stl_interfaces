@@ -16,6 +16,7 @@ struct basic_input_iter
     : boost::iterator_facade::
           iterator_facade<basic_input_iter, std::input_iterator_tag, int>
 {
+    basic_input_iter() : it_(nullptr) {}
     basic_input_iter(int * it) : it_(it) {}
 
 private:
@@ -33,6 +34,7 @@ struct input_iter : boost::iterator_facade::iterator_facade<
                         std::input_iterator_tag,
                         ValueType>
 {
+    input_iter() : it_(nullptr) {}
     input_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
@@ -65,6 +67,7 @@ struct proxy_input_iter : boost::iterator_facade::proxy_iterator_facade<
                               std::input_iterator_tag,
                               ValueType>
 {
+    proxy_input_iter() : it_(nullptr) {}
     proxy_input_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,

@@ -16,6 +16,7 @@ struct basic_output_iter
     : boost::iterator_facade::
           iterator_facade<basic_output_iter, std::input_iterator_tag, int>
 {
+    basic_output_iter() : it_(nullptr) {}
     basic_output_iter(int * it) : it_(it) {}
 
 private:
@@ -35,6 +36,7 @@ struct back_insert_iter : boost::iterator_facade::iterator_facade<
                               typename Container::value_type,
                               back_insert_iter<Container> &>
 {
+    back_insert_iter() : c_(nullptr) {}
     back_insert_iter(Container & c) : c_(std::addressof(c)) {}
 
     back_insert_iter & operator=(typename Container::value_type const & v)
