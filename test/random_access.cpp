@@ -139,8 +139,6 @@ private:
     int * it2_;
 };
 
-// TODO: Document the necessity of writing this overload, and in which cases
-// it needs to go in std.
 namespace std {
     // Required for std::sort to work with zip_iter.  If zip_iter::reference
     // were not a std::tuple with builtin types as its template parameters, we
