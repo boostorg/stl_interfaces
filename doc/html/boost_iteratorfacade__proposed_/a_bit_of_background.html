@@ -1,0 +1,75 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>A Bit of Background</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.IteratorFacade (Proposed)">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.IteratorFacade (Proposed)">
+<link rel="prev" href="introduction.html" title="Introduction">
+<link rel="next" href="tutorial.html" title="Tutorial">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="introduction.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_iteratorfacade__proposed_.a_bit_of_background"></a><a class="link" href="a_bit_of_background.html" title="A Bit of Background">A
+    Bit of Background</a>
+</h2></div></div></div>
+<p>
+      <a href="https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html" target="_top">Boost.Iterator</a>
+      is a library that is already in Boost, and it has been around for a long time.
+    </p>
+<p>
+      However, it was attempting to solve a lot of problems related to iterators,
+      not just how to write them from scratch. It is also not easy to modernize it
+      for use in C++11 and later. Specifically:
+    </p>
+<p>
+      - <a href="https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html" target="_top">Boost.Iterator</a>
+      contains a large number of iterator adaptors; those have since been rendered
+      moot by C++20 ranges.
+    </p>
+<p>
+      - <a href="https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html" target="_top">Boost.Iterator</a>'s
+      <code class="computeroutput"><span class="identifier">iterator_facade</span></code> template is
+      not limited just to the existing standard C++ iterator categories; that was
+      an experiment that never landed in standard C++, so it adds needless complexity.
+    </p>
+<p>
+      - <a href="https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html" target="_top">Boost.Iterator</a>'s
+      <code class="computeroutput"><span class="identifier">iterator_facade</span></code> was written
+      against C++98, so it is not <code class="computeroutput"><span class="keyword">constexpr</span></code>-
+      and <code class="computeroutput"><span class="keyword">noexcept</span></code>-friendly.
+    </p>
+<p>
+      - <a href="https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html" target="_top">Boost.Iterator</a>'s
+      <code class="computeroutput"><span class="identifier">iterator_facade</span></code> does not support
+      proxy iterators, which are fully supported by the C++20 iterator concepts.
+    </p>
+<p>
+      - There is opportunity to reduce the amount of code the user must write in
+      order to use <code class="computeroutput"><span class="identifier">iterator_facade</span></code>.
+    </p>
+<p>
+      For these reasons, it seems more appropriate to introduce a new Boost library
+      than to try and address the shortcomings of <a href="https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html" target="_top">Boost.Iterator</a>'s
+      <code class="computeroutput"><span class="identifier">iterator_facade</span></code> template directly.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2019 T. Zachary Laine<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="introduction.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

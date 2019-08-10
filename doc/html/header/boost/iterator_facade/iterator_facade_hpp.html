@@ -1,0 +1,65 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Header &lt;boost/iterator_facade/iterator_facade.hpp&gt;</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.IteratorFacade (Proposed)">
+<link rel="up" href="../../../reference.html" title="Reference">
+<link rel="prev" href="../../../reference.html" title="Reference">
+<link rel="next" href="../../../boost/iterator_facade/access.html" title="Struct access">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../../../reference.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../reference.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../../boost/iterator_facade/access.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="header.boost.iterator_facade.iterator_facade_hpp"></a>Header &lt;<a href="../../../../../boost/iterator_facade/iterator_facade.hpp" target="_top">boost/iterator_facade/iterator_facade.hpp</a>&gt;</h3></div></div></div>
+<pre class="synopsis">
+
+<a class="link" href="../../../BOOST_ITERATOR_FAC_idm3844.html" title="Macro BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT">BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT</a>(iter, concept_name)
+<a class="link" href="../../../BOOST_ITERATOR_FAC_idm3859.html" title="Macro BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS</a>(iter, category, concept, value_type, reference, pointer, difference_type)</pre>
+<pre class="synopsis"><span class="keyword">namespace</span> <span class="identifier">boost</span> <span class="special">{</span>
+  <span class="keyword">namespace</span> <span class="identifier">iterator_facade</span> <span class="special">{</span>
+    <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/access.html" title="Struct access">access</a><span class="special">;</span>
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> Derived<span class="special">,</span> <span class="keyword">typename</span> IteratorConcept<span class="special">,</span> <span class="keyword">typename</span> ValueType<span class="special">,</span> 
+             <span class="keyword">typename</span> Reference <span class="special">=</span> <span class="identifier">ValueType</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">typename</span> Pointer <span class="special">=</span> <span class="identifier">ValueType</span> <span class="special">*</span><span class="special">,</span> 
+             <span class="keyword">typename</span> DifferenceType <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">ptrdiff_t</span><span class="special">&gt;</span> 
+      <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/iterator_facade.html" title="Struct template iterator_facade">iterator_facade</a><span class="special">;</span>
+
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> Derived<span class="special">,</span> <span class="keyword">typename</span> ValueType<span class="special">,</span> <span class="keyword">typename</span> Reference<span class="special">,</span> 
+             <span class="keyword">typename</span> Pointer<span class="special">,</span> <span class="keyword">typename</span> DifferenceType<span class="special">&gt;</span> 
+      <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/iterator_facade_De_idm3580.html" title="Struct template iterator_facade&lt;Derived, std::bidirectional_iterator_tag, ValueType, Reference, Pointer, DifferenceType&gt;">iterator_facade</a><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">bidirectional_iterator_tag</span><span class="special">,</span> <span class="identifier">ValueType</span><span class="special">,</span> <span class="identifier">Reference</span><span class="special">,</span> <span class="identifier">Pointer</span><span class="special">,</span> <span class="identifier">DifferenceType</span><span class="special">&gt;</span><span class="special">;</span>
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> Derived<span class="special">,</span> <span class="keyword">typename</span> ValueType<span class="special">,</span> <span class="keyword">typename</span> Reference<span class="special">,</span> 
+             <span class="keyword">typename</span> Pointer<span class="special">,</span> <span class="keyword">typename</span> DifferenceType<span class="special">&gt;</span> 
+      <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/iterator_facade_De_idm3626.html" title="Struct template iterator_facade&lt;Derived, std::forward_iterator_tag, ValueType, Reference, Pointer, DifferenceType&gt;">iterator_facade</a><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">forward_iterator_tag</span><span class="special">,</span> <span class="identifier">ValueType</span><span class="special">,</span> <span class="identifier">Reference</span><span class="special">,</span> <span class="identifier">Pointer</span><span class="special">,</span> <span class="identifier">DifferenceType</span><span class="special">&gt;</span><span class="special">;</span>
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> Derived<span class="special">,</span> <span class="keyword">typename</span> ValueType<span class="special">,</span> <span class="keyword">typename</span> Reference<span class="special">,</span> 
+             <span class="keyword">typename</span> Pointer<span class="special">,</span> <span class="keyword">typename</span> DifferenceType<span class="special">&gt;</span> 
+      <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/iterator_facade_De_idm3666.html" title="Struct template iterator_facade&lt;Derived, std::input_iterator_tag, ValueType, Reference, Pointer, DifferenceType&gt;">iterator_facade</a><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">input_iterator_tag</span><span class="special">,</span> <span class="identifier">ValueType</span><span class="special">,</span> <span class="identifier">Reference</span><span class="special">,</span> <span class="identifier">Pointer</span><span class="special">,</span> <span class="identifier">DifferenceType</span><span class="special">&gt;</span><span class="special">;</span>
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> Derived<span class="special">,</span> <span class="keyword">typename</span> ValueType<span class="special">,</span> <span class="keyword">typename</span> Reference<span class="special">,</span> 
+             <span class="keyword">typename</span> Pointer<span class="special">,</span> <span class="keyword">typename</span> DifferenceType<span class="special">&gt;</span> 
+      <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/iterator_facade_De_idm3706.html" title="Struct template iterator_facade&lt;Derived, std::output_iterator_tag, ValueType, Reference, Pointer, DifferenceType&gt;">iterator_facade</a><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">output_iterator_tag</span><span class="special">,</span> <span class="identifier">ValueType</span><span class="special">,</span> <span class="identifier">Reference</span><span class="special">,</span> <span class="identifier">Pointer</span><span class="special">,</span> <span class="identifier">DifferenceType</span><span class="special">&gt;</span><span class="special">;</span>
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> Derived<span class="special">,</span> <span class="keyword">typename</span> ValueType<span class="special">,</span> <span class="keyword">typename</span> Reference<span class="special">,</span> 
+             <span class="keyword">typename</span> Pointer<span class="special">,</span> <span class="keyword">typename</span> DifferenceType<span class="special">&gt;</span> 
+      <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/iterator_facade_De_idm3746.html" title="Struct template iterator_facade&lt;Derived, std::random_access_iterator_tag, ValueType, Reference, Pointer, DifferenceType&gt;">iterator_facade</a><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">random_access_iterator_tag</span><span class="special">,</span> <span class="identifier">ValueType</span><span class="special">,</span> <span class="identifier">Reference</span><span class="special">,</span> <span class="identifier">Pointer</span><span class="special">,</span> <span class="identifier">DifferenceType</span><span class="special">&gt;</span><span class="special">;</span>
+
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <span class="keyword">struct</span> <a class="link" href="../../../boost/iterator_facade/proxy_arrow_result.html" title="Struct template proxy_arrow_result">proxy_arrow_result</a><span class="special">;</span>
+    <span class="keyword">typedef</span> <a class="link" href="../../../boost/iterator_facade/iterator_facade.html" title="Struct template iterator_facade">iterator_facade</a><span class="special">&lt;</span> <span class="identifier">Derived</span><span class="special">,</span> <span class="identifier">IteratorConcept</span><span class="special">,</span> <span class="identifier">ValueType</span><span class="special">,</span> <span class="identifier">Reference</span><span class="special">,</span> <a class="link" href="../../../boost/iterator_facade/proxy_arrow_result.html" title="Struct template proxy_arrow_result">proxy_arrow_result</a><span class="special">&lt;</span> <span class="identifier">Reference</span> <span class="special">&gt;</span><span class="special">,</span> <span class="identifier">DifferenceType</span> <span class="special">&gt;</span> <a class="link" href="../../../boost/iterator_facade/proxy_iterator_facade.html" title="Type definition proxy_iterator_facade"><span class="identifier">proxy_iterator_facade</span></a><span class="special">;</span>
+  <span class="special">}</span>
+<span class="special">}</span></pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2019 T. Zachary Laine<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../../../reference.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../reference.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../../boost/iterator_facade/access.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
