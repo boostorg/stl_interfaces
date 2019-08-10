@@ -1,9 +1,9 @@
-//[ interoperability
 // Copyright (C) 2019 T. Zachary Laine
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+//[ interoperability
 #include <boost/iterator_facade/iterator_facade.hpp>
 
 #include <algorithm>
@@ -51,7 +51,7 @@ private:
     ValueType * it_;
 
     // This friendship is necessary to enable the implicit conversion
-    // constructor to work aboev.
+    // constructor above to work.
     template<typename ValueType2>
     friend struct random_access_iterator;
 };
@@ -69,7 +69,8 @@ int main()
     std::sort(first, last);
     assert(ints == (std::array<int, 10>{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}}));
 
-    // Create and use two constant iterators, one from an existing mutable one.
+    // Create and use two constant iterators, one from an existing mutable
+    // iterator.
     std::array<int, 10> ints_copy;
     const_iterator cfirst(ints.data());
     const_iterator clast = last;

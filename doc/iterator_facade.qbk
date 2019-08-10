@@ -52,7 +52,7 @@
 
 [include intro.qbk]
 [include tutorial.qbk]
-[/ include examples.qbk]
+[include examples.qbk]
 
 [xinclude iterator_facade_reference.xml]
 

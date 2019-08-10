@@ -1,9 +1,9 @@
-//[ back_insert_iterator
 // Copyright (C) 2019 T. Zachary Laine
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+//[ back_insert_iterator
 #include <boost/iterator_facade/iterator_facade.hpp>
 
 #include <algorithm>
@@ -16,7 +16,7 @@
 // push_back() on that container when it is written to, just like
 // std::back_insert_iterator.  This is not a lot less code to write than the
 // implementation of std::back_insert_iterator, but it demonstrates that
-// iterator_facade is flexible to handle this odd kind of iterator.
+// iterator_facade is flexible enough to handle this odd kind of iterator.
 template<typename Container>
 struct back_insert_iterator : boost::iterator_facade::iterator_facade<
                                   back_insert_iterator<Container>,
@@ -30,13 +30,13 @@ struct back_insert_iterator : boost::iterator_facade::iterator_facade<
     // Construct from a container.
     explicit back_insert_iterator(Container & c) : c_(std::addressof(c)) {}
 
-    // When writing to *this, copy the into the container via push_back().
+    // When writing to *this, copy v into the container via push_back().
     back_insert_iterator & operator=(typename Container::value_type const & v)
     {
         c_->push_back(v);
         return *this;
     }
-    // When writing to *this, move the into the container via push_back().
+    // When writing to *this, move v into the container via push_back().
     back_insert_iterator & operator=(typename Container::value_type && v)
     {
         c_->push_back(std::move(v));
@@ -48,7 +48,8 @@ private:
     // Dereferencing *this just returns a reference to *this, so that the
     // expression *it = value uses the operator=() overloads above.
     back_insert_iterator & dereference() { return *this; }
-    // There is nowhere to go in next(), so do nothing.
+    // There is no underlying sequence over which we are iteratung, so there's
+    // nowhere to go in next().  Do nothing.
     void next() {}
 
     Container * c_;
