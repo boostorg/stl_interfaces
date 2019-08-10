@@ -1,7 +1,8 @@
 [section Rationale]
 
-[heading TODO]
+[heading No Derived-Type Contraints]
 
-TODO
+There is no constraint on the `Derived` template parameter to _iter_facade_,
+because `Derived` is an incomplete type within _iter_facade_.
 
 [endsect]
