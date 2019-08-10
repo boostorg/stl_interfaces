@@ -174,4 +174,8 @@ private:
 };
 ```
 
-if you don't ever write iterators, this is not for you.
+If you don't ever write iterators, this is not for you.
+
+Online docs: https://tzlaine.github.io/iterator_facade.
+
+[![License](https://img.shields.io/badge/license-boost-brightgreen.svg)](LICENSE_1_0.txt)
