@@ -219,4 +219,7 @@ Consider this good code hygiene.  Without this simple check, you'll probably
 eventually find yourself looking at an error message with a very long template
 instantiation stack.
 
+There's also a macro that can help you check that `std::iterator_traits` is
+well-formed and provides the corect types.  See _traits_m_.
+
 [endsect]

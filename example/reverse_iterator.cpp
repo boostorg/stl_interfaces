@@ -22,7 +22,7 @@ template<typename BidiIter>
 struct reverse_iterator
     : boost::iterator_facade::iterator_facade<
           reverse_iterator<BidiIter>,
-#if 201703L < __cplusplus
+#if 201703L < __cplusplus && defined(__cpp_lib_ranges)
           typename std::iterator_traits<BidiIter>::iterator_concept,
 #else
           typename std::iterator_traits<BidiIter>::iterator_category,

@@ -14,7 +14,7 @@
 
 struct basic_output_iter
     : boost::iterator_facade::
-          iterator_facade<basic_output_iter, std::input_iterator_tag, int>
+          iterator_facade<basic_output_iter, std::output_iterator_tag, int>
 {
     basic_output_iter() : it_(nullptr) {}
     basic_output_iter(int * it) : it_(it) {}
@@ -28,6 +28,16 @@ private:
 };
 
 using output = basic_output_iter;
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(output, std::output_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    output,
+    std::output_iterator_tag,
+    std::output_iterator_tag,
+    int,
+    int &,
+    void,
+    std::ptrdiff_t)
 
 template<typename Container>
 struct back_insert_iter : boost::iterator_facade::iterator_facade<
@@ -59,6 +69,16 @@ private:
 };
 
 using back_insert = back_insert_iter<std::vector<int>>;
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(back_insert, std::output_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    back_insert,
+    std::output_iterator_tag,
+    std::output_iterator_tag,
+    int,
+    back_insert &,
+    void,
+    std::ptrdiff_t)
 
 
 std::vector<int> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};

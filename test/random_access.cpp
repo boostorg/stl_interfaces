@@ -32,6 +32,17 @@ private:
     int * it_;
 };
 
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    basic_random_access_iter, std::random_access_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_random_access_iter,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
 template<typename ValueType>
 struct random_access_iter : boost::iterator_facade::iterator_facade<
                                 random_access_iter<ValueType>,
@@ -63,6 +74,28 @@ private:
 using random_access = random_access_iter<int>;
 using const_random_access = random_access_iter<int const>;
 
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    random_access, std::random_access_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    random_access,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    const_random_access, std::random_access_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    const_random_access,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int const,
+    int const &,
+    int const *,
+    std::ptrdiff_t)
+
 // TODO: Call ranges algorithms with this.
 struct zip_iter : boost::iterator_facade::proxy_iterator_facade<
                       zip_iter,
@@ -92,6 +125,20 @@ private:
     int * it1_;
     int * it2_;
 };
+
+using int_pair = std::tuple<int, int>;
+using int_refs_pair = std::tuple<int &, int &>;
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    zip_iter, std::random_access_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    zip_iter,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int_pair,
+    int_refs_pair,
+    boost::iterator_facade::proxy_arrow_result<int_refs_pair>,
+    std::ptrdiff_t)
 
 struct int_t
 {
@@ -138,6 +185,20 @@ private:
     int_t * it1_;
     int * it2_;
 };
+
+using int_t_int_pair = std::tuple<int_t, int>;
+using int_t_int_refs_pair = std::tuple<int_t &, int &>;
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    udt_zip_iter, std::random_access_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    udt_zip_iter,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int_t_int_pair,
+    int_t_int_refs_pair,
+    boost::iterator_facade::proxy_arrow_result<int_t_int_refs_pair>,
+    std::ptrdiff_t)
 
 namespace std {
     // Required for std::sort to work with zip_iter.  If zip_iter::reference

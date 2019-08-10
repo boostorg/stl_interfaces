@@ -45,6 +45,9 @@
 [def _Facade_              Boost.IteratorFacade]
 [def _iter_facade_         [classref boost::iterator_facade::iterator_facade `iterator_facade`]]
 
+[def _concept_m_           [macroref BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT]]
+[def _traits_m_            [macroref BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS]]
+
 [def _CRTP_                [@https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern CRTP]]
 [def _Iterator_            [@https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html Boost.Iterator]]
 

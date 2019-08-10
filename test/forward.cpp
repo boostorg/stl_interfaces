@@ -28,6 +28,17 @@ private:
     int * it_;
 };
 
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    basic_forward_iter, std::forward_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_forward_iter,
+    std::forward_iterator_tag,
+    std::forward_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
 template<typename ValueType>
 struct forward_iter : boost::iterator_facade::iterator_facade<
                           forward_iter<ValueType>,
@@ -58,6 +69,28 @@ private:
 
 using forward = forward_iter<int>;
 using const_forward = forward_iter<int const>;
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    forward, std::forward_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    forward,
+    std::forward_iterator_tag,
+    std::forward_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    const_forward, std::forward_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    const_forward,
+    std::forward_iterator_tag,
+    std::forward_iterator_tag,
+    int const,
+    int const &,
+    int const *,
+    std::ptrdiff_t)
 
 #if 0 // TODO: Call ranges algorithms with this.
 struct basic_proxy_forward_iter : boost::iterator_facade::iterator_facade<

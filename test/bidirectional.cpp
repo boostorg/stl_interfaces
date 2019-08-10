@@ -33,6 +33,17 @@ private:
     int * it_;
 };
 
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    basic_bidirectional_iter, std::bidirectional_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_bidirectional_iter,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
 template<typename ValueType>
 struct bidirectional_iter : boost::iterator_facade::iterator_facade<
                                 bidirectional_iter<ValueType>,
@@ -64,6 +75,28 @@ private:
 
 using bidirectional = bidirectional_iter<int>;
 using const_bidirectional = bidirectional_iter<int const>;
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    bidirectional, std::bidirectional_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    bidirectional,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+    const_bidirectional, std::bidirectional_iterator)
+BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+    const_bidirectional,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int const,
+    int const &,
+    int const *,
+    std::ptrdiff_t)
 
 #if 0 // TODO: Call ranges algorithms with this.
 struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_facade<

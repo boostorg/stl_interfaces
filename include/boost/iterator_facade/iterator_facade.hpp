@@ -333,8 +333,6 @@ namespace boost { namespace iterator_facade {
     // TODO: Compile-fail tests and associated static_asserts in these
     // specializations to help catch common errors.
 
-    // TODO: Tests that cover iterator_traits for uses of these facades.
-
     /** A specialization of iterator_facade specific to output iterators. */
     template<
         typename Derived,
@@ -860,5 +858,82 @@ namespace boost { namespace iterator_facade {
         DifferenceType>;
 
 }}
+
+
+#ifdef BOOST_ITERATOR_FACADE_DOXYGEN
+
+/** `static_asserts` that iterator type `iter` models concept `concept_name`.
+    This is useful for checking that an iterator you write using
+    `iterator_facade` models the right C++ concept.
+
+    For example: `BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(my_iter,
+    std::input_iterator)`.
+
+    \note This macro exapnds to nothing when `__cpp_lib_concepts` is not
+    defined. */
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(iter, concept_name)
+
+/** `static_asserts` that the types of all typedefs in
+    `std::iterator_traits<iter>` match the remaining macro parameters.  This
+    is useful for checking that an iterator you write using `iterator_facade`
+    has the correct iterator traits.
+
+    For example: `BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(my_iter,
+    std::input_iterator_tag, std::input_iterator_tag, int, int &, int *, std::ptrdiff_t)`.
+
+    \note This macro ignores the `concept` parameter when `__cpp_lib_concepts`
+    is not defined. */
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(                   \
+    iter, category, concept, value_type, reference, pointer, difference_type)
+
+#else
+
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(             \
+    iter, concept_name)                                                        \
+    static_assert(concept_name<iter>);
+
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts)
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(iter, concept_name)        \
+    BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(                 \
+        iter, concept_name)
+#else
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(iter, concept_name)
+#endif
+
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(              \
+    iter, category, value_t, ref, ptr, diff_t)                                 \
+    static_assert(std::is_same<                                                \
+                  typename std::iterator_traits<iter>::iterator_category,      \
+                  category>::value);                                           \
+    static_assert(std::is_same<                                                \
+                  typename std::iterator_traits<iter>::value_type,             \
+                  value_t>::value);                                            \
+    static_assert(                                                             \
+        std::is_same<typename std::iterator_traits<iter>::reference, ref>::    \
+            value);                                                            \
+    static_assert(                                                             \
+        std::is_same<typename std::iterator_traits<iter>::pointer, ptr>::      \
+            value);                                                            \
+    static_assert(std::is_same<                                                \
+                  typename std::iterator_traits<iter>::difference_type,        \
+                  diff_t>::value);
+
+#if 201703L < __cplusplus && defined(__cpp_lib_ranges)
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(                   \
+    iter, category, concept, value_type, reference, pointer, difference_type)  \
+    static_assert(std::is_same<                                                \
+                  typename std::iterator_traits<iter>::iterator_concept,       \
+                  concept>::value);                                            \
+    BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                  \
+        iter, category, value_type, reference, pointer, difference_type)
+#else
+#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(                   \
+    iter, category, concept, value_type, reference, pointer, difference_type)  \
+    BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                  \
+        iter, category, value_type, reference, pointer, difference_type)
+#endif
+
+#endif
+
 
 #endif
