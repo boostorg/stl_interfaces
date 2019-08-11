@@ -890,7 +890,7 @@ namespace boost { namespace iterator_facade {
 
 #define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(             \
     iter, concept_name)                                                        \
-    static_assert(concept_name<iter>);
+    static_assert(concept_name<iter>, "");
 
 #if 201703L < __cplusplus && defined(__cpp_lib_concepts)
 #define BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(iter, concept_name)        \
@@ -902,28 +902,38 @@ namespace boost { namespace iterator_facade {
 
 #define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(              \
     iter, category, value_t, ref, ptr, diff_t)                                 \
-    static_assert(std::is_same<                                                \
-                  typename std::iterator_traits<iter>::iterator_category,      \
-                  category>::value);                                           \
-    static_assert(std::is_same<                                                \
-                  typename std::iterator_traits<iter>::value_type,             \
-                  value_t>::value);                                            \
+    static_assert(                                                             \
+        std::is_same<                                                          \
+            typename std::iterator_traits<iter>::iterator_category,            \
+            category>::value,                                                  \
+        "");                                                                   \
+    static_assert(                                                             \
+        std::is_same<                                                          \
+            typename std::iterator_traits<iter>::value_type,                   \
+            value_t>::value,                                                   \
+        "");                                                                   \
     static_assert(                                                             \
         std::is_same<typename std::iterator_traits<iter>::reference, ref>::    \
-            value);                                                            \
+            value,                                                             \
+        "");                                                                   \
     static_assert(                                                             \
         std::is_same<typename std::iterator_traits<iter>::pointer, ptr>::      \
-            value);                                                            \
-    static_assert(std::is_same<                                                \
-                  typename std::iterator_traits<iter>::difference_type,        \
-                  diff_t>::value);
+            value,                                                             \
+        "");                                                                   \
+    static_assert(                                                             \
+        std::is_same<                                                          \
+            typename std::iterator_traits<iter>::difference_type,              \
+            diff_t>::value,                                                    \
+        "");
 
 #if 201703L < __cplusplus && defined(__cpp_lib_ranges)
 #define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(                   \
     iter, category, concept, value_type, reference, pointer, difference_type)  \
-    static_assert(std::is_same<                                                \
-                  typename std::iterator_traits<iter>::iterator_concept,       \
-                  concept>::value);                                            \
+    static_assert(                                                             \
+        std::is_same<                                                          \
+            typename std::iterator_traits<iter>::iterator_concept,             \
+            concept>::value,                                                   \
+        "");                                                                   \
     BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                  \
         iter, category, value_type, reference, pointer, difference_type)
 #else
