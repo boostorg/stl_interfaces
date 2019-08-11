@@ -551,8 +551,8 @@
     </p>
 <p>
 </p>
-<pre class="programlisting"><span class="comment">// static_assert(std::forward_iterator&lt;node_iterator&gt;), or nothing in C++17</span>
-<span class="comment">// and earlier.</span>
+<pre class="programlisting"><span class="comment">// static_assert(std::forward_iterator&lt;node_iterator&gt;, ""), or nothing in</span>
+<span class="comment">// C++17 and earlier.</span>
 <span class="identifier">BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT</span><span class="special">(</span>
     <span class="identifier">node_iterator</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">forward_iterator</span><span class="special">)</span>
 </pre>
@@ -565,7 +565,7 @@
     </p>
 <p>
       There's also a macro that can help you check that <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span></code>
-      is well-formed and provides the corect types. See <code class="computeroutput"><a class="link" href="../BOOST_ITERATOR_FAC_idm3859.html" title="Macro BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
+      is well-formed and provides the corect types. See <code class="computeroutput"><a class="link" href="../BOOST_ITERATOR_FAC_idm3945.html" title="Macro BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

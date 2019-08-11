@@ -37,7 +37,7 @@
                                     <span class="identifier">std</span><span class="special">::</span><span class="identifier">random_access_iterator_tag</span><span class="special">,</span>
                                     <span class="identifier">ValueType</span><span class="special">&gt;</span>
 <span class="special">{</span>
-    <span class="keyword">static_assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_object</span><span class="special">&lt;</span><span class="identifier">ValueType</span><span class="special">&gt;::</span><span class="identifier">value</span><span class="special">);</span>
+    <span class="keyword">static_assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_object</span><span class="special">&lt;</span><span class="identifier">ValueType</span><span class="special">&gt;::</span><span class="identifier">value</span><span class="special">,</span> <span class="string">""</span><span class="special">);</span>
 
     <span class="comment">// Default constructor.</span>
     <span class="keyword">constexpr</span> <span class="identifier">random_access_iterator</span><span class="special">()</span> <span class="keyword">noexcept</span> <span class="special">{}</span>
