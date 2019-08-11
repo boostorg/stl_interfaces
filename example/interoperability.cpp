@@ -21,7 +21,7 @@ struct random_access_iterator : boost::iterator_facade::iterator_facade<
                                     std::random_access_iterator_tag,
                                     ValueType>
 {
-    static_assert(std::is_object<ValueType>::value);
+    static_assert(std::is_object<ValueType>::value, "");
 
     // Default constructor.
     constexpr random_access_iterator() noexcept {}

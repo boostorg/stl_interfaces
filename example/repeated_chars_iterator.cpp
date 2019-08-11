@@ -5,6 +5,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 #include <boost/iterator_facade/iterator_facade.hpp>
 
+#include <string>
+
 #include <cassert>
 
 

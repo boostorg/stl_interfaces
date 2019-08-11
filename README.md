@@ -178,4 +178,6 @@ If you don't ever write iterators, this is not for you.
 
 Online docs: https://tzlaine.github.io/iterator_facade.
 
+[![Build Status](https://travis-ci.org/tzlaine/iterator_facade.svg?branch=master)](https://travis-ci.org/tzlaine/iterator_facade)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/iterator_facade?branch=master&svg=true)](https://ci.appveyor.com/project/tzlaine/iterator_facade)
 [![License](https://img.shields.io/badge/license-boost-brightgreen.svg)](LICENSE_1_0.txt)
