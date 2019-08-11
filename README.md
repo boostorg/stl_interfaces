@@ -1,6 +1,8 @@
 # iterator_facade
 
-An updated C++20-friendly version of the iterator_facade part of Boost.Iterator, targeting standardization.
+An updated C++20-friendly version of the iterator_facade part of
+Boost.Iterator, targeting standardization.  This library requires at least
+C++14.
 
 In short, if you need to write an iterator, iterator_facade turns this:
 

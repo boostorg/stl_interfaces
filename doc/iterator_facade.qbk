@@ -57,6 +57,16 @@
 [include tutorial.qbk]
 [include examples.qbk]
 
+[section Compiler Support]
+
+_Facade_ is written against the C++14 standard.  It is targetting
+standardization, and the changes required to make it C++11-compatible were
+considered too great.
+
+_Facade_ should work with any conforming C++14 compiler.
+
+[endsect]
+
 [xinclude iterator_facade_reference.xml]
 
 [include rationale.qbk]
