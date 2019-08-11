@@ -11,6 +11,17 @@
 #include <type_traits>
 
 
+#ifndef BOOST_ITERATOR_FACADE_DOXYGEN
+
+#if defined(_MSC_VER)
+#define BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR
+#else
+#define BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR constexpr
+#endif
+
+#endif
+
+
 namespace boost { namespace iterator_facade {
 
     /** A CRTP template that one may derive from to make defining iterators
@@ -319,12 +330,13 @@ namespace boost { namespace iterator_facade {
             return retval;
         }
 
-        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
-            noexcept(access::equals(lhs, rhs)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator==(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(access::equals(lhs, rhs)))
         {
             return access::equals(lhs, rhs);
         }
-        friend constexpr auto
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto
         operator!=(Derived lhs, Derived rhs) noexcept(noexcept(lhs == rhs))
         {
             return !(lhs == rhs);
@@ -436,12 +448,13 @@ namespace boost { namespace iterator_facade {
             return retval;
         }
 
-        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
-            noexcept(access::equals(lhs, rhs)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator==(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(access::equals(lhs, rhs)))
         {
             return access::equals(lhs, rhs);
         }
-        friend constexpr auto
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto
         operator!=(Derived lhs, Derived rhs) noexcept(noexcept(lhs == rhs))
         {
             return !(lhs == rhs);
@@ -513,12 +526,13 @@ namespace boost { namespace iterator_facade {
             return retval;
         }
 
-        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
-            noexcept(access::equals(lhs, rhs)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator==(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(access::equals(lhs, rhs)))
         {
             return access::equals(lhs, rhs);
         }
-        friend constexpr auto
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto
         operator!=(Derived lhs, Derived rhs) noexcept(noexcept(lhs == rhs))
         {
             return !(lhs == rhs);
@@ -600,7 +614,7 @@ namespace boost { namespace iterator_facade {
             access::advance(copy, i);
             return copy;
         }
-        friend constexpr Derived
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR Derived
         operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
         {
             return it + i;
@@ -637,49 +651,57 @@ namespace boost { namespace iterator_facade {
             return copy;
         }
 
-        friend constexpr difference_type
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR difference_type
         operator-(Derived it1, Derived it2) noexcept(noexcept(it1.comp(it2)))
         {
             return it1.comp(it2);
         }
 
-        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) == difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator==(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) == difference_type(0)))
         {
             return lhs.comp(rhs) == difference_type(0);
         }
-        friend constexpr auto operator!=(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) != difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator!=(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) != difference_type(0)))
         {
             return lhs.comp(rhs) != difference_type(0);
         }
-        friend constexpr auto operator<(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) < difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator<(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) < difference_type(0)))
         {
             return lhs.comp(rhs) < difference_type(0);
         }
-        friend constexpr auto operator<=(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) <= difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator<=(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) <= difference_type(0)))
         {
             return lhs.comp(rhs) <= difference_type(0);
         }
-        friend constexpr auto operator>(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) > difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator>(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) > difference_type(0)))
         {
             return lhs.comp(rhs) > difference_type(0);
         }
-        friend constexpr auto operator>=(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) >= difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator>=(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) >= difference_type(0)))
         {
             return lhs.comp(rhs) >= difference_type(0);
         }
 
+#ifndef BOOST_ITERATOR_FACADE_DOXYGEN
     private:
         constexpr auto comp(Derived it2) const noexcept(
             noexcept(access::compare(std::declval<iterator_facade &>(), it2)))
         {
             return access::compare(*this, it2);
         }
+#endif
     };
 
 #if 201703L < __cplusplus && defined(__cpp_lib_ranges) ||                      \
@@ -761,7 +783,7 @@ namespace boost { namespace iterator_facade {
             access::advance(copy, i);
             return copy;
         }
-        friend constexpr Derived
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR Derived
         operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
         {
             return it + i;
@@ -798,39 +820,45 @@ namespace boost { namespace iterator_facade {
             return copy;
         }
 
-        friend constexpr difference_type
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR difference_type
         operator-(Derived it1, Derived it2) noexcept(noexcept(it1.comp(it2)))
         {
             return it1.comp(it2);
         }
 
-        friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) == difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator==(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) == difference_type(0)))
         {
             return lhs.comp(rhs) == difference_type(0);
         }
-        friend constexpr auto operator!=(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) != difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator!=(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) != difference_type(0)))
         {
             return lhs.comp(rhs) != difference_type(0);
         }
-        friend constexpr auto operator<(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) < difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator<(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) < difference_type(0)))
         {
             return lhs.comp(rhs) < difference_type(0);
         }
-        friend constexpr auto operator<=(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) <= difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator<=(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) <= difference_type(0)))
         {
             return lhs.comp(rhs) <= difference_type(0);
         }
-        friend constexpr auto operator>(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) > difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator>(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) > difference_type(0)))
         {
             return lhs.comp(rhs) > difference_type(0);
         }
-        friend constexpr auto operator>=(Derived lhs, Derived rhs) noexcept(
-            noexcept(lhs.comp(rhs) >= difference_type(0)))
+        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR auto operator>=(
+            Derived lhs,
+            Derived rhs) noexcept(noexcept(lhs.comp(rhs) >= difference_type(0)))
         {
             return lhs.comp(rhs) >= difference_type(0);
         }
