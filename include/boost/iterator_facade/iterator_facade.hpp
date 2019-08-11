@@ -25,7 +25,7 @@ namespace boost { namespace iterator_facade {
     struct iterator_facade;
 
     /** A type for granting access to the private members of an iterator
-        derived from iterator_facade. */
+        derived from `iterator_facade`. */
     struct access
     {
         template<
@@ -85,8 +85,8 @@ namespace boost { namespace iterator_facade {
             return derived(it).dereference();
         }
 
-        // This overload takes a non-const facade parameter, to support output
-        // iterators like std::back_insert_iterator.
+        // This overload takes a non-`const` facade parameter, to support
+        // output iterators like `std::back_insert_iterator`.
         template<
             typename Derived,
             typename IteratorConcept,
@@ -220,11 +220,12 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-    /** The return type of operator->() in a proxy iterator.
+    /** The return type of `operator->()` in a proxy iterator.
 
-        This template is used as the default Pointer template parameter in the
-        proxy_iterator_facade template alias.  Note that the use of this
-        template implies a copy or move of the underlying object of type T. */
+        This template is used as the default `Pointer` template parameter in
+        the `proxy_iterator_facade` template alias.  Note that the use of this
+        template implies a copy or move of the underlying object of type
+        `T`. */
     template<typename T>
     struct proxy_arrow_result
     {
@@ -269,7 +270,7 @@ namespace boost { namespace iterator_facade {
         }
     }
 
-    /** A specialization of iterator_facade specific to input iterators. */
+    /** A specialization of `iterator_facade` specific to input iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -333,7 +334,7 @@ namespace boost { namespace iterator_facade {
     // TODO: Compile-fail tests and associated static_asserts in these
     // specializations to help catch common errors.
 
-    /** A specialization of iterator_facade specific to output iterators. */
+    /** A specialization of `iterator_facade` specific to output iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -385,7 +386,8 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-    /** A specialization of iterator_facade specific to forward iterators. */
+    /** A specialization of `iterator_facade` specific to forward
+        iterators. */
     template<
         typename Derived,
         typename ValueType,
@@ -446,7 +448,7 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-    /** A specialization of iterator_facade specific to bidirectional
+    /** A specialization of `iterator_facade` specific to bidirectional
         iterators. */
     template<
         typename Derived,
@@ -523,7 +525,7 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-    /** A specialization of iterator_facade specific to random access
+    /** A specialization of `iterator_facade` specific to random access
         iterators. */
     template<
         typename Derived,
@@ -680,10 +682,12 @@ namespace boost { namespace iterator_facade {
         }
     };
 
-#if 201703L < __cplusplus
+#if 201703L < __cplusplus && defined(__cpp_lib_ranges) ||                      \
+    defined(BOOST_ITERATOR_FACADE_DOXYGEN)
 
-    /** A specialization of iterator_facade specific to contiguous
-        iterators. */
+    /** A specialization of `iterator_facade` specific to contiguous
+        iterators.  This specialization is only available in C++20 or later,
+        when `__cpp_lib_ranges` is defined. */
     template<
         typename Derived,
         typename ValueType,
@@ -842,7 +846,7 @@ namespace boost { namespace iterator_facade {
 #endif
 
     /** A template alias useful for defining proxy iterators.  \see
-        iterator_facade. */
+        `iterator_facade`. */
     template<
         typename Derived,
         typename IteratorConcept,
