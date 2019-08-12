@@ -33,19 +33,29 @@ struct node_iterator
     constexpr node_iterator(node<T> * it) noexcept : it_(it) {}
     //]
 
-    //[ node_iterator_suffix
+    //[ node_iterator_user_ops
     constexpr T & operator*() const noexcept { return it_->value_; }
-    constexpr void next() noexcept { it_ = it_->next_; }
+    constexpr node_iterator & operator++() noexcept
+    {
+        it_ = it_->next_;
+        return *this;
+    }
     friend constexpr bool
     operator==(node_iterator lhs, node_iterator rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+    //]
+
+    //[ node_iterator_using_declaration
+    using base_type = boost::iterator_facade::
+        iterator_interface<node_iterator<T>, std::forward_iterator_tag, T>;
+    using base_type::operator++;
+    //]
 
 private:
     node<T> * it_;
 };
-//]
 
 //[ node_iterator_concept_check Equivalent to
 // static_assert(std::forward_iterator<node_iterator>, ""), or nothing in
@@ -72,7 +82,7 @@ int main()
     //[ node_iterator_usage
     node_iterator<int> const first(&nodes[0]);
     node_iterator<int> const last;
-    for (auto it = first; it != last; ++it) {
+    for (auto it = first; it != last; it++) {
         std::cout << *it << " "; // Prints 0 1 2 3 4
     }
     std::cout << "\n";

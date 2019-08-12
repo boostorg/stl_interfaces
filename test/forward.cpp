@@ -20,12 +20,20 @@ struct basic_forward_iter
     basic_forward_iter(int * it) : it_(it) {}
 
     int & operator*() const { return *it_; }
-    void next() { ++it_; }
+    basic_forward_iter & operator++()
+    {
+        ++it_;
+        return *this;
+    }
     friend bool
     operator==(basic_forward_iter lhs, basic_forward_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::
+        iterator_interface<basic_forward_iter, std::forward_iterator_tag, int>;
+    using base_type::operator++;
 
 private:
     int * it_;
@@ -59,11 +67,21 @@ struct forward_iter : boost::iterator_facade::iterator_interface<
     {}
 
     ValueType & operator*() const { return *it_; }
-    void next() { ++it_; }
+    forward_iter & operator++()
+    {
+        ++it_;
+        return *this;
+    }
     friend bool operator==(forward_iter lhs, forward_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        forward_iter<ValueType>,
+        std::forward_iterator_tag,
+        ValueType>;
+    using base_type::operator++;
 
 private:
     ValueType * it_;
@@ -108,12 +126,19 @@ struct basic_proxy_forward_iter : boost::iterator_facade::iterator_interface<
     basic_proxy_forward_iter(int * it) : it_(it) {}
 
     int operator*() const { return *it_; }
-    void next() { ++it_; }
+    basic_proxy_forward_iter & operator++() { ++it_; }
     friend bool operator==(
         basic_proxy_forward_iter lhs, basic_proxy_forward_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        basic_proxy_forward_iter,
+        std::forward_iterator_tag,
+        int,
+        int>;
+    using base_type::operator++;
 
 private:
     int * it_;

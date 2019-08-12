@@ -90,13 +90,13 @@ type `difference_type`.
         `i2 == i + (i2 - i)`. ]
     ]
     [
-        [ `i.next()` ]
+        [ `++i` ]
         [ `void` ]
         [ Increments `i`. ]
         [ ]
     ]
     [
-        [ `i.prev()` ]
+        [ `--i` ]
         [ `void` ]
         [ Decrements `i`. ]
         [ ]
@@ -129,28 +129,28 @@ operations used with each iterator cocept:
         [
 ``*i
 i == i2
-next()`` ]
+++i`` ]
     ]
     [
         [ `output_iterator` ]
         [
 ``*i
-next()`` ]
+++i`` ]
     ]
     [
         [ `forward_iterator` ]
         [
 ``*i
 i == i2
-next()`` ]
+++i`` ]
     ]
     [
         [ `bidirectional_iterator` ]
         [
 ``*i
 i == i2
-next()
-prev()`` ]
+++i
+--i`` ]
     ]
     [
         [ `random_access_iterator`/`continguous_iterator` ]
@@ -160,6 +160,26 @@ i - i2
 i += n`` ]
     ]
 ]
+
+[heading An Important Note About `operator++()` and `operator--()`]
+
+There's a wrinkle in this way of doing things.  When you define `operator++()`
+in your iterator type `Derived`, _iter_iface_ defines post-increment,
+`operator++(int)`.  But since `Derived` has an `operator++` and so does its
+base class _iter_iface_, the one in `Derived` *hides* the one in _iter_iface_.
+
+So, you need to add a using declaration that makes the `operator++` from the
+base class visible in the derived class.  For instance, in the `node_iterator`
+example there are these lines:
+
+[node_iterator_using_declaration]
+
+[important All of the above applies to `operator--`.  So, for bidirectional
+iterators, you need to add a line like `using base_type::operator--;` as
+well. ]
+
+[note These using declarations are not necessary for a random access iterator,
+because `Derived` does not have an `operator++()` in that case. ]
 
 [heading Putting it All Together]
 
@@ -200,7 +220,7 @@ visible in derived types without user intervention.
 
 [important A default constructor is required for every iterator concept.]
 
-[node_iterator_suffix]
+[node_iterator_user_ops]
 
 Next, we define the user-defined operations that _iter_iface_ requires to do
 its work.  As you might expect, the three required operations are very
@@ -219,7 +239,12 @@ Either of these forms works, since _iter_iface_ is concept-based _emdash_ the
 appropriate expressions need to be well-formed for the _iter_iface_ tempalte
 to do its work. ]
 
-Finally, we're ready to use our forward iterator:
+Finally, we need a using declataion to make
+`iterator_interface::operator++(int)` visible:
+
+[node_iterator_using_declaration]
+
+Here's how we might use the forward iterator we just defined:
 
 [node_iterator_usage]
 

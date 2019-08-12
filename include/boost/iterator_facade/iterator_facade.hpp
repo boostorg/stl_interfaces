@@ -143,8 +143,6 @@ namespace boost { namespace iterator_facade {
             return static_cast<Derived const &>(*this);
         }
 
-        constexpr static DifferenceType one = DifferenceType(1);
-
     public:
         using iterator_concept = IteratorConcept;
         using iterator_category = detail::concept_category_t<iterator_concept>;
@@ -169,50 +167,30 @@ namespace boost { namespace iterator_facade {
                 std::declval<D &>() += i,
                 *std::declval<D &>()))
         {
-            D copy = derived();
-            copy += i;
-            return *copy;
+            D retval = derived();
+            retval += i;
+            return *retval;
         }
 
         template<typename D = Derived>
-        constexpr auto
-        operator++() noexcept(noexcept(std::declval<D &>().next()))
-            -> decltype(std::declval<D &>().next(), std::declval<D &>())
+        constexpr auto operator++() noexcept(
+            noexcept(std::declval<D &>() += difference_type(1)))
+            -> decltype(
+                std::declval<D &>() += difference_type(1), std::declval<D &>())
         {
-            derived().next();
+            derived() += difference_type(1);
             return derived();
         }
         template<typename D = Derived>
-        constexpr auto
-        operator++() noexcept(noexcept(std::declval<D &>() += one))
-            -> decltype(std::declval<D &>() += one, std::declval<D &>())
-        {
-            derived() += one;
-            return derived();
-        }
-
-        template<typename D = Derived>
-        constexpr auto
-        operator++(int)noexcept(noexcept(std::declval<D &>().next()))
+        constexpr auto operator++(int)noexcept(
+            noexcept(D(std::declval<D &>()), ++std::declval<D &>()))
             -> std::remove_reference_t<decltype(
                 D(std::declval<D &>()),
-                std::declval<D &>().next(),
+                ++std::declval<D &>(),
                 std::declval<D &>())>
         {
             D retval = derived();
-            derived().next();
-            return retval;
-        }
-        template<typename D = Derived>
-        constexpr auto
-        operator++(int)noexcept(noexcept(std::declval<D &>() += one))
-            -> std::remove_reference_t<decltype(
-                D(std::declval<D &>()),
-                std::declval<D &>() += one,
-                std::declval<D &>())>
-        {
-            D retval = derived();
-            derived() += one;
+            ++derived();
             return retval;
         }
 
@@ -220,9 +198,9 @@ namespace boost { namespace iterator_facade {
         constexpr D operator+(difference_type i) noexcept(
             noexcept(D(std::declval<D &>()), std::declval<D &>() += i))
         {
-            D copy = derived();
-            copy += i;
-            return copy;
+            D retval = derived();
+            retval += i;
+            return retval;
         }
         friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR Derived
         operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
@@ -231,44 +209,24 @@ namespace boost { namespace iterator_facade {
         }
 
         template<typename D = Derived>
-        constexpr auto
-        operator--() noexcept(noexcept(std::declval<D &>().prev()))
-            -> decltype(std::declval<D &>().prev(), std::declval<D &>())
+        constexpr auto operator--() noexcept(noexcept(
+            D(std::declval<D &>()), std::declval<D &>() += -difference_type(1)))
+            -> decltype(
+                std::declval<D &>() += -difference_type(1), std::declval<D &>())
         {
-            derived().prev();
+            derived() += -difference_type(1);
             return derived();
         }
         template<typename D = Derived>
-        constexpr auto
-        operator--() noexcept(noexcept(std::declval<D &>() += -one))
-            -> decltype(std::declval<D &>() += -one, std::declval<D &>())
-        {
-            derived() += -one;
-            return derived();
-        }
-
-        template<typename D = Derived>
-        constexpr auto
-        operator--(int)noexcept(noexcept(std::declval<D &>().prev()))
+        constexpr auto operator--(int)noexcept(
+            noexcept(D(std::declval<D &>()), --std::declval<D &>()))
             -> std::remove_reference_t<decltype(
                 D(std::declval<D &>()),
-                std::declval<D &>().prev(),
+                --std::declval<D &>(),
                 std::declval<D &>())>
         {
             D retval = derived();
-            derived().prev();
-            return retval;
-        }
-        template<typename D = Derived>
-        constexpr auto
-        operator--(int)noexcept(noexcept(std::declval<D &>() += -one))
-            -> std::remove_reference_t<decltype(
-                D(std::declval<D &>()),
-                std::declval<D &>() += -one,
-                std::declval<D &>())>
-        {
-            D retval = derived();
-            derived() += -one;
+            --derived();
             return retval;
         }
 
@@ -284,9 +242,9 @@ namespace boost { namespace iterator_facade {
             Derived it,
             difference_type i) noexcept(noexcept(Derived(it), it += -i))
         {
-            Derived copy = it;
-            copy += -i;
-            return copy;
+            Derived retval = it;
+            retval += -i;
+            return retval;
         }
     };
 

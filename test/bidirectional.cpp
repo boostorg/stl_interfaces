@@ -21,13 +21,28 @@ struct basic_bidirectional_iter : boost::iterator_facade::iterator_interface<
     basic_bidirectional_iter(int * it) : it_(it) {}
 
     int & operator*() const { return *it_; }
-    void next() { ++it_; }
-    void prev() { --it_; }
+    basic_bidirectional_iter & operator++()
+    {
+        ++it_;
+        return *this;
+    }
+    basic_bidirectional_iter & operator--()
+    {
+        --it_;
+        return *this;
+    }
     friend bool operator==(
         basic_bidirectional_iter lhs, basic_bidirectional_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        basic_bidirectional_iter,
+        std::bidirectional_iterator_tag,
+        int>;
+    using base_type::operator++;
+    using base_type::operator--;
 
 private:
     int * it_;
@@ -61,13 +76,28 @@ struct bidirectional_iter : boost::iterator_facade::iterator_interface<
     {}
 
     ValueType & operator*() const { return *it_; }
-    void next() { ++it_; }
-    void prev() { --it_; }
+    bidirectional_iter & operator++()
+    {
+        ++it_;
+        return *this;
+    }
+    bidirectional_iter & operator--()
+    {
+        --it_;
+        return *this;
+    }
     friend bool
     operator==(bidirectional_iter lhs, bidirectional_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        bidirectional_iter<ValueType>,
+        std::bidirectional_iterator_tag,
+        ValueType>;
+    using base_type::operator++;
+    using base_type::operator--;
 
 private:
     ValueType * it_;
@@ -112,14 +142,22 @@ struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_interfa
     basic_proxy_bidirectional_iter(int * it) : it_(it) {}
 
     int operator*() const { return *it_; }
-    void next() { ++it_; }
-    void prev() { --it_; }
+    basic_proxy_bidirectional_iter & operator++() { ++it_; }
+    basic_proxy_bidirectional_iter & operator--() { --it_; }
     friend bool operator==(
         basic_proxy_bidirectional_iter lhs,
         basic_proxy_bidirectional_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        basic_proxy_bidirectional_iter,
+        std::bidirectional_iterator_tag,
+        int,
+        int>;
+    using base_type::operator++;
+    using base_type::operator--;
 
 private:
     int * it_;

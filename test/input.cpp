@@ -20,12 +20,21 @@ struct basic_input_iter
     basic_input_iter(int * it) : it_(it) {}
 
     int & operator*() const noexcept { return *it_; }
-    void next() noexcept { ++it_; }
+    basic_input_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
     friend bool operator==(basic_input_iter lhs, basic_input_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
 
+    using base_type = boost::iterator_facade::
+        iterator_interface<basic_input_iter, std::input_iterator_tag, int>;
+    using base_type::operator++;
+
+private:
     int * it_;
 };
 
@@ -57,11 +66,21 @@ struct input_iter : boost::iterator_facade::iterator_interface<
     {}
 
     ValueType & operator*() const noexcept { return *it_; }
-    void next() noexcept { ++it_; }
+    input_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
     friend bool operator==(input_iter lhs, input_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        input_iter<ValueType>,
+        std::input_iterator_tag,
+        ValueType>;
+    using base_type::operator++;
 
 private:
     ValueType * it_;
@@ -103,11 +122,21 @@ struct proxy_input_iter : boost::iterator_facade::proxy_iterator_interface<
     {}
 
     ValueType operator*() const noexcept { return *it_; }
-    void next() noexcept { ++it_; }
+    proxy_input_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
     friend bool operator==(proxy_input_iter lhs, proxy_input_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+    using base_type = boost::iterator_facade::proxy_iterator_interface<
+        proxy_input_iter<ValueType>,
+        std::input_iterator_tag,
+        ValueType>;
+    using base_type::operator++;
 
 private:
     ValueType * it_;

@@ -42,10 +42,10 @@ struct reverse_iterator
     bool operator==(reverse_iterator other) const { return it_ == other.it_; }
 
     // Even though iterator_interface-derived bidirectional iterators are
-    // usually given next() and prev() members, it turns out that operator+=()
-    // below amounts to the same thing.  That's good, since having next() and
-    // operator+=() in this class would have lead to ambiguities in
-    // iterator_interface.
+    // usually given operator++() and operator--() members, it turns out that
+    // operator+=() below amounts to the same thing.  That's good, since
+    // having operator++() and operator+=() in this class would have lead to
+    // ambiguities in iterator_interface.
 
     // These two are only used when BidiIter::iterator_category is
     // std::random_access_iterator_tag or std::contiguous_iterator_tag.  Even
@@ -67,6 +67,10 @@ struct reverse_iterator
         std::advance(it_, -n);
         return *this;
     }
+
+    // No need for a using declaration to make
+    // iterator_interface::operator++(int) visible, becasue we're not defining
+    // operator++() in this template.
 
 private:
     BidiIter it_;

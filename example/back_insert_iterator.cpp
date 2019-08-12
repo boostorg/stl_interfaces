@@ -48,7 +48,14 @@ struct back_insert_iterator : boost::iterator_facade::iterator_interface<
     back_insert_iterator & operator*() { return *this; }
     // There is no underlying sequence over which we are iterating, so there's
     // nowhere to go in next().  Do nothing.
-    void next() {}
+    back_insert_iterator & operator++() { return *this; }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        back_insert_iterator<Container>,
+        std::output_iterator_tag,
+        typename Container::value_type,
+        back_insert_iterator<Container> &>;
+    using base_type::operator++;
 
 private:
     Container * c_;

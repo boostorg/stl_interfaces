@@ -20,7 +20,15 @@ struct basic_output_iter
     basic_output_iter(int * it) : it_(it) {}
 
     int & operator*() noexcept { return *it_; }
-    void next() noexcept { ++it_; }
+    basic_output_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
+
+    using base_type = boost::iterator_facade::
+        iterator_interface<basic_output_iter, std::output_iterator_tag, int>;
+    using base_type::operator++;
 
 private:
     int * it_;
@@ -49,7 +57,7 @@ struct back_insert_iter : boost::iterator_facade::iterator_interface<
     back_insert_iter(Container & c) : c_(std::addressof(c)) {}
 
     back_insert_iter & operator*() noexcept { return *this; }
-    void next() noexcept {}
+    back_insert_iter & operator++() noexcept { return *this; }
 
     back_insert_iter & operator=(typename Container::value_type const & v)
     {
@@ -61,6 +69,13 @@ struct back_insert_iter : boost::iterator_facade::iterator_interface<
         c_->push_back(std::move(v));
         return *this;
     }
+
+    using base_type = boost::iterator_facade::iterator_interface<
+        back_insert_iter<Container>,
+        std::output_iterator_tag,
+        typename Container::value_type,
+        back_insert_iter<Container> &>;
+    using base_type::operator++;
 
 private:
     Container * c_;
