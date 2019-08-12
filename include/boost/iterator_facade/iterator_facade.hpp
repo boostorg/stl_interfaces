@@ -6,20 +6,11 @@
 #ifndef BOOST_ITERATOR_FACADE_ITERATOR_FACADE_HPP
 #define BOOST_ITERATOR_FACADE_ITERATOR_FACADE_HPP
 
+#include <boost/iterator_facade/fwd.hpp>
+
 #include <utility>
 #include <iterator>
 #include <type_traits>
-
-
-#ifndef BOOST_ITERATOR_FACADE_DOXYGEN
-
-#if defined(_MSC_VER) || defined(__GNUC__) && __GNUC__ < 8
-#define BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR
-#else
-#define BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR constexpr
-#endif
-
-#endif
 
 
 namespace boost { namespace iterator_facade {
@@ -102,8 +93,6 @@ namespace boost { namespace iterator_facade {
         template<typename Pointer, typename IteratorConcept>
         using pointer_t = typename pointer<Pointer, IteratorConcept>::type;
 
-        template<typename... T>
-        using void_t = void;
         template<typename Iterator, typename = void>
         struct ra_iter : std::false_type
         {
