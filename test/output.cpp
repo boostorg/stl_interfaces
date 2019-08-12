@@ -85,7 +85,7 @@ std::vector<int> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 TEST(output, basic_std_copy)
 {
     std::vector<int> ints_copy(ints.size());
-    std::copy(ints.begin(), ints.end(), output(ints_copy.data()));
+    std::copy(ints.begin(), ints.end(), output(&ints_copy[0]));
     EXPECT_EQ(ints_copy, ints);
 }
 
@@ -94,4 +94,12 @@ TEST(output, back_insert_std_copy)
     std::vector<int> ints_copy;
     std::copy(ints.begin(), ints.end(), back_insert(ints_copy));
     EXPECT_EQ(ints_copy, ints);
+}
+
+TEST(output, postincrement)
+{
+    std::vector<int> ints_copy;
+    back_insert out(ints_copy);
+    for (int i = 0; i < 10; ++i)
+        out++;
 }

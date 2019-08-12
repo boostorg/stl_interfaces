@@ -167,6 +167,14 @@ TEST(input, mutable_to_const_conversions)
     std::equal(first, last, first_copy, last_copy);
 }
 
+TEST(input, postincrement)
+{
+    int_input first(ints.data());
+    int_input last(ints.data() + ints.size());
+    while (first != last)
+        first++;
+}
+
 TEST(input, std_copy)
 {
     {
