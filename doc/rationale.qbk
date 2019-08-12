@@ -2,7 +2,7 @@
 
 [heading No Derived-Type Contraints]
 
-There is no constraint on the `Derived` template parameter to _iter_facade_,
-because `Derived` is an incomplete type within _iter_facade_.
+There is no constraint on the `Derived` template parameter to _iter_iface_,
+because `Derived` is an incomplete type within _iter_iface_.
 
 [endsect]

@@ -14,13 +14,13 @@
 
 
 // In all the previous examples, we only had to implement a subset of the six
-// possible user-defined basis operations.  For reverse_iterator, we want to
-// support bidirectional, random access, and contiguous iterators.  We
-// therefore need to provide all the basis operations that might be needed.
-// Unfortunately, that's all six of them.
+// possible user-defined basis operations that was needed for one particular
+// iterator concept.  For reverse_iterator, we want to support bidirectional,
+// random access, and contiguous iterators.  We therefore need to provide all
+// the basis operations that might be needed.
 template<typename BidiIter>
 struct reverse_iterator
-    : boost::iterator_facade::iterator_facade<
+    : boost::iterator_facade::iterator_interface<
           reverse_iterator<BidiIter>,
 #if 201703L < __cplusplus && defined(__cpp_lib_ranges)
           typename std::iterator_traits<BidiIter>::iterator_concept,
@@ -32,19 +32,20 @@ struct reverse_iterator
     reverse_iterator() : it_() {}
     reverse_iterator(BidiIter it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-
     using ref_t = typename std::iterator_traits<BidiIter>::reference;
     using diff_t = typename std::iterator_traits<BidiIter>::difference_type;
 
-    ref_t dereference() const { return *std::prev(it_); }
+    ref_t operator*() const { return *std::prev(it_); }
 
     // These three are used only when BidiIter::iterator_category is
     // std::bidirectional_iterator_tag.
-    bool equals(reverse_iterator other) const { return it_ == other.it_; }
-    void next() { --it_; }
-    void prev() { ++it_; }
+    bool operator==(reverse_iterator other) const { return it_ == other.it_; }
+
+    // Even though iterator_interface-derived bidirectional iterators are
+    // usually given next() and prev() members, it turns out that operator+=()
+    // below amounts to the same thing.  That's good, since having next() and
+    // operator+=() in this class would have lead to ambiguities in
+    // iterator_interface.
 
     // These two are only used when BidiIter::iterator_category is
     // std::random_access_iterator_tag or std::contiguous_iterator_tag.  Even
@@ -57,12 +58,17 @@ private:
     // and std::advance() are dead code, because compare() and advance() are
     // never even called when BidiIter::iterator_category is
     // std::bidirectional_iterator_tag.
-    diff_t compare(reverse_iterator other) const
+    diff_t operator-(reverse_iterator other) const
     {
         return std::distance(it_, other.it_);
     }
-    void advance(diff_t n) { std::advance(it_, -n); }
+    reverse_iterator & operator+=(diff_t n)
+    {
+        std::advance(it_, -n);
+        return *this;
+    }
 
+private:
     BidiIter it_;
 };
 

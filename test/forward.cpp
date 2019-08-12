@@ -14,17 +14,20 @@
 
 struct basic_forward_iter
     : boost::iterator_facade::
-          iterator_facade<basic_forward_iter, std::forward_iterator_tag, int>
+          iterator_interface<basic_forward_iter, std::forward_iterator_tag, int>
 {
     basic_forward_iter() : it_(nullptr) {}
     basic_forward_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
+    int & operator*() const { return *it_; }
     void next() { ++it_; }
-    bool equals(basic_forward_iter other) const { return it_ == other.it_; }
+    friend bool
+    operator==(basic_forward_iter lhs, basic_forward_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+private:
     int * it_;
 };
 
@@ -40,7 +43,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct forward_iter : boost::iterator_facade::iterator_facade<
+struct forward_iter : boost::iterator_facade::iterator_interface<
                           forward_iter<ValueType>,
                           std::forward_iterator_tag,
                           ValueType>
@@ -55,12 +58,14 @@ struct forward_iter : boost::iterator_facade::iterator_facade<
     forward_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType & dereference() const { return *it_; }
+    ValueType & operator*() const { return *it_; }
     void next() { ++it_; }
-    bool equals(forward_iter other) const { return it_ == other.it_; }
+    friend bool operator==(forward_iter lhs, forward_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+private:
     ValueType * it_;
 
     template<typename ValueType2>
@@ -93,7 +98,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 #if 0 // TODO: Call ranges algorithms with this.
-struct basic_proxy_forward_iter : boost::iterator_facade::iterator_facade<
+struct basic_proxy_forward_iter : boost::iterator_facade::iterator_interface<
                                       basic_proxy_forward_iter,
                                       std::forward_iterator_tag,
                                       int,
@@ -102,15 +107,15 @@ struct basic_proxy_forward_iter : boost::iterator_facade::iterator_facade<
     basic_proxy_forward_iter() : it_(nullptr) {}
     basic_proxy_forward_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int dereference() const { return *it_; }
+    int operator*() const { return *it_; }
     void next() { ++it_; }
-    bool equals(basic_proxy_forward_iter other) const
+    friend bool operator==(
+        basic_proxy_forward_iter lhs, basic_proxy_forward_iter rhs) noexcept
     {
-        return it_ == other.it_;
+        return lhs.it_ == rhs.it_;
     }
 
+private:
     int * it_;
 };
 #endif
@@ -138,7 +143,6 @@ TEST(forward, basic_std_copy)
     }
 }
 
-
 TEST(forward, mutable_to_const_conversions)
 {
     forward first(ints.data());
@@ -146,6 +150,14 @@ TEST(forward, mutable_to_const_conversions)
     const_forward first_copy(first);
     const_forward last_copy(last);
     std::equal(first, last, first_copy, last_copy);
+}
+
+TEST(forward, postincrement)
+{
+    forward first(ints.data());
+    forward last(ints.data() + ints.size());
+    while (first != last)
+        first++;
 }
 
 TEST(forward, std_copy)

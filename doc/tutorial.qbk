@@ -1,6 +1,6 @@
 [section Tutorial]
 
-[heading The _iter_facade_ Template]
+[heading The _iter_iface_ Template]
 
 Though a given iterator may have a large number of operations associated with
 it, there are only a few basis operations that the iterator needs to define;
@@ -8,15 +8,22 @@ the full set of operations it supports can be defined in terms of that much
 smaller basis.
 
 It is possible to define any iterator `Iter` in terms of a subset of
-user-supplied member functions.  By deriving `Iter` from _iter_facade_ using
-_CRTP_, we can generate the full set of operations.  Here is the declaration
-of _iter_facade_:
+user-supplied operations.  By deriving `Iter` from _iter_iface_ using _CRTP_,
+we can generate the full set of operations.  Here is the declaration of
+_iter_iface_:
 
-[iterator_facade_decl]
+    template<
+        typename Derived,
+        typename IteratorConcept,
+        typename ValueType,
+        typename Reference = ValueType &,
+        typename Pointer = ValueType *,
+        typename DifferenceType = std::ptrdiff_t>
+    struct iterator_interface;
 
 Let's break that down.
 
-`Derived` is the type that you're deriving _iter_facade_ from.
+`Derived` is the type that you're deriving _iter_iface_ from.
 
 `IteratorConcept` defines the iterator category/concept.  This must be one of
 the C++ standard iterator tag types, like `std::forward_iterator_tag`.  In
@@ -34,41 +41,53 @@ iterators. ]
 a weirdo; just leave this as the default type, `std::ptrdiff_t`.
 
 When defining a proxy iterator, you can use a template alias that provides
-reasonable defaults for _iter_facade_'s parameters:
+reasonable defaults for _iter_iface_'s parameters:
 
-[proxy_iterator_alias_decl]
+    template<
+        typename Derived,
+        typename IteratorConcept,
+        typename ValueType,
+        typename Reference = ValueType,
+        typename DifferenceType = std::ptrdiff_t>
+    using proxy_iterator_interface = iterator_interface<
+        Derived,
+        IteratorConcept,
+        ValueType,
+        Reference,
+        proxy_arrow_result<Reference>,
+        DifferenceType>;
 
 
 [heading User-Defined Iterator Operations]
 
-Now, let's get back to the user-defined basis members.
+Now, let's get back to the user-defined basis operations.
 
-In the table below, `Iter` is a user-defined type derived from _iter_facade_;
-`i` and `i2` are objects of type `Iter`; `ci` is an object of type `Iter
-const`; `reference` is the type passed as the `Reference` template parameter
-to _iter_facade_; `pointer` is the type passed as the `Pointer` template
-parameter to _iter_facade_; and `n` is a value of type `difference_type`.
+In the table below, `Iter` is a user-defined type derived from _iter_iface_;
+`i` and `i2` are objects of type `Iter`; `reference` is the type passed as the
+`Reference` template parameter to _iter_iface_; `pointer` is the type passed
+as the `Pointer` template parameter to _iter_iface_; and `n` is a value of
+type `difference_type`.
 
 [table User-Supplied Operations
     [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
     [
-        [ `ci.dereference()` ]
+        [ `*i` ]
         [ Convertible to `reference`. ]
-        [ Dereferences `ci` and returns the result. ]
-        [ ['Expects:] ci is dereferenceable. ]
+        [ Dereferences `i` and returns the result. ]
+        [ ['Expects:] i is dereferenceable. ]
     ]
     [
-        [ `ci.equals(i2)` ]
+        [ `i == i2` ]
         [ Contextually convertible to `bool`. ]
-        [ Returns true if and only if `ci` and `i2` refer to the same value. ]
-        [ ['Expects:] `(ci, i2)` is in the domain of `==`. ]
+        [ Returns true if and only if `i` and `i2` refer to the same value. ]
+        [ ['Expects:] `(i, i2)` is in the domain of `==`. ]
     ]
     [
-        [ `ci.compare(i2)` ]
+        [ `i2 - i` ]
         [ Convertible to `difference_type`. ]
         [ Returns `n`. ]
-        [ ['Expects:] there exists a value `n` of type `difference_type` such that `a + n == b`.
-        `b == a + (b - a)`. ]
+        [ ['Expects:] there exists a value `n` of type `difference_type` such that `i + n == i2`.
+        `i2 == i + (i2 - i)`. ]
     ]
     [
         [ `i.next()` ]
@@ -83,8 +102,8 @@ parameter to _iter_facade_; and `n` is a value of type `difference_type`.
         [ ]
     ]
     [
-        [ `i.advance(n)` ]
-        [ `void` ]
+        [ `i += n` ]
+        [ `Iter &` ]
         [
 ``  difference_type m = n;
   if (m >= 0)
@@ -95,10 +114,10 @@ parameter to _iter_facade_; and `n` is a value of type `difference_type`.
     ]
 ]
 
-[tip The table above leaves a lot of implementation freedom.  In `advance()`,
-you could take `n` as a value or as a reference; `compare()` can return a
-`difference_type` or just something convertible to one; etc.  In particular,
-your operations can be `constexpr` or `noexcept` as you see fit.]
+[tip The table above leaves a lot of implementation freedom.  In
+`operator+=()`, you could take `n` as a value or as a reference; `operator-()`
+can return a `difference_type` or just something convertible to one; etc.  In
+particular, your operations can be `constexpr` or `noexcept` as you see fit.]
 
 Not all the iterator concepts require all the operations above.  Here are the
 operations used with each iterator cocept:
@@ -108,37 +127,37 @@ operations used with each iterator cocept:
     [
         [ `input_iterator` ]
         [
-``dereference()
-equals()
+``*i
+i == i2
 next()`` ]
     ]
     [
         [ `output_iterator` ]
         [
-``dereference()
+``*i
 next()`` ]
     ]
     [
         [ `forward_iterator` ]
         [
-``dereference()
-equals()
+``*i
+i == i2
 next()`` ]
     ]
     [
         [ `bidirectional_iterator` ]
         [
-``dereference()
-equals()
+``*i
+i == i2
 next()
 prev()`` ]
     ]
     [
         [ `random_access_iterator`/`continguous_iterator` ]
         [
-``dereference()
-compare()
-advance()`` ]
+``*i
+i - i2
+i += n`` ]
     ]
 ]
 
@@ -155,13 +174,13 @@ will get us there.
 
 [node_iterator_class_head]
 
-We are deriving `node_iterator` from _iter_facade_, and because we're using
+We are deriving `node_iterator` from _iter_iface_, and because we're using
 _CRTP_, we first have to pass `node_iterator` for the `Derived` template
-parameter, so that _iter_facade_ knows what derived type to cast to in order
-to get at the user-defined operations.  Then, we pass
-`std::forward_iterator_tag` for `IteratorConcept`, since that's appropriate
-for a forward linked list.  Finally, we pass `T` to let _iter_facade_ know
-what the `value_type` is for our iterator.
+parameter, so that _iter_iface_ knows what derived type to cast to in order to
+get at the user-defined operations.  Then, we pass `std::forward_iterator_tag`
+for `IteratorConcept`, since that's appropriate for a singly-linked list.
+Finally, we pass `T` to let _iter_iface_ know what the `value_type` is for our
+iterator.
 
 We leave the rest of the template parameters at their defaults: `T &` for
 `Reference`, `T *` for `Pointer`, and `std::ptrdiff_t` for `DifferenceType`.
@@ -170,27 +189,35 @@ to this are usually some kind of proxy iterator.  Another exception is when
 for better code generation you want to return builtin values instead of
 references for constant iterators.  To see an example of the latter, see the
 `repeated_chars_iterator` in the introduction; it's `Reference` template
-parameter is `char const` for this reason.
+parameter is `char` for this reason.
 
 [node_iterator_ctors]
 
 Next, we define two constructors: a default constructor, and one that takes a
 `node` pointer.  A default constructor is required by the `forward_iterator`
-concept, but _iter_facade_ cannot supply this, since constructors are not
+concept, but _iter_iface_ cannot supply this, since constructors are not
 visible in derived types without user intervention.
 
 [important A default constructor is required for every iterator concept.]
 
-[node_iterator_private]
+[node_iterator_suffix]
 
-Next, we define the user-defined operations that _iter_facade_ requires to do
+Next, we define the user-defined operations that _iter_iface_ requires to do
 its work.  As you might expect, the three required operations are very
 straightfoward.
 
-[note Above I've made all of those private, and `friend`ed
-`boost::iterator_facade::access`.  This is recommended, but it is not strictly
-necessary.  If you make all of the user-defined operations public, there's no
-need to `friend` `boost::iterator_facade::access`.]
+[note Here, I implement `operator==()` as a hidden friend function.  it would
+have worked just as well if I had instead implemanted it as a member function,
+like this:
+
+``constexpr bool operator==(node_iterator rhs) const noexcept
+{
+    return it_ == rhs.it_;
+}``
+
+Either of these forms works, since _iter_iface_ is concept-based _emdash_ the
+appropriate expressions need to be well-formed for the _iter_iface_ tempalte
+to do its work. ]
 
 Finally, we're ready to use our forward iterator:
 
@@ -202,14 +229,14 @@ _Facade_ is able to check that some of the code that you write is compatible
 with the concept for the iterator you're writing.  It cannot check everything.
 For instance, _Facade_ does not know if your derived type includes a default
 constructor, which is required by all the iterators.  In particular,
-_iter_facade_ cannot `static_assert` on the wellformedness of `Derived()`,
-since `Derived` is an incomplete type within the body of _iter_facade_
-_emdash_ _iter_facade_ is the base class for `Derived`, not the other way
+_iter_iface_ cannot `static_assert` on the wellformedness of `Derived()`,
+since `Derived` is an incomplete type within the body of _iter_iface_
+_emdash_ _iter_iface_ is the base class for `Derived`, not the other way
 round.
 
-Since you can easily `static_assert` that a concept is satisfied by a
-particular type, a good practice is to put such a `static_assert` after you
-define your iterator type.
+Since you can easily `static_assert` that a type models a given concept, a
+good practice is to put such a `static_assert` after you define your iterator
+type.
 
 For instance, after `node_iterator` you'll find this code:
 

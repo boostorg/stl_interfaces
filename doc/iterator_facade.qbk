@@ -43,7 +43,7 @@
 [/ Links ]
 
 [def _Facade_              Boost.IteratorFacade]
-[def _iter_facade_         [classref boost::iterator_facade::iterator_facade `iterator_facade`]]
+[def _iter_iface_          [classref boost::iterator_interface::iterator_interface `iterator_interface`]]
 
 [def _concept_m_           [macroref BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT]]
 [def _traits_m_            [macroref BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS]]

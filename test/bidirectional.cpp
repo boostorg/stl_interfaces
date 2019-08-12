@@ -12,7 +12,7 @@
 #include <type_traits>
 
 
-struct basic_bidirectional_iter : boost::iterator_facade::iterator_facade<
+struct basic_bidirectional_iter : boost::iterator_facade::iterator_interface<
                                       basic_bidirectional_iter,
                                       std::bidirectional_iterator_tag,
                                       int>
@@ -20,16 +20,16 @@ struct basic_bidirectional_iter : boost::iterator_facade::iterator_facade<
     basic_bidirectional_iter() : it_(nullptr) {}
     basic_bidirectional_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
-    void prev() { --it_; }
+    int & operator*() const { return *it_; }
     void next() { ++it_; }
-    bool equals(basic_bidirectional_iter other) const
+    void prev() { --it_; }
+    friend bool operator==(
+        basic_bidirectional_iter lhs, basic_bidirectional_iter rhs) noexcept
     {
-        return it_ == other.it_;
+        return lhs.it_ == rhs.it_;
     }
 
+private:
     int * it_;
 };
 
@@ -45,7 +45,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct bidirectional_iter : boost::iterator_facade::iterator_facade<
+struct bidirectional_iter : boost::iterator_facade::iterator_interface<
                                 bidirectional_iter<ValueType>,
                                 std::bidirectional_iterator_tag,
                                 ValueType>
@@ -60,13 +60,16 @@ struct bidirectional_iter : boost::iterator_facade::iterator_facade<
     bidirectional_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType & dereference() const { return *it_; }
-    void prev() { --it_; }
+    ValueType & operator*() const { return *it_; }
     void next() { ++it_; }
-    bool equals(bidirectional_iter other) const { return it_ == other.it_; }
+    void prev() { --it_; }
+    friend bool
+    operator==(bidirectional_iter lhs, bidirectional_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+private:
     ValueType * it_;
 
     template<typename ValueType2>
@@ -99,7 +102,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 #if 0 // TODO: Call ranges algorithms with this.
-struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_facade<
+struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_interface<
                                             basic_proxy_bidirectional_iter,
                                             std::bidirectional_iterator_tag,
                                             int,
@@ -108,16 +111,17 @@ struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_facade<
     basic_proxy_bidirectional_iter() : it_(nullptr) {}
     basic_proxy_bidirectional_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int dereference() const { return *it_; }
-    void prev() { --it_; }
+    int operator*() const { return *it_; }
     void next() { ++it_; }
-    bool equals(basic_proxy_bidirectional_iter other) const
+    void prev() { --it_; }
+    friend bool operator==(
+        basic_proxy_bidirectional_iter lhs,
+        basic_proxy_bidirectional_iter rhs) noexcept
     {
-        return it_ == other.it_;
+        return lhs.it_ == rhs.it_;
     }
 
+private:
     int * it_;
 };
 #endif
@@ -167,7 +171,6 @@ TEST(bidirectional, basic_std_copy)
     }
 }
 
-
 TEST(bidirectional, mutable_to_const_conversions)
 {
     bidirectional first(ints.data());
@@ -175,6 +178,23 @@ TEST(bidirectional, mutable_to_const_conversions)
     const_bidirectional first_copy(first);
     const_bidirectional last_copy(last);
     std::equal(first, last, first_copy, last_copy);
+}
+
+TEST(bidirectional, postincrement_preincrement)
+{
+    {
+        bidirectional first(ints.data());
+        bidirectional last(ints.data() + ints.size());
+        while (first != last)
+            first++;
+    }
+
+    {
+        bidirectional first(ints.data());
+        bidirectional last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
 }
 
 TEST(bidirectional, std_copy)

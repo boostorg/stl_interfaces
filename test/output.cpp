@@ -14,16 +14,15 @@
 
 struct basic_output_iter
     : boost::iterator_facade::
-          iterator_facade<basic_output_iter, std::output_iterator_tag, int>
+          iterator_interface<basic_output_iter, std::output_iterator_tag, int>
 {
     basic_output_iter() : it_(nullptr) {}
     basic_output_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
-    void next() { ++it_; }
+    int & operator*() noexcept { return *it_; }
+    void next() noexcept { ++it_; }
 
+private:
     int * it_;
 };
 
@@ -40,7 +39,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename Container>
-struct back_insert_iter : boost::iterator_facade::iterator_facade<
+struct back_insert_iter : boost::iterator_facade::iterator_interface<
                               back_insert_iter<Container>,
                               std::output_iterator_tag,
                               typename Container::value_type,
@@ -48,6 +47,9 @@ struct back_insert_iter : boost::iterator_facade::iterator_facade<
 {
     back_insert_iter() : c_(nullptr) {}
     back_insert_iter(Container & c) : c_(std::addressof(c)) {}
+
+    back_insert_iter & operator*() noexcept { return *this; }
+    void next() noexcept {}
 
     back_insert_iter & operator=(typename Container::value_type const & v)
     {
@@ -61,10 +63,6 @@ struct back_insert_iter : boost::iterator_facade::iterator_facade<
     }
 
 private:
-    friend boost::iterator_facade::access;
-    back_insert_iter & dereference() { return *this; }
-    void next() {}
-
     Container * c_;
 };
 

@@ -25,7 +25,7 @@ struct node
 template<typename T>
 struct node_iterator
     : boost::iterator_facade::
-          iterator_facade<node_iterator<T>, std::forward_iterator_tag, T>
+          iterator_interface<node_iterator<T>, std::forward_iterator_tag, T>
 //]
 {
     //[ node_iterator_ctors
@@ -33,16 +33,16 @@ struct node_iterator
     constexpr node_iterator(node<T> * it) noexcept : it_(it) {}
     //]
 
-    //[ node_iterator_private
-private:
-    friend boost::iterator_facade::access;
-    constexpr T & dereference() const noexcept { return it_->value_; }
+    //[ node_iterator_suffix
+    constexpr T & operator*() const noexcept { return it_->value_; }
     constexpr void next() noexcept { it_ = it_->next_; }
-    constexpr bool equals(node_iterator other) const noexcept
+    friend constexpr bool
+    operator==(node_iterator lhs, node_iterator rhs) noexcept
     {
-        return it_ == other.it_;
+        return lhs.it_ == rhs.it_;
     }
 
+private:
     node<T> * it_;
 };
 //]

@@ -14,16 +14,17 @@
 
 struct basic_input_iter
     : boost::iterator_facade::
-          iterator_facade<basic_input_iter, std::input_iterator_tag, int>
+          iterator_interface<basic_input_iter, std::input_iterator_tag, int>
 {
     basic_input_iter() : it_(nullptr) {}
     basic_input_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
-    void next() { ++it_; }
-    bool equals(basic_input_iter other) const { return it_ == other.it_; }
+    int & operator*() const noexcept { return *it_; }
+    void next() noexcept { ++it_; }
+    friend bool operator==(basic_input_iter lhs, basic_input_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
     int * it_;
 };
@@ -40,7 +41,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct input_iter : boost::iterator_facade::iterator_facade<
+struct input_iter : boost::iterator_facade::iterator_interface<
                         input_iter<ValueType>,
                         std::input_iterator_tag,
                         ValueType>
@@ -55,12 +56,14 @@ struct input_iter : boost::iterator_facade::iterator_facade<
     input_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType & dereference() const { return *it_; }
-    void next() { ++it_; }
-    bool equals(input_iter other) const { return it_ == other.it_; }
+    ValueType & operator*() const noexcept { return *it_; }
+    void next() noexcept { ++it_; }
+    friend bool operator==(input_iter lhs, input_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+private:
     ValueType * it_;
 
     template<typename ValueType2>
@@ -84,7 +87,7 @@ using pair_input = input_iter<std::pair<int, int>>;
 using const_pair_input = input_iter<std::pair<int, int> const>;
 
 template<typename ValueType>
-struct proxy_input_iter : boost::iterator_facade::proxy_iterator_facade<
+struct proxy_input_iter : boost::iterator_facade::proxy_iterator_interface<
                               proxy_input_iter<ValueType>,
                               std::input_iterator_tag,
                               ValueType>
@@ -99,12 +102,14 @@ struct proxy_input_iter : boost::iterator_facade::proxy_iterator_facade<
     proxy_input_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType dereference() const { return *it_; }
-    void next() { ++it_; }
-    bool equals(proxy_input_iter other) const { return it_ == other.it_; }
+    ValueType operator*() const noexcept { return *it_; }
+    void next() noexcept { ++it_; }
+    friend bool operator==(proxy_input_iter lhs, proxy_input_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+private:
     ValueType * it_;
 
     template<typename ValueType2>

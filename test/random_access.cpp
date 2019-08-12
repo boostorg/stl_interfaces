@@ -12,7 +12,7 @@
 #include <type_traits>
 
 
-struct basic_random_access_iter : boost::iterator_facade::iterator_facade<
+struct basic_random_access_iter : boost::iterator_facade::iterator_interface<
                                       basic_random_access_iter,
                                       std::random_access_iterator_tag,
                                       int>
@@ -20,15 +20,19 @@ struct basic_random_access_iter : boost::iterator_facade::iterator_facade<
     basic_random_access_iter() {}
     basic_random_access_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
-    void advance(std::ptrdiff_t i) { it_ += i; }
-    auto compare(basic_random_access_iter other) const
+    int & operator*() const { return *it_; }
+    basic_random_access_iter & operator+=(std::ptrdiff_t i)
     {
-        return it_ - other.it_;
+        it_ += i;
+        return *this;
+    }
+    friend std::ptrdiff_t operator-(
+        basic_random_access_iter lhs, basic_random_access_iter rhs) noexcept
+    {
+        return lhs.it_ - rhs.it_;
     }
 
+private:
     int * it_;
 };
 
@@ -44,7 +48,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct random_access_iter : boost::iterator_facade::iterator_facade<
+struct random_access_iter : boost::iterator_facade::iterator_interface<
                                 random_access_iter<ValueType>,
                                 std::random_access_iterator_tag,
                                 ValueType>
@@ -59,12 +63,19 @@ struct random_access_iter : boost::iterator_facade::iterator_facade<
     random_access_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType & dereference() const { return *it_; }
-    void advance(std::ptrdiff_t i) { it_ += i; }
-    auto compare(random_access_iter other) const { return it_ - other.it_; }
+    ValueType & operator*() const { return *it_; }
+    random_access_iter & operator+=(std::ptrdiff_t i)
+    {
+        it_ += i;
+        return *this;
+    }
+    friend std::ptrdiff_t
+    operator-(random_access_iter lhs, random_access_iter rhs) noexcept
+    {
+        return lhs.it_ - rhs.it_;
+    }
 
+private:
     ValueType * it_;
 
     template<typename ValueType2>
@@ -97,7 +108,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 // TODO: Call ranges algorithms with this.
-struct zip_iter : boost::iterator_facade::proxy_iterator_facade<
+struct zip_iter : boost::iterator_facade::proxy_iterator_interface<
                       zip_iter,
                       std::random_access_iterator_tag,
                       std::tuple<int, int>,
@@ -106,22 +117,22 @@ struct zip_iter : boost::iterator_facade::proxy_iterator_facade<
     zip_iter() : it1_(nullptr), it2_(nullptr) {}
     zip_iter(int * it1, int * it2) : it1_(it1), it2_(it2) {}
 
-private:
-    friend boost::iterator_facade::access;
-    std::tuple<int &, int &> dereference() const
+    std::tuple<int &, int &> operator*() const
     {
         return std::tuple<int &, int &>{*it1_, *it2_};
     }
-    void advance(std::ptrdiff_t i)
+    zip_iter & operator+=(std::ptrdiff_t i)
     {
         it1_ += i;
         it2_ += i;
+        return *this;
     }
-    auto compare(zip_iter other) const
+    friend std::ptrdiff_t operator-(zip_iter lhs, zip_iter rhs) noexcept
     {
-        return it1_ - other.it1_;
+        return lhs.it1_ - rhs.it1_;
     }
 
+private:
     int * it1_;
     int * it2_;
 };
@@ -157,7 +168,7 @@ struct int_t
     friend bool operator<(int lhs, int_t rhs) { return lhs < rhs.value_; }
 };
 
-struct udt_zip_iter : boost::iterator_facade::proxy_iterator_facade<
+struct udt_zip_iter : boost::iterator_facade::proxy_iterator_interface<
                           udt_zip_iter,
                           std::random_access_iterator_tag,
                           std::tuple<int_t, int>,
@@ -166,22 +177,22 @@ struct udt_zip_iter : boost::iterator_facade::proxy_iterator_facade<
     udt_zip_iter() : it1_(nullptr), it2_(nullptr) {}
     udt_zip_iter(int_t * it1, int * it2) : it1_(it1), it2_(it2) {}
 
-private:
-    friend boost::iterator_facade::access;
-    std::tuple<int_t &, int &> dereference() const
+    std::tuple<int_t &, int &> operator*() const
     {
         return std::tuple<int_t &, int &>{*it1_, *it2_};
     }
-    void advance(std::ptrdiff_t i)
+    udt_zip_iter & operator+=(std::ptrdiff_t i)
     {
         it1_ += i;
         it2_ += i;
+        return *this;
     }
-    auto compare(udt_zip_iter other) const
+    friend std::ptrdiff_t operator-(udt_zip_iter lhs, udt_zip_iter rhs) noexcept
     {
-        return it1_ - other.it1_;
+        return lhs.it1_ - rhs.it1_;
     }
 
+private:
     int_t * it1_;
     int * it2_;
 };
@@ -357,6 +368,23 @@ TEST(random_access, mutable_to_const_conversions)
     const_random_access first_copy(first);
     const_random_access last_copy(last);
     std::equal(first, last, first_copy, last_copy);
+}
+
+TEST(random_access, postincrement_preincrement)
+{
+    {
+        random_access first(ints.data());
+        random_access last(ints.data() + ints.size());
+        while (first != last)
+            first++;
+    }
+
+    {
+        random_access first(ints.data());
+        random_access last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
 }
 
 TEST(random_access, coverage)
