@@ -250,9 +250,9 @@ Here's how we might use the forward iterator we just defined:
 
 [heading Checking Your Work]
 
-_Facade_ is able to check that some of the code that you write is compatible
+_IFaces_ is able to check that some of the code that you write is compatible
 with the concept for the iterator you're writing.  It cannot check everything.
-For instance, _Facade_ does not know if your derived type includes a default
+For instance, _IFaces_ does not know if your derived type includes a default
 constructor, which is required by all the iterators.  In particular,
 _iter_iface_ cannot `static_assert` on the wellformedness of `Derived()`,
 since `Derived` is an incomplete type within the body of _iter_iface_

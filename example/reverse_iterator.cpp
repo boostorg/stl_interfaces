@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ reverse_iterator
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <list>
@@ -20,7 +20,7 @@
 // the basis operations that might be needed.
 template<typename BidiIter>
 struct reverse_iterator
-    : boost::iterator_facade::iterator_interface<
+    : boost::stl_interfaces::iterator_interface<
           reverse_iterator<BidiIter>,
 #if 201703L < __cplusplus && defined(__cpp_lib_ranges)
           typename std::iterator_traits<BidiIter>::iterator_concept,

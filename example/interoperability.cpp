@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ interoperability
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -16,7 +16,7 @@
 // template parameter allows us easily to define const and non-const iterators
 // from the same template.
 template<typename ValueType>
-struct random_access_iterator : boost::iterator_facade::iterator_interface<
+struct random_access_iterator : boost::stl_interfaces::iterator_interface<
                                     random_access_iterator<ValueType>,
                                     std::random_access_iterator_tag,
                                     ValueType>

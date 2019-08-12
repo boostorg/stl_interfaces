@@ -16,14 +16,14 @@ rule run_doxygen ( files * : name : expand ? )
 
     expand ?= <doxygen:param>EXPAND_ONLY_PREDEF=YES ;
 
-doxygen iterator_facade_reference
+doxygen stl_interfaces_reference
   :
     $(files)
   :
         <doxygen:param>EXTRACT_ALL=YES
         # note that there is no detail::unspecified -- this is a hack to get all
         # the SFINAE code out of the API docs.
-        <doxygen:param>"PREDEFINED=\"BOOST_ITERATOR_FACADE_DOXYGEN=1\" \\
+        <doxygen:param>"PREDEFINED=\"BOOST_STL_INTERFACES_DOXYGEN=1\" \\
                                    \"enable_if=detail::unspecified\""
         <doxygen:param>HIDE_UNDOC_MEMBERS=NO
         <doxygen:param>EXTRACT_PRIVATE=NO
@@ -37,21 +37,21 @@ doxygen iterator_facade_reference
 
 }
 
-run_doxygen [ glob ../include/boost/iterator_facade/*.hpp ] : "Reference" ;
+run_doxygen [ glob ../include/boost/stl_interfaces/*.hpp ] : "Reference" ;
 
-xml iterator_facade
+xml stl_interfaces
     :
-        iterator_facade.qbk
+        stl_interfaces.qbk
     ;
 
 boostbook standalone
     :
-        iterator_facade
+        stl_interfaces
     :
         <dependency>css
         <dependency>images
 
-        <dependency>iterator_facade_reference
+        <dependency>stl_interfaces_reference
 
         # HTML options first:
         # Use graphics not text for navigation:
@@ -93,7 +93,7 @@ boostbook standalone
         <auto-index>on
         <auto-index-verbose>on
         <auto-index-internal>on
-        <auto-index-script>iterator_facade.idx
+        <auto-index-script>stl_interfaces.idx
         <quickbook-define>enable_index
         <auto-index-prefix>..
         <xsl:param>index.on.type=1

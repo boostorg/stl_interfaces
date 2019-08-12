@@ -1,3 +1,0 @@
-!scan-path "include/boost/iterator_facade" ".*\.hpp" true 
-
-!scan-path "example" ".*\.cpp" 

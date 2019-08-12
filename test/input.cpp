@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +13,7 @@
 
 
 struct basic_input_iter
-    : boost::iterator_facade::
+    : boost::stl_interfaces::
           iterator_interface<basic_input_iter, std::input_iterator_tag, int>
 {
     basic_input_iter() : it_(nullptr) {}
@@ -30,7 +30,7 @@ struct basic_input_iter
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::iterator_facade::
+    using base_type = boost::stl_interfaces::
         iterator_interface<basic_input_iter, std::input_iterator_tag, int>;
     using base_type::operator++;
 
@@ -38,9 +38,9 @@ private:
     int * it_;
 };
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_input_iter, std::input_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_input_iter,
     std::input_iterator_tag,
     std::input_iterator_tag,
@@ -50,7 +50,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct input_iter : boost::iterator_facade::iterator_interface<
+struct input_iter : boost::stl_interfaces::iterator_interface<
                         input_iter<ValueType>,
                         std::input_iterator_tag,
                         ValueType>
@@ -76,7 +76,7 @@ struct input_iter : boost::iterator_facade::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::iterator_facade::iterator_interface<
+    using base_type = boost::stl_interfaces::iterator_interface<
         input_iter<ValueType>,
         std::input_iterator_tag,
         ValueType>;
@@ -89,9 +89,9 @@ private:
     friend struct input_iter;
 };
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     input_iter<int>, std::input_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     input_iter<int>,
     std::input_iterator_tag,
     std::input_iterator_tag,
@@ -106,7 +106,7 @@ using pair_input = input_iter<std::pair<int, int>>;
 using const_pair_input = input_iter<std::pair<int, int> const>;
 
 template<typename ValueType>
-struct proxy_input_iter : boost::iterator_facade::proxy_iterator_interface<
+struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
                               proxy_input_iter<ValueType>,
                               std::input_iterator_tag,
                               ValueType>
@@ -132,7 +132,7 @@ struct proxy_input_iter : boost::iterator_facade::proxy_iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::iterator_facade::proxy_iterator_interface<
+    using base_type = boost::stl_interfaces::proxy_iterator_interface<
         proxy_input_iter<ValueType>,
         std::input_iterator_tag,
         ValueType>;
@@ -146,15 +146,15 @@ private:
 };
 
 using int_pair = std::pair<int, int>;
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     proxy_input_iter<int_pair>, std::input_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     proxy_input_iter<int_pair>,
     std::input_iterator_tag,
     std::input_iterator_tag,
     int_pair,
     int_pair,
-    boost::iterator_facade::proxy_arrow_result<int_pair>,
+    boost::stl_interfaces::proxy_arrow_result<int_pair>,
     std::ptrdiff_t)
 
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};

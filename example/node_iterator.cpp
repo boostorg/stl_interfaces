@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -24,7 +24,7 @@ struct node
 //[ node_iterator_class_head
 template<typename T>
 struct node_iterator
-    : boost::iterator_facade::
+    : boost::stl_interfaces::
           iterator_interface<node_iterator<T>, std::forward_iterator_tag, T>
 //]
 {
@@ -48,7 +48,7 @@ struct node_iterator
     //]
 
     //[ node_iterator_using_declaration
-    using base_type = boost::iterator_facade::
+    using base_type = boost::stl_interfaces::
         iterator_interface<node_iterator<T>, std::forward_iterator_tag, T>;
     using base_type::operator++;
     //]
@@ -60,8 +60,7 @@ private:
 //[ node_iterator_concept_check Equivalent to
 // static_assert(std::forward_iterator<node_iterator>, ""), or nothing in
 // C++17 and earlier.
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
-    node_iterator, std::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(node_iterator, std::forward_iterator)
 //]
 
 

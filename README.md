@@ -1,10 +1,12 @@
-# iterator_facade
+# stl_interfaces
 
-An updated C++20-friendly version of the iterator_facade part of
-Boost.Iterator, targeting standardization.  This library requires at least
-C++14.
+An updated C++20-friendly version of the `iterator_facade` part of
+Boost.Iterator (now called `iterator_interface`); a pre-C++20 version of
+C++20's `view_interface`; and a new template called `container_interface`,
+meant to aid the creation of new containers; all targeting standardization.
+This library requires at least C++14.
 
-In short, if you need to write an iterator, iterator_facade turns this:
+In short, if you need to write an iterator, iterator_iterface turns this:
 
 ```c++
     struct repeated_chars_iterator
@@ -140,11 +142,11 @@ In short, if you need to write an iterator, iterator_facade turns this:
 into this:
 
 ```c++
-struct repeated_chars_iterator : boost::iterator_facade::iterator_facade<
+struct repeated_chars_iterator : boost::stl_interfaces::iterator_interface<
                                      repeated_chars_iterator,
                                      std::random_access_iterator_tag,
                                      char,
-                                     char const>
+                                     char>
 {
     constexpr repeated_chars_iterator() noexcept :
         first_(nullptr),
@@ -158,28 +160,28 @@ struct repeated_chars_iterator : boost::iterator_facade::iterator_facade<
         n_(n)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    constexpr char const dereference() const noexcept
+    constexpr char operator*() const noexcept { return first_[n_ % size_]; }
+    constexpr repeated_chars_iterator & operator+=(std::ptrdiff_t i) noexcept
     {
-        return first_[n_ % size_];
+        n_ += i;
+        return *this;
     }
-    constexpr void advance(std::ptrdiff_t i) noexcept { n_ += i; }
-    constexpr auto compare(repeated_chars_iterator other) const noexcept
+    constexpr auto operator-(repeated_chars_iterator other) const noexcept
     {
         return n_ - other.n_;
     }
 
+private:
     char const * first_;
     difference_type size_;
     difference_type n_;
 };
 ```
 
-If you don't ever write iterators, this is not for you.
+If you don't ever write iterators, range views, or containers, this is not for you.
 
-Online docs: https://tzlaine.github.io/iterator_facade.
+Online docs: https://tzlaine.github.io/stl_interfaces.
 
-[![Build Status](https://travis-ci.org/tzlaine/iterator_facade.svg?branch=master)](https://travis-ci.org/tzlaine/iterator_facade)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/iterator_facade?branch=master&svg=true)](https://ci.appveyor.com/project/tzlaine/iterator_facade)
+[![Build Status](https://travis-ci.org/tzlaine/stl_interfaces.svg?branch=master)](https://travis-ci.org/tzlaine/stl_interfaces)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/stl_interfaces?branch=master&svg=true)](https://ci.appveyor.com/project/tzlaine/stl_interfaces)
 [![License](https://img.shields.io/badge/license-boost-brightgreen.svg)](LICENSE_1_0.txt)

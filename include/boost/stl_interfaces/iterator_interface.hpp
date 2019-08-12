@@ -3,23 +3,23 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#ifndef BOOST_ITERATOR_FACADE_ITERATOR_FACADE_HPP
-#define BOOST_ITERATOR_FACADE_ITERATOR_FACADE_HPP
+#ifndef BOOST_STL_INTERFACES_ITERATOR_INTERFACE_HPP
+#define BOOST_STL_INTERFACES_ITERATOR_INTERFACE_HPP
 
-#include <boost/iterator_facade/fwd.hpp>
+#include <boost/stl_interfaces/fwd.hpp>
 
 #include <utility>
 #include <iterator>
 #include <type_traits>
 
 
-namespace boost { namespace iterator_facade {
+namespace boost { namespace stl_interfaces {
 
     /** The return type of `operator->()` in a proxy iterator.
 
         This template is used as the default `Pointer` template parameter in
-        the `proxy_iterator_facade` template alias.  Note that the use of this
-        template implies a copy or move of the underlying object of type
+        the `proxy_iterator_interface` template alias.  Note that the use of
+        this template implies a copy or move of the underlying object of type
         `T`. */
     template<typename T>
     struct proxy_arrow_result
@@ -191,7 +191,7 @@ namespace boost { namespace iterator_facade {
             retval += i;
             return retval;
         }
-        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR Derived
+        friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR Derived
         operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
         {
             return it + i;
@@ -227,7 +227,7 @@ namespace boost { namespace iterator_facade {
             return derived();
         }
 
-        friend BOOST_ITERATOR_FACADE_HIDDEN_FRIEND_CONSTEXPR Derived operator-(
+        friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR Derived operator-(
             Derived it,
             difference_type i) noexcept(noexcept(Derived(it), it += -i))
         {
@@ -354,47 +354,46 @@ namespace boost { namespace iterator_facade {
 }}
 
 
-#ifdef BOOST_ITERATOR_FACADE_DOXYGEN
+#ifdef BOOST_STL_INTERFACES_DOXYGEN
 
 /** `static_asserts` that iterator type `iter` models concept `concept_name`.
     This is useful for checking that an iterator you write using
-    `iterator_facade` models the right C++ concept.
+    `iterator_interface` models the right C++ concept.
 
-    For example: `BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(my_iter,
+    For example: `BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(my_iter,
     std::input_iterator)`.
 
     \note This macro exapnds to nothing when `__cpp_lib_concepts` is not
     defined. */
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(iter, concept_name)
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(iter, concept_name)
 
 /** `static_asserts` that the types of all typedefs in
     `std::iterator_traits<iter>` match the remaining macro parameters.  This
-    is useful for checking that an iterator you write using `iterator_facade`
-    has the correct iterator traits.
+    is useful for checking that an iterator you write using
+    `iterator_interface` has the correct iterator traits.
 
-    For example: `BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(my_iter,
+    For example: `BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(my_iter,
     std::input_iterator_tag, std::input_iterator_tag, int, int &, int *, std::ptrdiff_t)`.
 
     \note This macro ignores the `concept` parameter when `__cpp_lib_concepts`
     is not defined. */
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(                   \
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(                    \
     iter, category, concept, value_type, reference, pointer, difference_type)
 
 #else
 
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(             \
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(              \
     iter, concept_name)                                                        \
     static_assert(concept_name<iter>, "");
 
 #if 201703L < __cplusplus && defined(__cpp_lib_concepts)
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(iter, concept_name)        \
-    BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(                 \
-        iter, concept_name)
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(iter, concept_name)         \
+    BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(iter, concept_name)
 #else
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(iter, concept_name)
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(iter, concept_name)
 #endif
 
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(              \
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(               \
     iter, category, value_t, ref, ptr, diff_t)                                 \
     static_assert(                                                             \
         std::is_same<                                                          \
@@ -421,19 +420,19 @@ namespace boost { namespace iterator_facade {
         "");
 
 #if 201703L < __cplusplus && defined(__cpp_lib_ranges)
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(                   \
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(                    \
     iter, category, concept, value_type, reference, pointer, difference_type)  \
     static_assert(                                                             \
         std::is_same<                                                          \
             typename std::iterator_traits<iter>::iterator_concept,             \
             concept>::value,                                                   \
         "");                                                                   \
-    BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                  \
+    BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                   \
         iter, category, value_type, reference, pointer, difference_type)
 #else
-#define BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(                   \
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(                    \
     iter, category, concept, value_type, reference, pointer, difference_type)  \
-    BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                  \
+    BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                   \
         iter, category, value_type, reference, pointer, difference_type)
 #endif
 

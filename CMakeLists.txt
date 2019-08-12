@@ -54,18 +54,18 @@ include(dependencies)
 
 
 ##################################################
-# iterator_facade library
+# stl_interfaces library
 ##################################################
-add_library(iterator_facade INTERFACE)
+add_library(stl_interfaces INTERFACE)
 
-target_include_directories(iterator_facade INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(iterator_facade INTERFACE boost)
+target_include_directories(stl_interfaces INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(stl_interfaces INTERFACE boost)
 if (link_flags)
-    target_link_libraries(iterator_facade INTERFACE ${link_flags})
-    target_compile_options(iterator_facade INTERFACE ${compile_flags})
+    target_link_libraries(stl_interfaces INTERFACE ${link_flags})
+    target_compile_options(stl_interfaces INTERFACE ${compile_flags})
 endif ()
 if (NOT MSVC)
-    target_compile_options(iterator_facade INTERFACE -Wall)
+    target_compile_options(stl_interfaces INTERFACE -Wall)
 endif ()
 
 

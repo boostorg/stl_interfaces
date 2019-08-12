@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ zip_proxy_iterator
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -18,7 +18,7 @@
 // iterator writable, it needs to have a reference type that is not actually a
 // reference -- the reference type is a pair of references, std::tuple<int &,
 // int &>.
-struct zip_iterator : boost::iterator_facade::proxy_iterator_interface<
+struct zip_iterator : boost::stl_interfaces::proxy_iterator_interface<
                       zip_iterator,
                       std::random_access_iterator_tag,
                       std::tuple<int, int>,

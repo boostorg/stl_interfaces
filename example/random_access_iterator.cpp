@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ random_access_iterator
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -13,9 +13,9 @@
 
 
 // This is a minimal random access iterator.  It uses default template
-// parameters for most iterator_facade template parameters.
+// parameters for most stl_interfaces template parameters.
 struct simple_random_access_iterator
-    : boost::iterator_facade::iterator_interface<
+    : boost::stl_interfaces::iterator_interface<
           simple_random_access_iterator,
           std::random_access_iterator_tag,
           int>

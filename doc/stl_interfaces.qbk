@@ -3,13 +3,13 @@
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  /]
 
-[library Boost.IteratorFacade (Proposed)
+[library Boost.STLInterfaces (Proposed)
     [quickbook 1.3]
     [authors [Laine, Zach]]
     [copyright 2019 T. Zachary Laine]
     [category template]
-    [id iterator_facade]
-    [dirname iterator_facade]
+    [id stl_interfaces]
+    [dirname stl_interfaces]
     [purpose
         A string and rope library targeting standardization.
     ]
@@ -42,11 +42,11 @@
 
 [/ Links ]
 
-[def _Facade_              Boost.IteratorFacade]
+[def _IFaces_              Boost.STLInterfaces]
 [def _iter_iface_          [classref boost::iterator_interface::iterator_interface `iterator_interface`]]
 
-[def _concept_m_           [macroref BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT]]
-[def _traits_m_            [macroref BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS]]
+[def _concept_m_           [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT]]
+[def _traits_m_            [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS]]
 
 [def _CRTP_                [@https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern CRTP]]
 [def _Iterator_            [@https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html Boost.Iterator]]
@@ -59,14 +59,14 @@
 
 [section Compiler Support]
 
-_Facade_ is written against the C++14 standard.  It is targetting
+_IFaces_ is written against the C++14 standard.  It is targetting
 standardization, and the changes required to make it C++11-compatible were
 considered too great.
 
-_Facade_ should work with any conforming C++14 compiler.
+_IFaces_ should work with any conforming C++14 compiler.
 
 [endsect]
 
-[xinclude iterator_facade_reference.xml]
+[xinclude stl_interfaces_reference.xml]
 
 [include rationale.qbk]

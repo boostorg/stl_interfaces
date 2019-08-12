@@ -3,13 +3,13 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#ifndef BOOST_ITERATOR_FACADE_VIEW_INTERFACE_HPP
-#define BOOST_ITERATOR_FACADE_VIEW_INTERFACE_HPP
+#ifndef BOOST_STL_INTERFACES_VIEW_INTERFACE_HPP
+#define BOOST_STL_INTERFACES_VIEW_INTERFACE_HPP
 
-#include <boost/iterator_facade/fwd.hpp>
+#include <boost/stl_interfaces/fwd.hpp>
 
 
-namespace boost { namespace iterator_facade {
+namespace boost { namespace stl_interfaces {
 
     namespace detail {
         template<typename T, typename = void>

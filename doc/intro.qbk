@@ -151,7 +151,7 @@ Ah, that's better.  Both of these definitions for `repeated_chars_iterator`
 have the same semantics and performance profile.  It's just a lot less code to
 write the second one, and writing the second one is more novice-friendly.
 
-[note _Facade_'s `iterator_interface` implements iterators that model the
+[note _IFaces_'s `iterator_interface` implements iterators that model the
 C++20 iterator concepts.]
 
 [endsect]

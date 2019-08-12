@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <gtest/gtest.h>
 
@@ -12,7 +12,7 @@
 #include <type_traits>
 
 
-struct basic_bidirectional_iter : boost::iterator_facade::iterator_interface<
+struct basic_bidirectional_iter : boost::stl_interfaces::iterator_interface<
                                       basic_bidirectional_iter,
                                       std::bidirectional_iterator_tag,
                                       int>
@@ -37,7 +37,7 @@ struct basic_bidirectional_iter : boost::iterator_facade::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::iterator_facade::iterator_interface<
+    using base_type = boost::stl_interfaces::iterator_interface<
         basic_bidirectional_iter,
         std::bidirectional_iterator_tag,
         int>;
@@ -48,9 +48,9 @@ private:
     int * it_;
 };
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_bidirectional_iter, std::bidirectional_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_bidirectional_iter,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
@@ -60,7 +60,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct bidirectional_iter : boost::iterator_facade::iterator_interface<
+struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
                                 bidirectional_iter<ValueType>,
                                 std::bidirectional_iterator_tag,
                                 ValueType>
@@ -92,7 +92,7 @@ struct bidirectional_iter : boost::iterator_facade::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::iterator_facade::iterator_interface<
+    using base_type = boost::stl_interfaces::iterator_interface<
         bidirectional_iter<ValueType>,
         std::bidirectional_iterator_tag,
         ValueType>;
@@ -109,9 +109,9 @@ private:
 using bidirectional = bidirectional_iter<int>;
 using const_bidirectional = bidirectional_iter<int const>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     bidirectional, std::bidirectional_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     bidirectional,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
@@ -120,9 +120,9 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     const_bidirectional, std::bidirectional_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_bidirectional,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
@@ -132,7 +132,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 #if 0 // TODO: Call ranges algorithms with this.
-struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_interface<
+struct basic_proxy_bidirectional_iter : boost::stl_interfaces::iterator_interface<
                                             basic_proxy_bidirectional_iter,
                                             std::bidirectional_iterator_tag,
                                             int,
@@ -151,7 +151,7 @@ struct basic_proxy_bidirectional_iter : boost::iterator_facade::iterator_interfa
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::iterator_facade::iterator_interface<
+    using base_type = boost::stl_interfaces::iterator_interface<
         basic_proxy_bidirectional_iter,
         std::bidirectional_iterator_tag,
         int,

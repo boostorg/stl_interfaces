@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <string>
 
@@ -11,7 +11,7 @@
 
 
 //[ repeated_chars_iterator
-struct repeated_chars_iterator : boost::iterator_facade::iterator_interface<
+struct repeated_chars_iterator : boost::stl_interfaces::iterator_interface<
                                      repeated_chars_iterator,
                                      std::random_access_iterator_tag,
                                      char,

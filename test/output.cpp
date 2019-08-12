@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +13,7 @@
 
 
 struct basic_output_iter
-    : boost::iterator_facade::
+    : boost::stl_interfaces::
           iterator_interface<basic_output_iter, std::output_iterator_tag, int>
 {
     basic_output_iter() : it_(nullptr) {}
@@ -26,7 +26,7 @@ struct basic_output_iter
         return *this;
     }
 
-    using base_type = boost::iterator_facade::
+    using base_type = boost::stl_interfaces::
         iterator_interface<basic_output_iter, std::output_iterator_tag, int>;
     using base_type::operator++;
 
@@ -36,8 +36,8 @@ private:
 
 using output = basic_output_iter;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(output, std::output_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(output, std::output_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     output,
     std::output_iterator_tag,
     std::output_iterator_tag,
@@ -47,7 +47,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename Container>
-struct back_insert_iter : boost::iterator_facade::iterator_interface<
+struct back_insert_iter : boost::stl_interfaces::iterator_interface<
                               back_insert_iter<Container>,
                               std::output_iterator_tag,
                               typename Container::value_type,
@@ -70,7 +70,7 @@ struct back_insert_iter : boost::iterator_facade::iterator_interface<
         return *this;
     }
 
-    using base_type = boost::iterator_facade::iterator_interface<
+    using base_type = boost::stl_interfaces::iterator_interface<
         back_insert_iter<Container>,
         std::output_iterator_tag,
         typename Container::value_type,
@@ -83,8 +83,8 @@ private:
 
 using back_insert = back_insert_iter<std::vector<int>>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(back_insert, std::output_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(back_insert, std::output_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     back_insert,
     std::output_iterator_tag,
     std::output_iterator_tag,

@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <gtest/gtest.h>
 
@@ -12,7 +12,7 @@
 #include <type_traits>
 
 
-struct basic_random_access_iter : boost::iterator_facade::iterator_interface<
+struct basic_random_access_iter : boost::stl_interfaces::iterator_interface<
                                       basic_random_access_iter,
                                       std::random_access_iterator_tag,
                                       int>
@@ -36,9 +36,9 @@ private:
     int * it_;
 };
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_random_access_iter, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_random_access_iter,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
@@ -48,7 +48,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct random_access_iter : boost::iterator_facade::iterator_interface<
+struct random_access_iter : boost::stl_interfaces::iterator_interface<
                                 random_access_iter<ValueType>,
                                 std::random_access_iterator_tag,
                                 ValueType>
@@ -85,9 +85,9 @@ private:
 using random_access = random_access_iter<int>;
 using const_random_access = random_access_iter<int const>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     random_access, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     random_access,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
@@ -96,9 +96,9 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     const_random_access, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_random_access,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
@@ -108,7 +108,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 // TODO: Call ranges algorithms with this.
-struct zip_iter : boost::iterator_facade::proxy_iterator_interface<
+struct zip_iter : boost::stl_interfaces::proxy_iterator_interface<
                       zip_iter,
                       std::random_access_iterator_tag,
                       std::tuple<int, int>,
@@ -140,15 +140,15 @@ private:
 using int_pair = std::tuple<int, int>;
 using int_refs_pair = std::tuple<int &, int &>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     zip_iter, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     zip_iter,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
     int_pair,
     int_refs_pair,
-    boost::iterator_facade::proxy_arrow_result<int_refs_pair>,
+    boost::stl_interfaces::proxy_arrow_result<int_refs_pair>,
     std::ptrdiff_t)
 
 struct int_t
@@ -168,7 +168,7 @@ struct int_t
     friend bool operator<(int lhs, int_t rhs) { return lhs < rhs.value_; }
 };
 
-struct udt_zip_iter : boost::iterator_facade::proxy_iterator_interface<
+struct udt_zip_iter : boost::stl_interfaces::proxy_iterator_interface<
                           udt_zip_iter,
                           std::random_access_iterator_tag,
                           std::tuple<int_t, int>,
@@ -200,15 +200,15 @@ private:
 using int_t_int_pair = std::tuple<int_t, int>;
 using int_t_int_refs_pair = std::tuple<int_t &, int &>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     udt_zip_iter, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     udt_zip_iter,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
     int_t_int_pair,
     int_t_int_refs_pair,
-    boost::iterator_facade::proxy_arrow_result<int_t_int_refs_pair>,
+    boost::stl_interfaces::proxy_arrow_result<int_t_int_refs_pair>,
     std::ptrdiff_t)
 
 namespace std {

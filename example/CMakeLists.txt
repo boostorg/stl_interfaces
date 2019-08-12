@@ -8,7 +8,7 @@ add_custom_target(run_examples COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_CFG
 
 macro(add_sample name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(${name} iterator_facade)
+    target_link_libraries(${name} stl_interfaces)
     set_property(TARGET ${name} PROPERTY CXX_STANDARD ${CXX_STD})
     add_test(${name} ${CMAKE_CURRENT_BINARY_DIR}/${name})
     if (clang_on_linux)
