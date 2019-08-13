@@ -57,6 +57,7 @@ namespace boost { namespace stl_interfaces {
     template<typename Derived, typename Contiguity = discontiguous_data_tag>
     struct container_interface
     {
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
     private:
         constexpr Derived & derived() noexcept
         {
@@ -68,6 +69,7 @@ namespace boost { namespace stl_interfaces {
         }
         constexpr static bool contiguous =
             std::is_same<Contiguity, contiguous_data_tag>::value;
+#endif
 
     public:
         template<typename D = Derived>

@@ -8,6 +8,8 @@
 
 #include <boost/stl_interfaces/fwd.hpp>
 
+#include <iterator>
+
 
 namespace boost { namespace stl_interfaces {
 
@@ -23,6 +25,7 @@ namespace boost { namespace stl_interfaces {
             using type = typename std::iterator_traits<std::decay_t<decltype(
                 std::begin(std::declval<T>()))>>::difference_type;
         };
+        template<typename T>
         using range_difference_t = typename range_difference<T>::type;
     }
 
@@ -33,6 +36,7 @@ namespace boost { namespace stl_interfaces {
     template<typename Derived, typename Contiguity = discontiguous_data_tag>
     struct view_interface
     {
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
     private:
         constexpr Derived & derived() noexcept
         {
@@ -44,6 +48,7 @@ namespace boost { namespace stl_interfaces {
         }
         constexpr static bool contiguous =
             std::is_same<Contiguity, contiguous_data_tag>::value;
+#endif
 
     public:
         template<typename D = Derived>
@@ -55,44 +60,48 @@ namespace boost { namespace stl_interfaces {
             return derived().begin() == derived().end();
         }
         template<typename D = Derived>
-        constexpr bool empty() const noexcept(
+        constexpr auto empty() const noexcept(
             noexcept(std::declval<D &>().begin() == std::declval<D &>().end()))
             ->decltype(std::declval<D &>().begin() == std::declval<D &>().end())
         {
             return derived().begin() == derived().end();
         }
 
-        template<typename D = Derived>
+        template<
+            typename D = Derived,
+            typename R = decltype(std::declval<D &>().empty())>
         constexpr explicit
-        operator bool() noexcept(noexcept(std::declval<D &>().empty()))
-            ->decltype(std::declval<D &>().empty())
+        operator R() noexcept(noexcept(std::declval<D &>().empty()))
         {
             return !derived().empty();
         }
-        template<typename D = Derived>
+        template<
+            typename D = Derived,
+            typename R = decltype(std::declval<D &>().empty())>
         constexpr explicit operator bool() const
             noexcept(noexcept(std::declval<D &>().empty()))
-                ->decltype(std::declval<D &>().empty())
         {
             return !derived().empty();
         }
 
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<contiguous>>
+            bool B = contiguous,
+            typename Enable = std::enable_if_t<B>>
         constexpr auto data() noexcept(noexcept(std::declval<D &>().begin()))
-            -> decltype(std::addressof(std::declval<D &>().begin()))
+            -> decltype(std::declval<D &>().begin())
         {
-            return std::to_address(derived().begin());
+            return std::addressof(*derived().begin());
         }
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<contiguous>>
+            bool B = contiguous,
+            typename Enable = std::enable_if_t<B>>
         constexpr auto data() const
             noexcept(noexcept(std::declval<D &>().begin()))
                 -> decltype(std::declval<D &>().begin())
         {
-            return std::to_address(derived().begin());
+            return std::addressof(*derived().begin());
         }
 
         template<typename D = Derived>
@@ -100,7 +109,7 @@ namespace boost { namespace stl_interfaces {
             noexcept(std::declval<D &>().end() - std::declval<D &>().begin()))
             -> decltype(std::declval<D &>().end() - std::declval<D &>().begin())
         {
-            return derived().end() - derived().begin()
+            return derived().end() - derived().begin();
         }
         template<typename D = Derived>
         constexpr auto size() const noexcept(
@@ -142,7 +151,7 @@ namespace boost { namespace stl_interfaces {
 
         template<typename D = Derived>
         constexpr decltype(auto)
-        operator[](deatil::range_difference_t<D> n) noexcept(
+        operator[](detail::range_difference_t<D> n) noexcept(
             noexcept(std::declval<D &>().begin()[n]))
             -> decltype(std::declval<D &>().begin()[n])
         {

@@ -122,6 +122,7 @@ namespace boost { namespace stl_interfaces {
         typename DifferenceType = std::ptrdiff_t>
     struct iterator_interface
     {
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
     private:
         constexpr Derived & derived() noexcept
         {
@@ -131,6 +132,7 @@ namespace boost { namespace stl_interfaces {
         {
             return static_cast<Derived const &>(*this);
         }
+#endif
 
     public:
         using iterator_concept = IteratorConcept;

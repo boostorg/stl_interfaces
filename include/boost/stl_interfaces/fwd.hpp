@@ -23,12 +23,14 @@ namespace boost { namespace stl_interfaces {
     /** A tag-type that may be passed to `view_interface` and
         `container_interface` to indicate that the underlying data have a
         contiguous layout. */
-    struct contiguous_data_tag;
+    struct contiguous_data_tag
+    {};
 
     /** A tag-type that may be passed to `view_interface` and
         `container_interface` to indicate that the underlying data have a
         discontiguous layout. */
-    struct discontiguous_data_tag;
+    struct discontiguous_data_tag
+    {};
 
     namespace detail {
         template<typename... T>
