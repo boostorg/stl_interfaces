@@ -59,6 +59,38 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
+static_assert(
+    !boost::stl_interfaces::detail::
+        plus_eq<basic_bidirectional_iter, std::ptrdiff_t>::value,
+    "");
+
+struct basic_adapted_bidirectional_iter : boost::stl_interfaces::iterator_interface<
+                                      basic_adapted_bidirectional_iter,
+                                      std::bidirectional_iterator_tag,
+                                      int>
+{
+    basic_adapted_bidirectional_iter() : it_(nullptr) {}
+    basic_adapted_bidirectional_iter(int * it) : it_(it) {}
+
+private:
+    friend boost::stl_interfaces::access;
+    constexpr int *& base_reference() noexcept { return it_; }
+    constexpr int * base_reference() const noexcept { return it_; }
+
+    int * it_;
+};
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    basic_adapted_bidirectional_iter, std::bidirectional_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_adapted_bidirectional_iter,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
 template<typename ValueType>
 struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
                                 bidirectional_iter<ValueType>,
@@ -209,6 +241,50 @@ TEST(bidirectional, basic_std_copy)
     }
 }
 
+TEST(bidirectional, basic_adapted_std_copy)
+{
+    basic_adapted_bidirectional_iter first(ints.data());
+    basic_adapted_bidirectional_iter last(ints.data() + ints.size());
+
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(first, last, ints_copy.begin());
+        EXPECT_EQ(ints_copy, ints);
+    }
+
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(
+            std::make_reverse_iterator(last),
+            std::make_reverse_iterator(first),
+            ints_copy.begin());
+        std::reverse(ints_copy.begin(), ints_copy.end());
+        EXPECT_EQ(ints_copy, ints);
+    }
+
+    {
+        std::array<int, 10> iota_ints;
+        basic_adapted_bidirectional_iter first(iota_ints.data());
+        basic_adapted_bidirectional_iter last(
+            iota_ints.data() + iota_ints.size());
+        std::iota(first, last, 0);
+        EXPECT_EQ(iota_ints, ints);
+    }
+
+    {
+        std::array<int, 10> iota_ints;
+        basic_adapted_bidirectional_iter first(iota_ints.data());
+        basic_adapted_bidirectional_iter last(
+            iota_ints.data() + iota_ints.size());
+        std::iota(
+            std::make_reverse_iterator(last),
+            std::make_reverse_iterator(first),
+            0);
+        std::reverse(iota_ints.begin(), iota_ints.end());
+        EXPECT_EQ(iota_ints, ints);
+    }
+}
+
 TEST(bidirectional, mutable_to_const_conversions)
 {
     bidirectional first(ints.data());
@@ -230,6 +306,34 @@ TEST(bidirectional, postincrement_preincrement)
     {
         bidirectional first(ints.data());
         bidirectional last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
+
+    {
+        basic_bidirectional_iter first(ints.data());
+        basic_bidirectional_iter last(ints.data() + ints.size());
+        while (first != last)
+            first++;
+    }
+
+    {
+        basic_bidirectional_iter first(ints.data());
+        basic_bidirectional_iter last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
+
+    {
+        basic_adapted_bidirectional_iter first(ints.data());
+        basic_adapted_bidirectional_iter last(ints.data() + ints.size());
+        while (first != last)
+            first++;
+    }
+
+    {
+        basic_adapted_bidirectional_iter first(ints.data());
+        basic_adapted_bidirectional_iter last(ints.data() + ints.size());
         while (first != last)
             last--;
     }

@@ -15,6 +15,32 @@
 
 namespace boost { namespace stl_interfaces {
 
+    /** A type for granting access to the private members of an iterator
+        derived from `iterator_interface`. */
+    struct access
+    {
+        template<typename T>
+        struct dummy
+        {
+        };
+        template<typename Derived>
+        using dummy_t = dummy<detail::void_t<decltype(
+            std::declval<Derived &>().base_reference())>>;
+
+        template<typename Derived>
+        static constexpr decltype(auto)
+        base(Derived & d, dummy_t<Derived> = dummy_t<Derived>()) noexcept
+        {
+            return d.base_reference();
+        }
+        template<typename Derived>
+        static constexpr decltype(auto)
+        base(Derived const & d, dummy_t<Derived> = dummy_t<Derived>()) noexcept
+        {
+            return d.base_reference();
+        }
+    };
+
     /** The return type of `operator->()` in a proxy iterator.
 
         This template is used as the default `Pointer` template parameter in
@@ -106,6 +132,20 @@ namespace boost { namespace stl_interfaces {
                       typename Iterator::iterator_concept>::value>
         {
         };
+
+        template<typename Iterator, typename DifferenceType, typename = void>
+        struct plus_eq : std::false_type
+        {
+        };
+        template<typename Iterator, typename DifferenceType>
+        struct plus_eq<
+            Iterator,
+            DifferenceType,
+            void_t<decltype(
+                std::declval<Iterator &>() += std::declval<DifferenceType>())>>
+            : std::true_type
+        {
+        };
     }
 
     // TODO: Compile-fail tests and associated static_asserts to help catch
@@ -145,6 +185,14 @@ namespace boost { namespace stl_interfaces {
         using derived_iterator_type = Derived;
 
         template<typename D = Derived>
+        constexpr auto operator*() const
+            noexcept(noexcept(*access::base(std::declval<D &>())))
+                -> decltype(*access::base(std::declval<D &>()))
+        {
+            return *access::base(derived());
+        }
+
+        template<typename D = Derived>
         constexpr pointer operator->() const noexcept(
             noexcept(detail::make_pointer<pointer>(*std::declval<D &>())))
         {
@@ -161,6 +209,17 @@ namespace boost { namespace stl_interfaces {
             D retval = derived();
             retval += i;
             return *retval;
+        }
+
+        template<
+            typename D = Derived,
+            typename Enable =
+                std::enable_if_t<!detail::plus_eq<D, difference_type>::value>>
+        constexpr auto
+        operator++() noexcept(noexcept(++access::base(std::declval<D &>())))
+            -> decltype(++access::base(std::declval<D &>()))
+        {
+            return ++access::base(derived());
         }
 
         template<typename D = Derived>
@@ -186,6 +245,14 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
+        constexpr auto operator+=(difference_type n) noexcept(
+            noexcept(access::base(std::declval<D &>()) += n))
+            -> decltype(access::base(std::declval<D &>()) += n)
+        {
+            return access::base(derived()) += n;
+        }
+
+        template<typename D = Derived>
         constexpr D operator+(difference_type i) noexcept(
             noexcept(D(std::declval<D &>()), std::declval<D &>() += i))
         {
@@ -197,6 +264,17 @@ namespace boost { namespace stl_interfaces {
         operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
         {
             return it + i;
+        }
+
+        template<
+            typename D = Derived,
+            typename Enable =
+                std::enable_if_t<!detail::plus_eq<D, difference_type>::value>>
+        constexpr auto
+        operator--() noexcept(noexcept(--access::base(std::declval<D &>())))
+            -> decltype(--access::base(std::declval<D &>()))
+        {
+            return --access::base(derived());
         }
 
         template<typename D = Derived>
@@ -229,6 +307,14 @@ namespace boost { namespace stl_interfaces {
             return derived();
         }
 
+        template<typename D = Derived>
+        constexpr auto operator-(D other) const noexcept(
+            noexcept(access::base(std::declval<D &>()) - access::base(other)))
+            -> decltype(access::base(std::declval<D &>()) - access::base(other))
+        {
+            return access::base(derived()) - access::base(other);
+        }
+
         friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR Derived operator-(
             Derived it,
             difference_type i) noexcept(noexcept(Derived(it), it += -i))
@@ -254,6 +340,27 @@ namespace boost { namespace stl_interfaces {
     {
         return !(lhs == rhs);
     }
+
+    /** Implementation of `operator==()`, implemented in terms of the iterator
+        underlying IteratorInterface, for all iterators derived from
+        `iterator_interface`, except those with an iterator category derived
+        from `std::random_access_iterator_tag`.  */
+    template<
+        typename IteratorInterface,
+        typename Enable = std::enable_if_t<!detail::plus_eq<
+            IteratorInterface,
+            typename IteratorInterface::difference_type>::value>>
+    constexpr auto
+    operator==(IteratorInterface lhs, IteratorInterface rhs) noexcept(noexcept(
+        access::base(std::declval<IteratorInterface &>()) ==
+        access::base(std::declval<IteratorInterface &>())))
+        -> decltype(
+            access::base(std::declval<IteratorInterface &>()) ==
+            access::base(std::declval<IteratorInterface &>()))
+    {
+        return access::base(lhs) == access::base(rhs);
+    }
+
 
     /** Implementation of `operator==()` for all iterators derived from
         `iterator_interface` that have an iterator category derived from
