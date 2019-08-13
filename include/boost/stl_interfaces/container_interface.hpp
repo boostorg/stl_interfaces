@@ -54,7 +54,7 @@ namespace boost { namespace stl_interfaces {
 
     /** A CRTP template that one may derive from to make it easier to define
         container types. */
-    template<typename Derived, typename Contiguity = discontiguous_data_tag>
+    template<typename Derived, bool Contiguous = discontiguous>
     struct container_interface
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
@@ -67,8 +67,6 @@ namespace boost { namespace stl_interfaces {
         {
             return static_cast<Derived const &>(*this);
         }
-        constexpr static bool contiguous =
-            std::is_same<Contiguity, contiguous_data_tag>::value;
 #endif
 
     public:
@@ -82,7 +80,8 @@ namespace boost { namespace stl_interfaces {
 
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<contiguous>>
+            bool C = Contiguous,
+            typename Enable = std::enable_if_t<C>>
         constexpr auto data() noexcept(noexcept(std::declval<D &>().begin()))
             -> decltype(std::addressof(std::declval<D &>().begin()))
         {
@@ -90,7 +89,8 @@ namespace boost { namespace stl_interfaces {
         }
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<contiguous>>
+            bool C = Contiguous,
+            typename Enable = std::enable_if_t<C>>
         constexpr auto data() const
             noexcept(noexcept(std::declval<D &>().begin()))
                 -> decltype(std::declval<D &>().begin())

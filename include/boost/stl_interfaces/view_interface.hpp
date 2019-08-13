@@ -33,7 +33,7 @@ namespace boost { namespace stl_interfaces {
         `std::ranges::view`-like types with a container-like interface.  This
         is a pre-C++20 version of C++20's `view_interface` (see
         [view.interface] in the C++ standard). */
-    template<typename Derived, typename Contiguity = discontiguous_data_tag>
+    template<typename Derived, bool Contiguous = discontiguous>
     struct view_interface
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
@@ -46,8 +46,6 @@ namespace boost { namespace stl_interfaces {
         {
             return static_cast<Derived const &>(*this);
         }
-        constexpr static bool contiguous =
-            std::is_same<Contiguity, contiguous_data_tag>::value;
 #endif
 
     public:
@@ -86,8 +84,8 @@ namespace boost { namespace stl_interfaces {
 
         template<
             typename D = Derived,
-            bool B = contiguous,
-            typename Enable = std::enable_if_t<B>>
+            bool C = Contiguous,
+            typename Enable = std::enable_if_t<C>>
         constexpr auto data() noexcept(noexcept(std::declval<D &>().begin()))
             -> decltype(std::declval<D &>().begin())
         {
@@ -95,8 +93,8 @@ namespace boost { namespace stl_interfaces {
         }
         template<
             typename D = Derived,
-            bool B = contiguous,
-            typename Enable = std::enable_if_t<B>>
+            bool C = Contiguous,
+            typename Enable = std::enable_if_t<C>>
         constexpr auto data() const
             noexcept(noexcept(std::declval<D &>().begin()))
                 -> decltype(std::declval<D &>().begin())

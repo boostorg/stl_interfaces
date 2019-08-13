@@ -24,6 +24,7 @@
 
 [/ Imports ]
 
+[/ Iterator Examples ]
 [import ../example/repeated_chars_iterator.cpp]
 [import ../example/node_iterator.cpp]
 [import ../example/random_access_iterator.cpp]
@@ -31,6 +32,9 @@
 [import ../example/zip_proxy_iterator.cpp]
 [import ../example/back_insert_iterator.cpp]
 [import ../example/reverse_iterator.cpp]
+
+[ / View Examples ]
+[import ../example/drop_while_view.cpp]
 
 [/ Images ]
 
@@ -44,6 +48,8 @@
 
 [def _IFaces_              Boost.STLInterfaces]
 [def _iter_iface_          [classref boost::iterator_interface::iterator_interface `iterator_interface`]]
+[def _view_iface_          [classref boost::iterator_interface::view_interface `view_interface`]]
+[def _cont_iface_          [classref boost::iterator_interface::container_interface `container_interface`]]
 
 [def _concept_m_           [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT]]
 [def _traits_m_            [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS]]

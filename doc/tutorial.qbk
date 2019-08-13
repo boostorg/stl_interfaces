@@ -1,4 +1,4 @@
-[section Tutorial]
+[section Tutorial: _iter_iface_]
 
 [heading The _iter_iface_ Template]
 
@@ -273,5 +273,28 @@ instantiation stack.
 
 There's also a macro that can help you check that `std::iterator_traits` is
 well-formed and provides the corect types.  See _traits_m_.
+
+[endsect]
+
+[section Tutorial: _view_iface_]
+
+[heading The _view_iface_ Template]
+
+As with _iter_iface_, _view_iface_ makes it possible to write very few
+operations _emdash_ only `begin()` and `end()` are actually used by
+_view_iface_ _emdash_ and get all the other operations that go with view
+types.  The operations added depend on what kinds of iterator and/or sentinel
+types your derived view type define.
+
+Here is the declaration of _view_iface_:
+
+    template<typename Derived, bool Contiguous = discontiguous>
+    struct view_interface;
+
+_view_iface_ only requires the derived type, and an optional `bool` non-type
+template parameter that indicates whether `Derived`'s iterators are
+contiguous.  This is necessary to support pre-C++20 code.
+
+TODO
 
 [endsect]

@@ -20,17 +20,10 @@
 
 namespace boost { namespace stl_interfaces {
 
-    /** A tag-type that may be passed to `view_interface` and
-        `container_interface` to indicate that the underlying data have a
-        contiguous layout. */
-    struct contiguous_data_tag
-    {};
-
-    /** A tag-type that may be passed to `view_interface` and
-        `container_interface` to indicate that the underlying data have a
-        discontiguous layout. */
-    struct discontiguous_data_tag
-    {};
+    /** An enumeration used to indicate whether the underlying data have a
+        contiguous layout when instantiating `view_interface` and
+        `container_interface`. */
+    enum element_layout : bool { discontiguous, contiguous };
 
     namespace detail {
         template<typename... T>
