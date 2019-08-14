@@ -14,26 +14,51 @@
 namespace boost { namespace stl_interfaces {
 
     namespace detail {
-        template<typename T, typename = void>
-        struct range_difference;
-        template<typename T>
-        struct range_difference<
-            T,
-            void_t<typename std::iterator_traits<std::decay_t<decltype(
-                std::begin(std::declval<T>()))>>::difference_type>>
+        template<typename Iter>
+        using iter_difference_t =
+            typename std::iterator_traits<Iter>::difference_type;
+
+        template<typename Range, typename = void>
+        struct iterator;
+        template<typename Range>
+        struct iterator<
+            Range,
+            void_t<decltype(std::declval<Range &>().begin())>>
         {
-            using type = typename std::iterator_traits<std::decay_t<decltype(
-                std::begin(std::declval<T>()))>>::difference_type;
+            using type = decltype(std::declval<Range &>().begin());
         };
-        template<typename T>
-        using range_difference_t = typename range_difference<T>::type;
+        template<typename Range>
+        using iterator_t = typename iterator<Range>::type;
+
+        template<typename Range, typename = void>
+        struct sentinel;
+        template<typename Range>
+        struct sentinel<
+            Range,
+            void_t<decltype(std::declval<Range &>().begin())>>
+        {
+            using type = decltype(std::declval<Range &>().begin());
+        };
+        template<typename Range>
+        using sentinel_t = typename sentinel<Range>::type;
+
+        template<typename Range>
+        using range_difference_t = iter_difference_t<iterator_t<Range>>;
+
+        template<typename Range>
+        using common_range = std::is_same<iterator_t<Range>, sentinel_t<Range>>;
     }
 
     /** A CRTP template that one may derive from to make it easier to define
         `std::ranges::view`-like types with a container-like interface.  This
         is a pre-C++20 version of C++20's `view_interface` (see
         [view.interface] in the C++ standard). */
-    template<typename Derived, bool Contiguous = discontiguous>
+    template<
+        typename Derived,
+        bool Contiguous = discontiguous,
+        typename E = std::enable_if_t<
+            std::is_class<Derived>::value &&
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>>
     struct view_interface
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
@@ -49,6 +74,8 @@ namespace boost { namespace stl_interfaces {
 #endif
 
     public:
+        using derived_view_type = Derived;
+
         template<typename D = Derived>
         constexpr auto empty() noexcept(
             noexcept(std::declval<D &>().begin() == std::declval<D &>().end()))
@@ -132,19 +159,23 @@ namespace boost { namespace stl_interfaces {
             *derived().begin();
         }
 
-        template<typename D = Derived>
+        template<
+            typename D = Derived,
+            typename Enable = std::enable_if_t<detail::common_range<D>::value>>
         constexpr auto
         back() noexcept(noexcept(*std::prev(std::declval<D &>().end())))
             -> decltype(*std::prev(std::declval<D &>().end()))
         {
-            *std::prev(derived().end());
+            return *std::prev(derived().end());
         }
-        template<typename D = Derived>
+        template<
+            typename D = Derived,
+            typename Enable = std::enable_if_t<detail::common_range<D>::value>>
         constexpr auto back() const
             noexcept(noexcept(*std::prev(std::declval<D &>().end())))
                 -> decltype(*std::prev(std::declval<D &>().end()))
         {
-            *std::prev(derived().end());
+            return *std::prev(derived().end());
         }
 
         template<typename D = Derived>
@@ -162,6 +193,18 @@ namespace boost { namespace stl_interfaces {
             return derived().begin()[n];
         }
     };
+
+    /** Implementation of `operator!=()` for all views derived from
+        `view_interface`.  */
+    template<typename ViewInterface>
+    constexpr auto operator!=(ViewInterface lhs, ViewInterface rhs) noexcept(
+        noexcept(lhs == rhs))
+        -> decltype(
+            detail::dummy<typename ViewInterface::derived_view_type>(),
+            lhs == rhs)
+    {
+        return !(lhs == rhs);
+    }
 
 }}
 

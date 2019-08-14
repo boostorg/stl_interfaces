@@ -131,5 +131,7 @@ int main()
 
     // ... and via view_interface.
     assert(!ints_after_even_prefix.empty());
+    assert(ints_after_even_prefix[2] == 5);
+    assert(ints_after_even_prefix.back() == 6);
     //]
 }

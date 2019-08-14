@@ -21,23 +21,21 @@ namespace boost { namespace stl_interfaces {
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
 
-        template<typename T>
-        struct dummy
-        {
-        };
         template<typename Derived>
-        using dummy_t = dummy<detail::void_t<decltype(
+        using dummy_derived_t = detail::dummy<detail::void_t<decltype(
             std::declval<Derived &>().base_reference())>>;
 
         template<typename Derived>
-        static constexpr decltype(auto)
-        base(Derived & d, dummy_t<Derived> = dummy_t<Derived>()) noexcept
+        static constexpr decltype(auto) base(
+            Derived & d,
+            dummy_derived_t<Derived> = dummy_derived_t<Derived>()) noexcept
         {
             return d.base_reference();
         }
         template<typename Derived>
-        static constexpr decltype(auto)
-        base(Derived const & d, dummy_t<Derived> = dummy_t<Derived>()) noexcept
+        static constexpr decltype(auto) base(
+            Derived const & d,
+            dummy_derived_t<Derived> = dummy_derived_t<Derived>()) noexcept
         {
             return d.base_reference();
         }
@@ -163,7 +161,10 @@ namespace boost { namespace stl_interfaces {
         typename ValueType,
         typename Reference = ValueType &,
         typename Pointer = ValueType *,
-        typename DifferenceType = std::ptrdiff_t>
+        typename DifferenceType = std::ptrdiff_t,
+        typename E = std::enable_if_t<
+            std::is_class<Derived>::value &&
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>>
     struct iterator_interface
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN

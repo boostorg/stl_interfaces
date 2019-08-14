@@ -28,6 +28,11 @@ namespace boost { namespace stl_interfaces {
     namespace detail {
         template<typename... T>
         using void_t = void;
+
+        template<typename T>
+        struct dummy
+        {
+        };
     }
 
 }}
