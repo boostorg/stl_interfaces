@@ -17,6 +17,7 @@ macro(add_sample name)
 endmacro()
 
 add_sample(repeated_chars_iterator)
+add_sample(filtered_int_iterator)
 add_sample(node_iterator)
 add_sample(random_access_iterator)
 add_sample(interoperability)

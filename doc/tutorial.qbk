@@ -8,7 +8,7 @@ the full set of operations it supports can be defined in terms of that much
 smaller basis.
 
 It is possible to define any iterator `Iter` in terms of a subset of
-user-supplied operations.  By deriving `Iter` from _iter_iface_ using _CRTP_,
+user-defined operations.  By deriving `Iter` from _iter_iface_ using _CRTP_,
 we can generate the full set of operations.  Here is the declaration of
 _iter_iface_:
 
@@ -68,7 +68,7 @@ In the table below, `Iter` is a user-defined type derived from _iter_iface_;
 as the `Pointer` template parameter to _iter_iface_; and `n` is a value of
 type `difference_type`.
 
-[table User-Supplied Operations
+[table User-Defined Operations
     [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
     [
         [ `*i` ]
@@ -91,13 +91,13 @@ type `difference_type`.
     ]
     [
         [ `++i` ]
-        [ `void` ]
+        [ `Iter &` ]
         [ Increments `i`. ]
         [ ]
     ]
     [
         [ `--i` ]
-        [ `void` ]
+        [ `Iter &` ]
         [ Decrements `i`. ]
         [ ]
     ]
@@ -120,7 +120,7 @@ can return a `difference_type` or just something convertible to one; etc.  In
 particular, your operations can be `constexpr` or `noexcept` as you see fit.]
 
 Not all the iterator concepts require all the operations above.  Here are the
-operations used with each iterator cocept:
+operations used with each iterator concept:
 
 [table Operations Required for Each Concept
     [[Concept]   [Operations]]
@@ -247,6 +247,31 @@ Finally, we need a using declataion to make
 Here's how we might use the forward iterator we just defined:
 
 [node_iterator_usage]
+
+[heading What About Adapting an Existing Iterator?]
+
+So glad you asked.  If you want to make something like a filtering iterator,
+or say a UTF-8 to UTF-32 transcoding iterator, you are starting with an
+existing iterator and adapting it.  There's a way to avoid having to write all
+of the user-defined basis functions, as long as there's a base iterator that
+already has the right operations with the right semantics.
+
+For example, consider an iterator that contains a pointer to an array of
+`int`, and predicate of type `Pred`.  It filters out integers that do not meet
+the predicate.  Since we are using an existing iterator (the pointer to
+`int`), we already have all the operations we need for a bidirectional
+iterator (and more), except that `operator++` on an `int *` does not skip over
+elements as we'd like.  Here's the code:
+
+[filtered_int_iterator_defn]
+
+So, all we had to do was let _iter_iface_ know that there was an underlying
+iterator it could use _emdash_ by implementing `base_reference()` _emdash_ and
+the operations that we did not define got defined for us by _iter_iface_.
+
+Here is the iterator in action:
+
+[filtered_int_iterator_usage]
 
 [heading Checking Your Work]
 
