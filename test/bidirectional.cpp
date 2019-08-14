@@ -401,3 +401,96 @@ TEST(bidirectional, const_std_copy)
             std::greater<>{}));
     }
 }
+
+
+////////////////////
+// view_interface //
+////////////////////
+#include "view_tests.hpp"
+
+TEST(bidirectional, basic_subrange)
+{
+    basic_bidirectional_iter first(ints.data());
+    basic_bidirectional_iter last(ints.data() + ints.size());
+
+    auto r = range<boost::stl_interfaces::discontiguous>(first, last);
+    auto empty = range<boost::stl_interfaces::discontiguous>(first, first);
+
+    // range begin/end
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(r.begin(), r.end(), ints_copy.begin());
+        EXPECT_EQ(ints_copy, ints);
+
+        EXPECT_EQ(empty.begin(), empty.end());
+    }
+
+    // empty/op bool
+    {
+        EXPECT_FALSE(r.empty());
+        EXPECT_TRUE(r);
+
+        EXPECT_TRUE(empty.empty());
+        EXPECT_FALSE(empty);
+
+        auto const cr = r;
+        EXPECT_FALSE(cr.empty());
+        EXPECT_TRUE(cr);
+
+        auto const cempty = empty;
+        EXPECT_TRUE(cempty.empty());
+        EXPECT_FALSE(cempty);
+    }
+
+#if 0 // TODO: COMPILE-FAIL test for this.
+    // data
+    {
+        EXPECT_NE(r.data(), nullptr);
+        EXPECT_EQ(r.data()[2], 2);
+
+        EXPECT_NE(empty.data(), nullptr);
+
+        auto const cr = r;
+        EXPECT_NE(cr.data(), nullptr);
+        EXPECT_EQ(cr.data()[2], 2);
+
+        auto const cempty = empty;
+        EXPECT_NE(cempty.data(), nullptr);
+    }
+#endif
+
+#if 0 // TODO: COMPILE-FAIL test for this.
+    // size
+    {
+        EXPECT_EQ(r.size(), 10u);
+
+        EXPECT_EQ(empty.size(), 0u);
+
+        auto const cr = r;
+        EXPECT_EQ(cr.size(), 10u);
+
+        auto const cempty = empty;
+        EXPECT_EQ(cempty.size(), 0u);
+    }
+#endif
+
+    // front/back
+    {
+        EXPECT_EQ(r.front(), 0);
+        EXPECT_EQ(r.back(), 9);
+
+        auto const cr = r;
+        EXPECT_EQ(cr.front(), 0);
+        EXPECT_EQ(cr.back(), 9);
+    }
+
+#if 0 // TODO: COMPILE-FAIL test for this.
+    // op[]
+    {
+        EXPECT_EQ(r[2], 2);
+
+        auto const cr = r;
+        EXPECT_EQ(cr[2], 2);
+    }
+#endif
+}

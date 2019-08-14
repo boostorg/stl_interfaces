@@ -65,6 +65,8 @@ namespace boost { namespace stl_interfaces {
         }
     }
 
+    // TODO:
+
     // Container requirements:
     // mutable begin/end -> const begin/end,cbegin/cend
     // c1 == c2 -> c1 != c2
@@ -105,7 +107,7 @@ namespace boost { namespace stl_interfaces {
     /** A CRTP template that one may derive from to make it easier to define
         container types. */
     template<typename Derived, bool Contiguous = discontiguous>
-    struct container_interface : view_interface<Derived, Contiguous>
+    struct container_interface : view_interface<Derived, Contiguous, true>
     {
         template<typename D = Derived>
         constexpr auto begin() const

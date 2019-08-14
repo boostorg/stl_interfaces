@@ -55,10 +55,15 @@ namespace boost { namespace stl_interfaces {
         [view.interface] in the C++ standard). */
     template<
         typename Derived,
-        bool Contiguous = discontiguous,
+        bool Contiguous = discontiguous
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+        ,
+        bool SuppressBoolConversion = false,
         typename E = std::enable_if_t<
             std::is_class<Derived>::value &&
-            std::is_same<Derived, std::remove_cv_t<Derived>>::value>>
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+#endif
+        >
     struct view_interface
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
@@ -95,7 +100,9 @@ namespace boost { namespace stl_interfaces {
 
         template<
             typename D = Derived,
-            typename R = decltype(std::declval<D &>().empty())>
+            typename R = std::enable_if_t<
+                !SuppressBoolConversion,
+                decltype(std::declval<D &>().empty())>>
         constexpr explicit
         operator R() noexcept(noexcept(std::declval<D &>().empty()))
         {
@@ -103,7 +110,9 @@ namespace boost { namespace stl_interfaces {
         }
         template<
             typename D = Derived,
-            typename R = decltype(std::declval<D &>().empty())>
+            typename R = std::enable_if_t<
+                !SuppressBoolConversion,
+                decltype(std::declval<D &>().empty())>>
         constexpr explicit operator bool() const
             noexcept(noexcept(std::declval<D &>().empty()))
         {
@@ -115,7 +124,7 @@ namespace boost { namespace stl_interfaces {
             bool C = Contiguous,
             typename Enable = std::enable_if_t<C>>
         constexpr auto data() noexcept(noexcept(std::declval<D &>().begin()))
-            -> decltype(std::declval<D &>().begin())
+            -> decltype(std::addressof(*std::declval<D &>().begin()))
         {
             return std::addressof(*derived().begin());
         }
@@ -125,7 +134,7 @@ namespace boost { namespace stl_interfaces {
             typename Enable = std::enable_if_t<C>>
         constexpr auto data() const
             noexcept(noexcept(std::declval<D &>().begin()))
-                -> decltype(std::declval<D &>().begin())
+                -> decltype(std::addressof(*std::declval<D &>().begin()))
         {
             return std::addressof(*derived().begin());
         }
@@ -149,14 +158,14 @@ namespace boost { namespace stl_interfaces {
         constexpr auto front() noexcept(noexcept(*std::declval<D &>().begin()))
             -> decltype(*std::declval<D &>().begin())
         {
-            *derived().begin();
+            return *derived().begin();
         }
         template<typename D = Derived>
         constexpr auto front() const
             noexcept(noexcept(*std::declval<D &>().begin()))
                 -> decltype(*std::declval<D &>().begin())
         {
-            *derived().begin();
+            return *derived().begin();
         }
 
         template<
