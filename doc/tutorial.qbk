@@ -305,6 +305,11 @@ well-formed and provides the corect types.  See _traits_m_.
 
 [heading The _view_iface_ Template]
 
+C++20 contains a _CRTP_ template, `std::ranges::view_interface`, which takes a
+range or view, and adds all the operations that view types have, using only
+the range's/view's `begin()` and `end()`.  This is a C++14-copatible version
+of that template.
+
 As with _iter_iface_, _view_iface_ makes it possible to write very few
 operations _emdash_ only `begin()` and `end()` are actually used by
 _view_iface_ _emdash_ and get all the other operations that go with view
@@ -318,8 +323,26 @@ Here is the declaration of _view_iface_:
 
 _view_iface_ only requires the derived type, and an optional `bool` non-type
 template parameter that indicates whether `Derived`'s iterators are
-contiguous.  This is necessary to support pre-C++20 code.
+contiguous.  The `bool` parameter is necessary to support pre-C++20 code.
 
-TODO
+In this example, we're implementing something very similar to
+`std::ranges::drop_while_view`.  First, we need helper view types `subrange`
+and `all_view`, and a function that takes a range and returns a view of the
+entire range, `all()`:
+
+[all_view]
+
+Note that `subrange` is derived from _view_iface_, so it will have all the
+view-like operations that are appropriate to its `Iterator` and `Sentinel`
+types.
+
+With the helpers available, we can define `drop_while_view`:
+
+[drop_while_view_template]
+
+Now, let's look at code using these types, including operations defined by
+_view_iface_ that we did not have to write:
+
+[drop_while_view_usage]
 
 [endsect]

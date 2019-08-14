@@ -5,4 +5,14 @@
 There is no constraint on the `Derived` template parameter to _iter_iface_,
 because `Derived` is an incomplete type within _iter_iface_.
 
+[heading Using a Special Access-Granting `struct`]
+
+The interface templates rely mostly on public members provided by their
+`Derived` template parameter.  However, _iter_iface_ requires you to supply
+`base_reference()` functions if you want it to act like an adaptor.  Since al
+least the non-`const` overload provides a non-`const` lvalue reference to one
+of your types data members, it will break the encapsulation of many types to
+leave `base_reference()` a public member.  To allow users to keep these
+overloads private, _access_ exists.
+
 [endsect]
