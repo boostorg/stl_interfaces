@@ -63,8 +63,8 @@ struct basic_adapted_random_access_iter
 
 private:
     friend boost::stl_interfaces::access;
-    constexpr int *& base_reference() noexcept { return it_; }
-    constexpr int * base_reference() const noexcept { return it_; }
+    int *& base_reference() noexcept { return it_; }
+    int * base_reference() const noexcept { return it_; }
 
     int * it_;
 };

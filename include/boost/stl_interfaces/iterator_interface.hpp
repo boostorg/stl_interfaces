@@ -19,6 +19,8 @@ namespace boost { namespace stl_interfaces {
         derived from `iterator_interface`. */
     struct access
     {
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+
         template<typename T>
         struct dummy
         {
@@ -39,6 +41,8 @@ namespace boost { namespace stl_interfaces {
         {
             return d.base_reference();
         }
+
+#endif
     };
 
     /** The return type of `operator->()` in a proxy iterator.
