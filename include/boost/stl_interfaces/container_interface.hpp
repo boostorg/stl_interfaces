@@ -63,6 +63,11 @@ namespace boost { namespace stl_interfaces {
         {
             return n_iter<T, SizeType>(x, n);
         }
+
+        template<typename Iter>
+        using in_iter = std::is_convertible<
+            typename std::iterator_traits<Iter>::iterator_category,
+            std::input_iterator_tag>;
     }
 
     // TODO:
@@ -76,26 +81,30 @@ namespace boost { namespace stl_interfaces {
     // c1.swap(c2) -> swap(c1, c2)
 
     // Reversible container requirements:
-    // mutable begin/end -> mutable rbegin/rend (requires detection of proxies for pre-C++20 code, because reverse_iterator does not handle proxies properly before that)
-    // mutable rbegin/rend -> const rbegin/rendc,rbegin/crend
+    // mutable begin/end -> mutable rbegin/rend (requires detection of proxies
+    // for pre-C++20 code, because reverse_iterator does not handle proxies
+    // properly before that) mutable rbegin/rend -> const
+    // rbegin/rendc,rbegin/crend
 
     // Sequence container requirements:
     // C(il) -> c = il
-    // emplace,insert(p,i,j) -> insert(p,t),insert(p,rv),insert(p,n,t),insert(p,il)
-    // clear,insert(p,i,j) -> assign(i,j),assign(n,t),assign(il)
-    // emplace_front -> push_front(t),push_front(rv)
-    // emplace_front,erase -> pop_front
+    // emplace,insert(p,i,j) ->
+    // insert(p,t),insert(p,rv),insert(p,n,t),insert(p,il) clear,insert(p,i,j)
+    // -> assign(i,j),assign(n,t),assign(il) emplace_front ->
+    // push_front(t),push_front(rv) emplace_front,erase -> pop_front
     // emplace_back -> push_back(t),push_back(rv)
     // emplace_back,erase -> pop_back
     // random access begin/end -> operator[]
     // operator[] -> at
 
     // Associative container requirements (only those not covered above):
-    // try_emplace -> all unique emplaces and inserts, except emplace_hint, hinted insert, and node handle inserts
-    // emplace (in absence of try_emplace) -> all non-unique emplaces and inserts, except emplace_hint, hinted insert, and node handle inserts
-    // emplace_hint -> hinted insert
-    // lower_bound,upper_bound -> equal_range,find(tran?),count(tran?),contains(tran?)
-    // erase(q),equal_range -> erase(k),erase(r),erase(q1,q2)
+    // try_emplace -> all unique emplaces and inserts, except emplace_hint,
+    // hinted insert, and node handle inserts emplace (in absence of
+    // try_emplace) -> all non-unique emplaces and inserts, except emplace_hint,
+    // hinted insert, and node handle inserts emplace_hint -> hinted insert
+    // lower_bound,upper_bound ->
+    // equal_range,find(tran?),count(tran?),contains(tran?) erase(q),equal_range
+    // -> erase(k),erase(r),erase(q1,q2)
 
     // TODO: Document that the reverse_iterator type of Derived should be
     // stl_interfaces::reverse_iterator<iterator> if you want the reverse
@@ -119,25 +128,80 @@ namespace boost { namespace stl_interfaces {
         {
             return static_cast<Derived const &>(*this);
         }
+        constexpr Derived & mutable_derived() const noexcept
+        {
+            return const_cast<Derived &>(static_cast<Derived const &>(*this));
+        }
 #endif
 
     public:
+        container_interface() {}
+
+        template<
+            typename D = Derived,
+            typename Enable =
+                detail::void_t<decltype(std::declval<D &>().assign(
+                    std::declval<typename D::size_type>(),
+                    std::declval<typename D::value_type const &>()))>>
+        container_interface(
+            typename D::size_type n, typename D::value_type const & value)
+        {
+            derived().assign(n, value);
+        }
+
+        template<
+            typename InputIterator,
+            typename D = Derived,
+            typename Enable = std::enable_if_t<
+                detail::in_iter<InputIterator>::value,
+                detail::void_t<decltype(std::declval<D &>().assign(
+                    std::declval<InputIterator>(),
+                    std::declval<InputIterator>()))>>>
+        container_interface(InputIterator first, InputIterator last)
+        {
+            assign(first, last);
+        }
+
+        template<
+            typename D = Derived,
+            typename Enable =
+                detail::void_t<decltype(std::declval<D &>().assign(
+                    std::declval<
+                        std::initializer_list<typename D::value_type>>()
+                        .begin(),
+                    std::declval<
+                        std::initializer_list<typename D::value_type>>()
+                        .end()))>>
+        container_interface(std::initializer_list<typename D::value_type> il)
+        {
+            derived().assign(il.begin(), il.end());
+        }
+
+        ~container_interface() { clear(); }
+
         // TODO: size() from view_interface is actually returning a
-        // difference_type, nto a size_type.
+        // difference_type, not a size_type.
+
+        template<typename D = Derived>
+        constexpr auto resize(typename D::size_type n) noexcept(
+            noexcept(std::declval<D &>().resize(
+                n, std::declval<typename D::value_type const &>())))
+            -> decltype(std::declval<D &>().resize(
+                n, std::declval<typename D::value_type const &>()))
+        {
+            return derived().resize(n, typename D::value_type());
+        }
 
         template<typename D = Derived>
         constexpr auto begin() const
             noexcept(noexcept(std::declval<D &>().begin()))
-                -> decltype(std::declval<D &>().begin())
         {
-            return derived().begin();
+            return typename D::const_iterator(mutable_derived().begin());
         }
         template<typename D = Derived>
-        constexpr auto end() const
-            noexcept(noexcept(std::declval<D &>().end()))
-                -> decltype(std::declval<D &>().end())
+        constexpr auto end() const noexcept(noexcept(std::declval<D &>().end()))
         {
-            return derived().end();
+            return typename D::const_iterator(mutable_derived().end());
         }
 
         template<typename D = Derived>
@@ -160,10 +224,6 @@ namespace boost { namespace stl_interfaces {
             typename Enable = std::enable_if_t<detail::common_range<D>::value>>
         constexpr auto rbegin() noexcept(noexcept(
             stl_interfaces::make_reverse_iterator(std::declval<D &>().end())))
-            -> decltype(
-                --std::declval<D &>().end(),
-                stl_interfaces::make_reverse_iterator(
-                    std::declval<D &>().end()))
         {
             return stl_interfaces::make_reverse_iterator(derived().end());
         }
@@ -172,10 +232,6 @@ namespace boost { namespace stl_interfaces {
             typename Enable = std::enable_if_t<detail::common_range<D>::value>>
         constexpr auto rend() noexcept(noexcept(
             stl_interfaces::make_reverse_iterator(std::declval<D &>().begin())))
-            -> decltype(
-                --std::declval<D &>().end(),
-                stl_interfaces::make_reverse_iterator(
-                    std::declval<D &>().begin()))
         {
             return stl_interfaces::make_reverse_iterator(derived().begin());
         }
@@ -183,16 +239,15 @@ namespace boost { namespace stl_interfaces {
         template<typename D = Derived>
         constexpr auto rbegin() const
             noexcept(noexcept(std::declval<D &>().rbegin()))
-                -> decltype(std::declval<D &>().rbegin())
         {
-            return derived().rbegin();
+            return
+                typename D::const_reverse_iterator(mutable_derived().rbegin());
         }
         template<typename D = Derived>
         constexpr auto rend() const
             noexcept(noexcept(std::declval<D &>().rend()))
-                -> decltype(std::declval<D &>().rend())
         {
-            return derived().rend();
+            return typename D::const_reverse_iterator(mutable_derived().rend());
         }
 
         template<typename D = Derived>
@@ -259,12 +314,28 @@ namespace boost { namespace stl_interfaces {
             return derived().insert(pos, il.begin(), il.end());
         }
 
-        template<class InputIterator, typename D = Derived>
+        template<typename D = Derived>
+        constexpr auto erase(typename D::const_iterator pos) noexcept(
+            noexcept(std::declval<D &>().erase(pos, std::next(pos))))
+            -> decltype(std::declval<D &>().erase(pos, std::next(pos)))
+        {
+            return derived().erase(pos, std::next(pos));
+        }
+
+        template<
+            typename InputIterator,
+            typename D = Derived,
+            typename Enable =
+                std::enable_if_t<detail::in_iter<InputIterator>::value>>
         constexpr auto
         assign(InputIterator first, InputIterator last) noexcept(noexcept(
             std::declval<D &>().clear(),
-            std::declval<D &>().insert(first, last)))
-            -> decltype(std::declval<D &>().insert(first, last))
+            std::declval<D &>().insert(
+                std::declval<D &>().begin(), first, last)))
+            -> decltype(
+                std::declval<D &>().clear(),
+                std::declval<D &>().insert(
+                    std::declval<D &>().begin(), first, last))
         {
             derived().clear();
             return derived().insert(derived().begin(), first, last);
@@ -379,13 +450,12 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto clear(typename D::size_type i) noexcept(
-            noexcept(std::declval<D &>().erase(
-                std::declval<D &>().begin(), std::declval<D &>().end())))
+        constexpr auto clear() noexcept(noexcept(std::declval<D &>().erase(
+            std::declval<D &>().begin(), std::declval<D &>().end())))
             -> decltype((void)std::declval<D &>().erase(
                 std::declval<D &>().begin(), std::declval<D &>().end()))
         {
-            return derived().erase(derived().begin(), derived().end());
+            derived().erase(derived().begin(), derived().end());
         }
     };
 
@@ -406,10 +476,12 @@ namespace boost { namespace stl_interfaces {
     /** Implementation of `operator<=()` for all containers derived from
         `container_interface`.  */
     template<typename ContainerInterface>
-    constexpr auto operator<=(ContainerInterface lhs, ContainerInterface rhs) noexcept(
-        noexcept(lhs < rhs))
+    constexpr auto operator<=(
+        ContainerInterface lhs,
+        ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
         -> decltype(
-            detail::dummy<typename ContainerInterface::derived_container_type>(),
+            detail::dummy<
+                typename ContainerInterface::derived_container_type>(),
             lhs < rhs)
     {
         return !(rhs < lhs);
@@ -418,10 +490,12 @@ namespace boost { namespace stl_interfaces {
     /** Implementation of `operator>()` for all containers derived from
         `container_interface`.  */
     template<typename ContainerInterface>
-    constexpr auto operator>(ContainerInterface lhs, ContainerInterface rhs) noexcept(
-        noexcept(lhs < rhs))
+    constexpr auto operator>(
+        ContainerInterface lhs,
+        ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
         -> decltype(
-            detail::dummy<typename ContainerInterface::derived_container_type>(),
+            detail::dummy<
+                typename ContainerInterface::derived_container_type>(),
             lhs < rhs)
     {
         return rhs < lhs;
@@ -430,10 +504,12 @@ namespace boost { namespace stl_interfaces {
     /** Implementation of `operator>=()` for all containers derived from
         `container_interface`.  */
     template<typename ContainerInterface>
-    constexpr auto operator>=(ContainerInterface lhs, ContainerInterface rhs) noexcept(
-        noexcept(lhs < rhs))
+    constexpr auto operator>=(
+        ContainerInterface lhs,
+        ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
         -> decltype(
-            detail::dummy<typename ContainerInterface::derived_container_type>(),
+            detail::dummy<
+                typename ContainerInterface::derived_container_type>(),
             lhs < rhs)
     {
         return !(lhs < rhs);

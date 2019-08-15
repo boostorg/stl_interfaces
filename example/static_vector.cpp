@@ -28,41 +28,33 @@ struct static_vector : boost::stl_interfaces::container_interface<
     using difference_type = std::ptrdiff_t;
     using iterator = T *;
     using const_iterator = T const *;
-    using reverse_iterator = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using reverse_iterator = boost::stl_interfaces::reverse_iterator<iterator>;
+    using const_reverse_iterator =
+        boost::stl_interfaces::reverse_iterator<const_iterator>;
 
-    // [vector.cons], construct/copy/destroy
+    // [vector.cons], construct/copy/destroy (6 members, skipped 4)
     static_vector() noexcept : size_(0) {}
     explicit static_vector(size_type n) { this->assign(n, T()); }
-    static_vector(size_type n, T const & value) { this->assign(n, value); }
-    template<typename InputIterator>
-    static_vector(InputIterator first, InputIterator last)
-    {
-        this->assign(first, last);
-    }
     static_vector(static_vector const & other)
     {
-        // TODO this->assign(other.begin(), other.end());
+        this->assign(other.begin(), other.end());
     }
-    static_vector(static_vector && other) noexcept
+    static_vector(static_vector && other) noexcept(noexcept(
+        std::declval<static_vector>().emplace_back(std::move(*other.begin()))))
     {
         for (auto & element : other) {
             emplace_back(std::move(element));
         }
         other.clear();
     }
-    static_vector(std::initializer_list<T> il)
-    {
-        // TODO this->assign(il.begin(), il.end());
-    }
-    ~static_vector() { this->clear(); }
     static_vector & operator=(static_vector const & other)
     {
         this->clear();
-        // TODO this->assign(other.begin(), other.end());
+        this->assign(other.begin(), other.end());
         return *this;
     }
-    static_vector & operator=(static_vector && other)
+    static_vector & operator=(static_vector && other) noexcept(noexcept(
+        std::declval<static_vector>().emplace_back(std::move(*other.begin()))))
     {
         this->clear();
         for (auto & element : other) {
@@ -79,32 +71,29 @@ struct static_vector : boost::stl_interfaces::container_interface<
         return reinterpret_cast<T *>(buf_ + size_ * sizeof(T));
     }
 
-    // [vector.capacity], capacity (6 members, skipped 2)
+    // [vector.capacity], capacity (5 members, skipped 3)
     size_type max_size() const noexcept { return N; }
     size_type capacity() const noexcept { return N; }
-    void resize(size_type sz) { resize(sz, T()); }
-    void resize(size_type sz, T const & x)
+    void resize(size_type sz, T const & x) noexcept
     {
+        assert(sz < capacity());
         if (sz < this->size())
             erase(begin() + sz, end());
         if (this->size() < sz)
             std::uninitialized_fill(end(), begin() + sz, x);
+        size_ = sz;
     }
-    void reserve(size_type n) {}
-    void shrink_to_fit() {}
+    void reserve(size_type n) noexcept { assert(n < capacity()); }
+    void shrink_to_fit() noexcept {}
 
-    // element access (skipped 8 members)
-    // [vector.data], data access (skipped 2 members)
+    // element access (skipped 8)
+    // [vector.data], data access (skipped 2)
 
-    // [vector.modifiers], modifiers (6 members, skipped 8)
+    // [vector.modifiers], modifiers (5 members, skipped 9)
     template<typename... Args>
     reference emplace_back(Args &&... args)
     {
-        assert(this->size() < capacity());
-        auto ptr =
-            new (buf_ + size_ * sizeof(T)) T(std::forward<Args>(args)...);
-        ++size_;
-        return *ptr;
+        return *emplace(end(), std::forward<Args>(args)...);
     }
     template<typename... Args>
     iterator emplace(const_iterator pos, Args &&... args)
@@ -121,7 +110,11 @@ struct static_vector : boost::stl_interfaces::container_interface<
     }
     // Note: This iterator category was upgraded to ForwardIterator (instead
     // of vector's InputIterator), to ensure linear time complexity.
-    template<typename ForwardIterator>
+    template<
+        typename ForwardIterator,
+        typename Enable = std::enable_if_t<std::is_convertible<
+            typename std::iterator_traits<ForwardIterator>::iterator_category,
+            std::forward_iterator_tag>::value>>
     iterator
     insert(const_iterator pos, ForwardIterator first, ForwardIterator last)
     {
@@ -134,25 +127,15 @@ struct static_vector : boost::stl_interfaces::container_interface<
         size_ += insertions;
         return retval;
     }
-    iterator erase(const_iterator pos)
-    {
-        auto position = const_cast<T *>(pos);
-        std::move(position + 1, end(), position);
-        this->back().~T();
-        --size_;
-        return position;
-    }
     iterator erase(const_iterator f, const_iterator last)
     {
         auto first = const_cast<T *>(f);
-#if 0 // TODO
-        auto const end_ = this->cend();
+        auto end_ = this->cend();
         auto it = std::move(last, end_, first);
         for (; it != end_; ++it) {
             it->~T();
         }
         size_ -= last - first;
-#endif
         return first;
     }
     void swap(static_vector & other)
@@ -182,8 +165,14 @@ struct static_vector : boost::stl_interfaces::container_interface<
         shorter->size_ = long_size;
     }
 
-    // TODO: Remove!
-    void clear() noexcept { erase(begin(), end()); }
+    using base_type = boost::stl_interfaces::container_interface<
+        static_vector<T, N>,
+        boost::stl_interfaces::contiguous>;
+    using base_type::base_type;
+    using base_type::begin;
+    using base_type::end;
+    using base_type::resize;
+    using base_type::erase;
 
 private:
     alignas(T) unsigned char buf_[N * sizeof(T)];
@@ -198,5 +187,62 @@ int main()
 {
     //[ static_vector_usage
     static_vector<int, 1024> sv;
+    sv.begin();
+    sv.end();
+    sv.rbegin();
+    sv.rend();
+    int const * sv_cfirst = sv.cbegin();
+    sv.cend();
+    sv.crbegin();
+    sv.crend();
+
+    sv.erase(sv.begin(), sv.end());
+    sv.clear();
+    sv.insert(sv.begin(), sv.begin(), sv.end());
+    sv.assign(sv.begin(), sv.end());
+
+    sv.resize(1);
+    sv.erase(sv.begin());
+
+    auto const csv = sv;
+    int const * csv_first = csv.begin();
+    csv.end();
+    int const * csv_cfirst = csv.cbegin();
+    csv.cend();
+    csv.rbegin();
+    csv.rend();
+    csv.crbegin();
+    csv.crend();
+
+    {
+        static_vector<int, 1024> sv;
+    }
+    {
+        static_vector<int, 1024> sv(2);
+    }
+    {
+        static_vector<int, 1024> sv(1, 42);
+    }
+    {
+        int ints[3] = {3, 4, 5};
+        static_vector<int, 1024> sv(std::begin(ints), std::end(ints));
+    }
+    {
+        static_vector<int, 1024> sv(2);
+        static_vector<int, 1024> sv2(sv);
+    }
+    {
+        static_vector<int, 1024> sv(2);
+        static_vector<int, 1024> sv2;
+        sv2 = sv;
+    }
+    {
+        static_vector<int, 1024> sv(std::initializer_list<int>{4, 5, 6});
+    }
+    {
+        std::initializer_list<int> il{4, 5, 6};
+        static_vector<int, 1024> sv;
+        sv = il;
+    }
     //]
 }
