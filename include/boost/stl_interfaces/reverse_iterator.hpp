@@ -36,6 +36,12 @@ namespace boost { namespace stl_interfaces {
             noexcept(BidiIter(it))) :
             it_(it)
         {}
+        template<
+            typename BidiIter2,
+            typename E = std::enable_if_t<
+                std::is_convertible<BidiIter2, BidiIter>::value>>
+        reverse_iterator(reverse_iterator<BidiIter2> it) : it_(it.it_)
+        {}
 
         friend constexpr bool operator==(
             reverse_iterator lhs,
@@ -75,6 +81,9 @@ namespace boost { namespace stl_interfaces {
         {
             return it_;
         }
+
+        template<typename BidiIter2>
+        friend struct reverse_iterator;
 
         BidiIter it_;
     };

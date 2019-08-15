@@ -52,6 +52,14 @@ TEST(reverse_iter, std_list_iterator)
     auto last = boost::stl_interfaces::make_reverse_iterator(ints.begin());
 
     {
+        auto cfirst = boost::stl_interfaces::reverse_iterator<
+            std::list<int>::const_iterator>(first);
+        auto clast = boost::stl_interfaces::reverse_iterator<
+            std::list<int>::const_iterator>(last);
+        EXPECT_TRUE(std::equal(first, last, cfirst, clast));
+    }
+
+    {
         auto ints_copy = ints;
         std::reverse(ints_copy.begin(), ints_copy.end());
         EXPECT_TRUE(
@@ -103,6 +111,14 @@ TEST(reverse_iter, std_vector_iterator)
 
     auto first = boost::stl_interfaces::make_reverse_iterator(ints.end());
     auto last = boost::stl_interfaces::make_reverse_iterator(ints.begin());
+
+    {
+        auto cfirst = boost::stl_interfaces::reverse_iterator<
+            std::vector<int>::const_iterator>(first);
+        auto clast = boost::stl_interfaces::reverse_iterator<
+            std::vector<int>::const_iterator>(last);
+        EXPECT_TRUE(std::equal(first, last, cfirst, clast));
+    }
 
     {
         auto ints_copy = ints;
