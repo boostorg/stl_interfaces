@@ -6,7 +6,7 @@
 #ifndef BOOST_STL_INTERFACES_REVERSE_ITERATOR_HPP
 #define BOOST_STL_INTERFACES_REVERSE_ITERATOR_HPP
 
-#include <boost/stl_interfaces/fwd.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 
 namespace boost { namespace stl_interfaces {

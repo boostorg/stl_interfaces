@@ -26,3 +26,5 @@ add_sample(back_insert_iterator)
 add_sample(reverse_iterator)
 
 add_sample(drop_while_view)
+
+add_sample(static_vector)

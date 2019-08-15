@@ -109,6 +109,22 @@ namespace boost { namespace stl_interfaces {
     template<typename Derived, bool Contiguous = discontiguous>
     struct container_interface : view_interface<Derived, Contiguous, true>
     {
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+    private:
+        constexpr Derived & derived() noexcept
+        {
+            return static_cast<Derived &>(*this);
+        }
+        constexpr const Derived & derived() const noexcept
+        {
+            return static_cast<Derived const &>(*this);
+        }
+#endif
+
+    public:
+        // TODO: size() from view_interface is actually returning a
+        // difference_type, nto a size_type.
+
         template<typename D = Derived>
         constexpr auto begin() const
             noexcept(noexcept(std::declval<D &>().begin()))
@@ -141,7 +157,7 @@ namespace boost { namespace stl_interfaces {
 
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<detail::common_range<D>>>
+            typename Enable = std::enable_if_t<detail::common_range<D>::value>>
         constexpr auto rbegin() noexcept(noexcept(
             stl_interfaces::make_reverse_iterator(std::declval<D &>().end())))
             -> decltype(
@@ -153,7 +169,7 @@ namespace boost { namespace stl_interfaces {
         }
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<detail::common_range<D>>>
+            typename Enable = std::enable_if_t<detail::common_range<D>::value>>
         constexpr auto rend() noexcept(noexcept(
             stl_interfaces::make_reverse_iterator(std::declval<D &>().begin())))
             -> decltype(
@@ -229,7 +245,7 @@ namespace boost { namespace stl_interfaces {
                 pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n)))
         {
             return derived().insert(
-                pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n)));
+                pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n));
         }
 
         template<typename D = Derived>
@@ -355,16 +371,28 @@ namespace boost { namespace stl_interfaces {
             noexcept(std::declval<D &>().size(), std::declval<D &>()[i]))
             -> decltype(std::declval<D &>().size(), std::declval<D &>()[i])
         {
-            if (derived.size() <= i)
-                throw TODO;
+            if (derived().size() <= i) {
+                throw std::out_of_range(
+                    "Bounds check failed in static_vector::at()");
+            }
             return derived()[i];
+        }
+
+        template<typename D = Derived>
+        constexpr auto clear(typename D::size_type i) noexcept(
+            noexcept(std::declval<D &>().erase(
+                std::declval<D &>().begin(), std::declval<D &>().end())))
+            -> decltype((void)std::declval<D &>().erase(
+                std::declval<D &>().begin(), std::declval<D &>().end()))
+        {
+            return derived().erase(derived().begin(), derived().end());
         }
     };
 
     /** Implementation of free function `swap()` for all containers derived
         from `container_interface`.  */
     template<typename ContainerInterface>
-    friend constexpr auto swap(
+    constexpr auto swap(
         ContainerInterface & lhs,
         ContainerInterface & rhs) noexcept(noexcept(lhs.swap(rhs)))
         -> decltype(

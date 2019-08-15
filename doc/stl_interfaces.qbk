@@ -37,6 +37,9 @@
 [/ View Examples ]
 [import ../example/drop_while_view.cpp]
 
+[/ Container Examples ]
+[import ../example/static_vector.cpp]
+
 [/ Images ]
 
 [def __note__              [$images/note.png]]
