@@ -34,7 +34,7 @@
 [import ../example/back_insert_iterator.cpp]
 [import ../example/reverse_iterator.cpp]
 
-[ / View Examples ]
+[/ View Examples ]
 [import ../example/drop_while_view.cpp]
 
 [/ Images ]

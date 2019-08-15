@@ -1,8 +1,8 @@
 [section Introduction]
 
-Writing iterators is suprisingly hard.  There are a lot of things that can
-subtly go wrong.  It is also very tedious, which of course consequently makes
-it error-prone.
+Writing STL iterators, views, and containers is suprisingly hard.  There are a
+lot of things that can subtly go wrong.  It is also very tedious, which of
+course makes it error-prone.
 
 As a quick example, let's say that we wanted to make a random access iterator
 that represents a string of arbitrary length constructed by repeating a
@@ -154,9 +154,15 @@ write the second one, and writing the second one is more novice-friendly.
 [note _IFaces_'s `iterator_interface` implements iterators that model the
 C++20 iterator concepts.]
 
+Writing view types like those found in `std::ranges` is also laborious,
+considering that most of each view type's API can be derived from `begin()`
+and `end()`.  C++20 has a template that doe exactly this,
+`std::ranges::view_interface`; _IFaces_ provides a pre-C++20-friendly
+implementation.
+
 [endsect]
 
-[section A Bit of Background]
+[section This Library's Relationship to _Iterator_]
 
 _Iterator_ is a library that is already in Boost, and it has been around for a
 long time.
@@ -168,21 +174,27 @@ for use in C++11 and later.  Specifically:
 - _Iterator_ contains a large number of iterator adaptors; those have since
   been rendered moot by C++20 ranges.
 
-- _Iterator_'s `iterator_interface` template is not limited just to the
+- _Iterator_'s `iterator_facade` template is not limited just to the
   existing standard C++ iterator categories; that was an experiment that never
   landed in standard C++, so it adds needless complexity.
 
-- _Iterator_'s `iterator_interface` was written against C++98, so it is not
+- _Iterator_'s `iterator_facade` was written against C++98, so it is not
   `constexpr`- and `noexcept`-friendly.
 
-- _Iterator_'s `iterator_interface` does not support proxy iterators, which
+- _Iterator_'s `iterator_facade` does not support proxy iterators, which
   are fully supported by the C++20 iterator concepts.
 
 - There is opportunity to reduce the amount of code the user must write in
-  order to use `iterator_interface`.
+  order to use `iterator_facade`.
+
+- _Iterator_ contains two templates, `iterator_facade` and `iterator_adaptor`,
+  that represent two ways of writing a new iterator while writing as little
+  code as possible.  It would be nice to have the functionality for both
+  available in on template, but it is difficult to unify those two templates
+  as written.
 
 For these reasons, it seems more appropriate to introduce a new Boost library
-than to try and address the shortcomings of _Iterator_'s `iterator_interface`
-template directly.
+than to try and address the shortcomings of _Iterator_'s `iterator_facade` and
+`iterator_adaptor` templates directly.
 
 [endsect]
