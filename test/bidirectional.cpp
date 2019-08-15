@@ -99,7 +99,7 @@ struct basic_adapted_bidirectional_list_iter
           std::bidirectional_iterator_tag,
           int>
 {
-    basic_adapted_bidirectional_list_iter() : it_(nullptr) {}
+    basic_adapted_bidirectional_list_iter() : it_() {}
     basic_adapted_bidirectional_list_iter(std::list<int>::iterator it) : it_(it) {}
 
 private:
