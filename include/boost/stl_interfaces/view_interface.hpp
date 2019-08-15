@@ -8,46 +8,8 @@
 
 #include <boost/stl_interfaces/fwd.hpp>
 
-#include <iterator>
-
 
 namespace boost { namespace stl_interfaces {
-
-    namespace detail {
-        template<typename Iter>
-        using iter_difference_t =
-            typename std::iterator_traits<Iter>::difference_type;
-
-        template<typename Range, typename = void>
-        struct iterator;
-        template<typename Range>
-        struct iterator<
-            Range,
-            void_t<decltype(std::declval<Range &>().begin())>>
-        {
-            using type = decltype(std::declval<Range &>().begin());
-        };
-        template<typename Range>
-        using iterator_t = typename iterator<Range>::type;
-
-        template<typename Range, typename = void>
-        struct sentinel;
-        template<typename Range>
-        struct sentinel<
-            Range,
-            void_t<decltype(std::declval<Range &>().begin())>>
-        {
-            using type = decltype(std::declval<Range &>().begin());
-        };
-        template<typename Range>
-        using sentinel_t = typename sentinel<Range>::type;
-
-        template<typename Range>
-        using range_difference_t = iter_difference_t<iterator_t<Range>>;
-
-        template<typename Range>
-        using common_range = std::is_same<iterator_t<Range>, sentinel_t<Range>>;
-    }
 
     /** A CRTP template that one may derive from to make it easier to define
         `std::ranges::view`-like types with a container-like interface.  This
@@ -58,7 +20,6 @@ namespace boost { namespace stl_interfaces {
         bool Contiguous = discontiguous
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
-        bool SuppressBoolConversion = false,
         typename E = std::enable_if_t<
             std::is_class<Derived>::value &&
             std::is_same<Derived, std::remove_cv_t<Derived>>::value>
@@ -100,9 +61,7 @@ namespace boost { namespace stl_interfaces {
 
         template<
             typename D = Derived,
-            typename R = std::enable_if_t<
-                !SuppressBoolConversion,
-                decltype(std::declval<D &>().empty())>>
+            typename R = decltype(std::declval<D &>().empty())>
         constexpr explicit
         operator R() noexcept(noexcept(std::declval<D &>().empty()))
         {
@@ -110,9 +69,7 @@ namespace boost { namespace stl_interfaces {
         }
         template<
             typename D = Derived,
-            typename R = std::enable_if_t<
-                !SuppressBoolConversion,
-                decltype(std::declval<D &>().empty())>>
+            typename R = decltype(std::declval<D &>().empty())>
         constexpr explicit operator bool() const
             noexcept(noexcept(std::declval<D &>().empty()))
         {

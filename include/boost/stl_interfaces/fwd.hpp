@@ -7,6 +7,8 @@
 #define BOOST_STL_INTERFACES_FWD_HPP
 
 
+#include <iterator>
+
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
 
 #if defined(_MSC_VER) || defined(__GNUC__) && __GNUC__ < 8
@@ -33,6 +35,40 @@ namespace boost { namespace stl_interfaces {
         struct dummy
         {
         };
+
+        template<typename Iter>
+        using iter_difference_t =
+            typename std::iterator_traits<Iter>::difference_type;
+
+        template<typename Range, typename = void>
+        struct iterator;
+        template<typename Range>
+        struct iterator<
+            Range,
+            void_t<decltype(std::declval<Range &>().begin())>>
+        {
+            using type = decltype(std::declval<Range &>().begin());
+        };
+        template<typename Range>
+        using iterator_t = typename iterator<Range>::type;
+
+        template<typename Range, typename = void>
+        struct sentinel;
+        template<typename Range>
+        struct sentinel<
+            Range,
+            void_t<decltype(std::declval<Range &>().begin())>>
+        {
+            using type = decltype(std::declval<Range &>().begin());
+        };
+        template<typename Range>
+        using sentinel_t = typename sentinel<Range>::type;
+
+        template<typename Range>
+        using range_difference_t = iter_difference_t<iterator_t<Range>>;
+
+        template<typename Range>
+        using common_range = std::is_same<iterator_t<Range>, sentinel_t<Range>>;
     }
 
 }}

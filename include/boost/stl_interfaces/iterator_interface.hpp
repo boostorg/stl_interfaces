@@ -9,7 +9,6 @@
 #include <boost/stl_interfaces/fwd.hpp>
 
 #include <utility>
-#include <iterator>
 #include <type_traits>
 
 

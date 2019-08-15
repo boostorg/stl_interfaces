@@ -174,6 +174,23 @@ struct static_vector : boost::stl_interfaces::container_interface<
     using base_type::resize;
     using base_type::erase;
 
+    // Comparisions (2 free functions, skipped 4)
+    friend bool operator==(static_vector const & lhs, static_vector const & rhs)
+    {
+        return lhs.size() == rhs.size() &&
+               std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+    friend bool operator<(static_vector const & lhs, static_vector const & rhs)
+    {
+        auto const iters =
+            std::mismatch(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+        if (iters.second == rhs.end())
+            return false;
+        if (iters.first == lhs.end())
+            return true;
+        return *iters.first < *iters.second;
+    }
+
 private:
     alignas(T) unsigned char buf_[N * sizeof(T)];
     size_type size_;
