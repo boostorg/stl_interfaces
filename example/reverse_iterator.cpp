@@ -60,7 +60,7 @@ struct reverse_iterator
     // std::bidirectional_iterator_tag.
     diff_t operator-(reverse_iterator other) const
     {
-        return std::distance(it_, other.it_);
+        return -std::distance(other.it_, it_);
     }
     reverse_iterator & operator+=(diff_t n)
     {

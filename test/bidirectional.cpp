@@ -9,6 +9,7 @@
 
 #include <array>
 #include <numeric>
+#include <list>
 #include <type_traits>
 
 
@@ -64,13 +65,14 @@ static_assert(
         plus_eq<basic_bidirectional_iter, std::ptrdiff_t>::value,
     "");
 
-struct basic_adapted_bidirectional_iter : boost::stl_interfaces::iterator_interface<
-                                      basic_adapted_bidirectional_iter,
-                                      std::bidirectional_iterator_tag,
-                                      int>
+struct basic_adapted_bidirectional_ptr_iter
+    : boost::stl_interfaces::iterator_interface<
+          basic_adapted_bidirectional_ptr_iter,
+          std::bidirectional_iterator_tag,
+          int>
 {
-    basic_adapted_bidirectional_iter() : it_(nullptr) {}
-    basic_adapted_bidirectional_iter(int * it) : it_(it) {}
+    basic_adapted_bidirectional_ptr_iter() : it_(nullptr) {}
+    basic_adapted_bidirectional_ptr_iter(int * it) : it_(it) {}
 
 private:
     friend boost::stl_interfaces::access;
@@ -81,9 +83,37 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    basic_adapted_bidirectional_iter, std::bidirectional_iterator)
+    basic_adapted_bidirectional_ptr_iter, std::bidirectional_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
-    basic_adapted_bidirectional_iter,
+    basic_adapted_bidirectional_ptr_iter,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
+struct basic_adapted_bidirectional_list_iter
+    : boost::stl_interfaces::iterator_interface<
+          basic_adapted_bidirectional_list_iter,
+          std::bidirectional_iterator_tag,
+          int>
+{
+    basic_adapted_bidirectional_list_iter() : it_(nullptr) {}
+    basic_adapted_bidirectional_list_iter(std::list<int>::iterator it) : it_(it) {}
+
+private:
+    friend boost::stl_interfaces::access;
+    std::list<int>::iterator & base_reference() noexcept { return it_; }
+    std::list<int>::iterator base_reference() const noexcept { return it_; }
+
+    std::list<int>::iterator it_;
+};
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    basic_adapted_bidirectional_list_iter, std::bidirectional_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_adapted_bidirectional_list_iter,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
     int,
@@ -241,10 +271,10 @@ TEST(bidirectional, basic_std_copy)
     }
 }
 
-TEST(bidirectional, basic_adapted_std_copy)
+TEST(bidirectional, basic_adapted_ptr_std_copy)
 {
-    basic_adapted_bidirectional_iter first(ints.data());
-    basic_adapted_bidirectional_iter last(ints.data() + ints.size());
+    basic_adapted_bidirectional_ptr_iter first(ints.data());
+    basic_adapted_bidirectional_ptr_iter last(ints.data() + ints.size());
 
     {
         std::array<int, 10> ints_copy;
@@ -264,8 +294,8 @@ TEST(bidirectional, basic_adapted_std_copy)
 
     {
         std::array<int, 10> iota_ints;
-        basic_adapted_bidirectional_iter first(iota_ints.data());
-        basic_adapted_bidirectional_iter last(
+        basic_adapted_bidirectional_ptr_iter first(iota_ints.data());
+        basic_adapted_bidirectional_ptr_iter last(
             iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
         EXPECT_EQ(iota_ints, ints);
@@ -273,8 +303,8 @@ TEST(bidirectional, basic_adapted_std_copy)
 
     {
         std::array<int, 10> iota_ints;
-        basic_adapted_bidirectional_iter first(iota_ints.data());
-        basic_adapted_bidirectional_iter last(
+        basic_adapted_bidirectional_ptr_iter first(iota_ints.data());
+        basic_adapted_bidirectional_ptr_iter last(
             iota_ints.data() + iota_ints.size());
         std::iota(
             std::make_reverse_iterator(last),
@@ -282,6 +312,30 @@ TEST(bidirectional, basic_adapted_std_copy)
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
         EXPECT_EQ(iota_ints, ints);
+    }
+}
+
+TEST(bidirectional, basic_adapted_list_std_copy)
+{
+    std::list<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    basic_adapted_bidirectional_list_iter first(ints.begin());
+    basic_adapted_bidirectional_list_iter last(ints.end());
+
+    {
+        std::list<int> ints_copy;
+        std::copy(first, last, std::back_inserter(ints_copy));
+        EXPECT_EQ(ints_copy, ints);
+    }
+
+    {
+        std::list<int> ints_copy;
+        std::copy(
+            std::make_reverse_iterator(last),
+            std::make_reverse_iterator(first),
+            std::back_inserter(ints_copy));
+        std::reverse(ints_copy.begin(), ints_copy.end());
+        EXPECT_EQ(ints_copy, ints);
     }
 }
 
@@ -325,15 +379,31 @@ TEST(bidirectional, postincrement_preincrement)
     }
 
     {
-        basic_adapted_bidirectional_iter first(ints.data());
-        basic_adapted_bidirectional_iter last(ints.data() + ints.size());
+        basic_adapted_bidirectional_ptr_iter first(ints.data());
+        basic_adapted_bidirectional_ptr_iter last(ints.data() + ints.size());
         while (first != last)
             first++;
     }
 
     {
-        basic_adapted_bidirectional_iter first(ints.data());
-        basic_adapted_bidirectional_iter last(ints.data() + ints.size());
+        basic_adapted_bidirectional_ptr_iter first(ints.data());
+        basic_adapted_bidirectional_ptr_iter last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
+
+    {
+        std::list<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        basic_adapted_bidirectional_list_iter first(ints.begin());
+        basic_adapted_bidirectional_list_iter last(ints.end());
+        while (first != last)
+            first++;
+    }
+
+    {
+        std::list<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        basic_adapted_bidirectional_list_iter first(ints.begin());
+        basic_adapted_bidirectional_list_iter last(ints.end());
         while (first != last)
             last--;
     }

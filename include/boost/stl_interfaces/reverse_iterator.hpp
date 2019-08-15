@@ -37,16 +37,32 @@ namespace boost { namespace stl_interfaces {
             it_(it)
         {}
 
+        friend constexpr bool operator==(
+            reverse_iterator lhs,
+            reverse_iterator rhs) noexcept(noexcept(lhs.it_ == rhs.it_))
+        {
+            return lhs.it_ == rhs.it_;
+        }
+
+        friend constexpr auto
+        operator-(reverse_iterator lhs, reverse_iterator rhs) noexcept(
+            noexcept(std::distance(lhs.it_, rhs.it_)))
+        {
+            return -std::distance(rhs.it_, lhs.it_);
+        }
+
         constexpr typename std::iterator_traits<BidiIter>::reference
         operator*() const
-            noexcept(noexcept(std::prev(std::declval<BidiIter>())))
+            noexcept(noexcept(std::prev(std::declval<BidiIter &>())))
         {
             return *std::prev(it_);
         }
 
         constexpr reverse_iterator & operator+=(
             typename std::iterator_traits<BidiIter>::difference_type
-                n) noexcept(noexcept(std::advance(std::declval<BidiIter>(), -n)))
+                n) noexcept(noexcept(std::
+                                         advance(
+                                             std::declval<BidiIter &>(), -n)))
         {
             std::advance(it_, -n);
             return *this;
