@@ -11,8 +11,6 @@
 
 namespace boost { namespace stl_interfaces {
 
-    // TODO: Look in all the headers for ADL traps.
-
     /** This type is very similar to the C++20 version of
         `std::reverse_iterator`; it is `constexpr`-, `noexcept`-, and
         proxy-friendly. */

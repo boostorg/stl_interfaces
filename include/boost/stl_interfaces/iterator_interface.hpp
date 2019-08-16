@@ -149,9 +149,6 @@ namespace boost { namespace stl_interfaces {
         };
     }
 
-    // TODO: Compile-fail tests and associated static_asserts to help catch
-    // common errors.
-
     /** A CRTP template that one may derive from to make defining iterators
         easier. */
     template<
