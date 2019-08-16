@@ -38,6 +38,7 @@
 [import ../example/drop_while_view.cpp]
 
 [/ Container Examples ]
+[import ../example/static_vector.hpp]
 [import ../example/static_vector.cpp]
 
 [/ Images ]

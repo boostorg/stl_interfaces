@@ -136,47 +136,7 @@ namespace boost { namespace stl_interfaces {
 #endif
 
     public:
-        container_interface() {}
-
-        template<
-            typename D = Derived,
-            typename Enable =
-                detail::void_t<decltype(std::declval<D &>().assign(
-                    std::declval<typename D::size_type>(),
-                    std::declval<typename D::value_type const &>()))>>
-        container_interface(
-            typename D::size_type n, typename D::value_type const & value)
-        {
-            derived().assign(n, value);
-        }
-
-        template<
-            typename InputIterator,
-            typename D = Derived,
-            typename Enable = std::enable_if_t<
-                detail::in_iter<InputIterator>::value,
-                detail::void_t<decltype(std::declval<D &>().assign(
-                    std::declval<InputIterator>(),
-                    std::declval<InputIterator>()))>>>
-        container_interface(InputIterator first, InputIterator last)
-        {
-            assign(first, last);
-        }
-
-        template<
-            typename D = Derived,
-            typename Enable =
-                detail::void_t<decltype(std::declval<D &>().assign(
-                    std::declval<
-                        std::initializer_list<typename D::value_type>>()
-                        .begin(),
-                    std::declval<
-                        std::initializer_list<typename D::value_type>>()
-                        .end()))>>
-        container_interface(std::initializer_list<typename D::value_type> il)
-        {
-            derived().assign(il.begin(), il.end());
-        }
+        using derived_container_type = Derived;
 
         ~container_interface() { clear(); }
 
@@ -242,8 +202,8 @@ namespace boost { namespace stl_interfaces {
         }
         template<typename D = Derived>
         constexpr auto front() const
-            noexcept(noexcept(*std::declval<D &>().begin()))
-                -> decltype(*std::declval<D &>().begin())
+            noexcept(noexcept(*std::declval<D const &>().begin()))
+                -> decltype(*std::declval<D const &>().begin())
         {
             return *derived().begin();
         }
@@ -261,8 +221,8 @@ namespace boost { namespace stl_interfaces {
             typename D = Derived,
             typename Enable = std::enable_if_t<detail::common_range<D>::value>>
         constexpr auto back() const
-            noexcept(noexcept(*std::prev(std::declval<D &>().end())))
-                -> decltype(*std::prev(std::declval<D &>().end()))
+            noexcept(noexcept(*std::prev(std::declval<D const &>().end())))
+                -> decltype(*std::prev(std::declval<D const &>().end()))
         {
             return *std::prev(derived().end());
         }
@@ -276,8 +236,8 @@ namespace boost { namespace stl_interfaces {
         }
         template<typename D = Derived>
         constexpr auto operator[](detail::range_difference_t<D> n) const
-            noexcept(noexcept(std::declval<D &>().begin()[n]))
-                -> decltype(std::declval<D &>().begin()[n])
+            noexcept(noexcept(std::declval<D const &>().begin()[n]))
+                -> decltype(std::declval<D const &>().begin()[n])
         {
             return derived().begin()[n];
         }
@@ -396,8 +356,6 @@ namespace boost { namespace stl_interfaces {
                                              pos,
                                              detail::make_n_iter(x, n),
                                              detail::make_n_iter_end(x, n))))
-            -> decltype(std::declval<D &>().insert(
-                pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n)))
         {
             return derived().insert(
                 pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n));
@@ -434,11 +392,11 @@ namespace boost { namespace stl_interfaces {
                 std::declval<D &>().begin(), first, last)))
             -> decltype(
                 std::declval<D &>().clear(),
-                std::declval<D &>().insert(
+                (void)std::declval<D &>().insert(
                     std::declval<D &>().begin(), first, last))
         {
             derived().clear();
-            return derived().insert(derived().begin(), first, last);
+            derived().insert(derived().begin(), first, last);
         }
 
         template<typename D = Derived>
@@ -466,7 +424,7 @@ namespace boost { namespace stl_interfaces {
         constexpr auto
         assign(std::initializer_list<typename D::value_type> il) noexcept(
             noexcept(std::declval<D &>().assign(il.begin(), il.end())))
-            -> decltype(std::declval<D &>().assign(il.begin(), il.end()))
+            -> decltype((void)std::declval<D &>().assign(il.begin(), il.end()))
         {
             derived().assign(il.begin(), il.end());
         }
@@ -488,7 +446,7 @@ namespace boost { namespace stl_interfaces {
             noexcept(std::declval<D &>().emplace_front(x)))
             -> decltype((void)std::declval<D &>().emplace_front(x))
         {
-            return derived().emplace_front(x);
+            derived().emplace_front(x);
         }
 
         template<typename D = Derived>
@@ -496,18 +454,18 @@ namespace boost { namespace stl_interfaces {
             noexcept(std::declval<D &>().emplace_front(std::move(x))))
             -> decltype((void)std::declval<D &>().emplace_front(std::move(x)))
         {
-            return derived().emplace_front(std::move(x));
+            derived().emplace_front(std::move(x));
         }
 
         template<typename D = Derived>
-        constexpr auto pop_front(typename D::value_type && x) noexcept(
+        constexpr auto pop_front() noexcept(
             noexcept(std::declval<D &>().erase(std::declval<D &>().begin())))
             -> decltype(
                 std::declval<D &>().emplace_front(
                     std::declval<typename D::value_type &>()),
                 (void)std::declval<D &>().erase(std::declval<D &>().begin()))
         {
-            return derived().erase(derived().begin());
+            derived().erase(derived().begin());
         }
 
         template<typename D = Derived>
@@ -515,7 +473,7 @@ namespace boost { namespace stl_interfaces {
             noexcept(std::declval<D &>().emplace_back(x)))
             -> decltype((void)std::declval<D &>().emplace_back(x))
         {
-            return derived().emplace_back(x);
+            derived().emplace_back(x);
         }
 
         template<typename D = Derived>
@@ -523,24 +481,35 @@ namespace boost { namespace stl_interfaces {
             noexcept(std::declval<D &>().emplace_back(std::move(x))))
             -> decltype((void)std::declval<D &>().emplace_back(std::move(x)))
         {
-            return derived().emplace_back(std::move(x));
+            derived().emplace_back(std::move(x));
         }
 
         template<typename D = Derived>
-        constexpr auto pop_back(typename D::value_type && x) noexcept(
-            noexcept(std::declval<D &>().erase(--std::declval<D &>().end())))
+        constexpr auto pop_back() noexcept(noexcept(
+            std::declval<D &>().erase(std::prev(std::declval<D &>().end()))))
             -> decltype(
                 std::declval<D &>().emplace_back(
                     std::declval<typename D::value_type &>()),
-                (void)std::declval<D &>().erase(--std::declval<D &>().end()))
+                (void)std::declval<D &>().erase(
+                    std::prev(std::declval<D &>().end())))
         {
-            return derived().erase(--derived().end());
+            derived().erase(std::prev(derived().end()));
         }
 
         template<typename D = Derived>
-        constexpr auto at(typename D::size_type i) noexcept(
-            noexcept(std::declval<D &>().size(), std::declval<D &>()[i]))
+        constexpr auto at(typename D::size_type i)
             -> decltype(std::declval<D &>().size(), std::declval<D &>()[i])
+        {
+            if (derived().size() <= i) {
+                throw std::out_of_range(
+                    "Bounds check failed in static_vector::at()");
+            }
+            return derived()[i];
+        }
+
+        template<typename D = Derived>
+        constexpr auto at(typename D::size_type i) const -> decltype(
+            std::declval<D &>().size(), std::declval<D const &>()[i])
         {
             if (derived().size() <= i) {
                 throw std::out_of_range(
