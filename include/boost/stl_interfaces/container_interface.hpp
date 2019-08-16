@@ -8,6 +8,8 @@
 
 #include <boost/stl_interfaces/reverse_iterator.hpp>
 
+#include <stdexcept>
+
 
 namespace boost { namespace stl_interfaces {
 
