@@ -62,36 +62,23 @@ namespace boost { namespace stl_interfaces {
         using in_iter = std::is_convertible<
             typename std::iterator_traits<Iter>::iterator_category,
             std::input_iterator_tag>;
+
+        template<typename Derived, typename = void>
+        struct clear_impl
+        {
+            static constexpr void call(Derived & d) noexcept {}
+        };
+        template<typename Derived>
+        struct clear_impl<
+            Derived,
+            void_t<decltype(std::declval<Derived>().clear())>>
+        {
+            static constexpr void call(Derived & d) noexcept { d.clear(); }
+        };
     }
 
-    // TODO:
-
-    // Container requirements:
-    // mutable begin/end -> const begin/end,cbegin/cend
-    // c1 == c2 -> c1 != c2
-    // c1 < c2 -> c1 <= c2,c1 > c2,c1 >= c2
-    // random access begin/end -> size
-    // equality-comparable begin/end -> empty
-    // c1.swap(c2) -> swap(c1, c2)
-
-    // Reversible container requirements:
-    // mutable begin/end -> mutable rbegin/rend (requires detection of proxies
-    // for pre-C++20 code, because reverse_iterator does not handle proxies
-    // properly before that) mutable rbegin/rend -> const
-    // rbegin/rendc,rbegin/crend
-
-    // Sequence container requirements:
-    // C(il) -> c = il
-    // emplace,insert(p,i,j) ->
-    // insert(p,t),insert(p,rv),insert(p,n,t),insert(p,il) clear,insert(p,i,j)
-    // -> assign(i,j),assign(n,t),assign(il) emplace_front ->
-    // push_front(t),push_front(rv) emplace_front,erase -> pop_front
-    // emplace_back -> push_back(t),push_back(rv)
-    // emplace_back,erase -> pop_back
-    // random access begin/end -> operator[]
-    // operator[] -> at
-
-    // Associative container requirements (only those not covered above):
+    // TODO (maybe one day...)
+    // Associative container requirements (only those not covered by the earlier tables):
     // try_emplace -> all unique emplaces and inserts, except emplace_hint,
     // hinted insert, and node handle inserts emplace (in absence of
     // try_emplace) -> all non-unique emplaces and inserts, except emplace_hint,
@@ -99,13 +86,6 @@ namespace boost { namespace stl_interfaces {
     // lower_bound,upper_bound ->
     // equal_range,find(tran?),count(tran?),contains(tran?) erase(q),equal_range
     // -> erase(k),erase(r),erase(q1,q2)
-
-    // TODO: Document that the reverse_iterator type of Derived should be
-    // stl_interfaces::reverse_iterator<iterator> if you want the reverse
-    // iterator API to be defined by container_interface.
-
-    // TODO: Document that iterator is expected to be implicitly convertible
-    // to const_iterator.
 
     /** A CRTP template that one may derive from to make it easier to define
         container types. */
@@ -140,7 +120,7 @@ namespace boost { namespace stl_interfaces {
     public:
         using derived_container_type = Derived;
 
-        ~container_interface() { clear(); }
+        ~container_interface() { detail::clear_impl<Derived>::call(derived()); }
 
         template<typename D = Derived>
         constexpr auto empty() noexcept(
@@ -375,8 +355,7 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto erase(typename D::const_iterator pos) noexcept(
-            noexcept(std::declval<D &>().erase(pos, std::next(pos))))
+        constexpr auto erase(typename D::const_iterator pos) noexcept
             -> decltype(std::declval<D &>().erase(pos, std::next(pos)))
         {
             return derived().erase(pos, std::next(pos));
@@ -387,10 +366,8 @@ namespace boost { namespace stl_interfaces {
             typename D = Derived,
             typename Enable =
                 std::enable_if_t<detail::in_iter<InputIterator>::value>>
-        constexpr auto
-        assign(InputIterator first, InputIterator last) noexcept(noexcept(
-            std::declval<D &>().clear(),
-            std::declval<D &>().insert(
+        constexpr auto assign(InputIterator first, InputIterator last) noexcept(
+            noexcept(std::declval<D &>().insert(
                 std::declval<D &>().begin(), first, last)))
             -> decltype(
                 std::declval<D &>().clear(),
@@ -402,18 +379,20 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto
-        assign(typename D::size_type n, typename D::value_type const & x) noexcept(
-            noexcept(
+        constexpr auto assign(
+            typename D::size_type n,
+            typename D::value_type const &
+                x) noexcept(noexcept(std::declval<D &>()
+                                         .insert(
+                                             std::declval<D &>().begin(),
+                                             detail::make_n_iter(x, n),
+                                             detail::make_n_iter_end(x, n))))
+            -> decltype(
                 std::declval<D &>().clear(),
-                std::declval<D &>().insert(
+                (void)std::declval<D &>().insert(
                     std::declval<D &>().begin(),
                     detail::make_n_iter(x, n),
-                    detail::make_n_iter_end(x, n))))
-            -> decltype((void)std::declval<D &>().insert(
-                std::declval<D &>().begin(),
-                detail::make_n_iter(x, n),
-                detail::make_n_iter_end(x, n)))
+                    detail::make_n_iter_end(x, n)))
         {
             derived().clear();
             derived().insert(
@@ -460,12 +439,10 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto pop_front() noexcept(
-            noexcept(std::declval<D &>().erase(std::declval<D &>().begin())))
-            -> decltype(
-                std::declval<D &>().emplace_front(
-                    std::declval<typename D::value_type &>()),
-                (void)std::declval<D &>().erase(std::declval<D &>().begin()))
+        constexpr auto pop_front() noexcept -> decltype(
+            std::declval<D &>().emplace_front(
+                std::declval<typename D::value_type &>()),
+            (void)std::declval<D &>().erase(std::declval<D &>().begin()))
         {
             derived().erase(derived().begin());
         }
@@ -487,13 +464,11 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto pop_back() noexcept(noexcept(
-            std::declval<D &>().erase(std::prev(std::declval<D &>().end()))))
-            -> decltype(
-                std::declval<D &>().emplace_back(
-                    std::declval<typename D::value_type &>()),
-                (void)std::declval<D &>().erase(
-                    std::prev(std::declval<D &>().end())))
+        constexpr auto pop_back() noexcept -> decltype(
+            std::declval<D &>().emplace_back(
+                std::declval<typename D::value_type &>()),
+            (void)std::declval<D &>().erase(
+                std::prev(std::declval<D &>().end())))
         {
             derived().erase(std::prev(derived().end()));
         }
@@ -521,8 +496,7 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto clear() noexcept(noexcept(std::declval<D &>().erase(
-            std::declval<D &>().begin(), std::declval<D &>().end())))
+        constexpr auto clear() noexcept
             -> decltype((void)std::declval<D &>().erase(
                 std::declval<D &>().begin(), std::declval<D &>().end()))
         {

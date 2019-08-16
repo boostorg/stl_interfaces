@@ -105,11 +105,11 @@ type `difference_type`.
         [ `i += n` ]
         [ `Iter &` ]
         [
-``  difference_type m = n;
-  if (m >= 0)
-    while (m--) ++i;
-  else
-    while (m++) --i;`` ]
+``difference_type m = n;
+if (m >= 0)
+  while (m--) ++i;
+else
+  while (m++) --i;`` ]
         [ ]
     ]
 ]
@@ -345,6 +345,10 @@ _view_iface_ that we did not have to write:
 
 [drop_while_view_usage]
 
+If you want more details on _view_iface_, you can find it wherever you usually
+find reference documentation on the standard library.  We won't cover it in
+too much detail here, for that reason.
+
 [endsect]
 
 [section Tutorial: _cont_iface_]
@@ -370,7 +374,461 @@ Just as with _view_iface_, _cont_iface_ takes the derived type and an optional
 iterators are contiguous.  The `bool` parameter is necessary to support
 pre-C++20 code.
 
-TODO: Tables
+The tables below represent a subset of the operations needed for each of the
+container requirements tables in the standard.  _cont_iface_ covers the
+definition of containers (including the optional container requirements);
+reversible containers; and sequence containers (including the optional
+sequence container requirements).  Each table lists all the user-defined types
+and operations required to make standard-conforming containers with
+_cont_iface_.  Note that _cont_iface_ does not interact at all with the
+allocator-aware container requirements, the associative contaienr
+requirements, or the unordered associative contaienr requirements.
+
+For instance, to make a `std::array`-like container (but not a sequence
+container, because if has no `insert()`, `erase()`, etc.), you need to define
+the types and operations in the "User-Defined Types and Operations for
+Containers" table, and optionally the one in the "Optional User-Defined Types
+and Operations for Containers".
+
+To make a `std::forward_list`-like type, you need to define the types and
+operations in the "User-Defined Types and Operations for Containers" table,
+and optionally the one in the "Optional User-Defined Types and Operations for
+Containers".  You cannot define the types and operations in the "User-Defined
+Types and Operations for Reversible Containers" table, because your container
+is forward-only.  You would also define the types and operations in the
+"User-Defined Types and Operations for Sequence Containers" table.
+
+To make a `std::vector`-like type, you would provide the types and operations
+in all the tables below.
+
+If you have a type that does not have all the operations in one of the tables,
+that's fine -- you can just implement the operations that your type can do,
+and whatever operations can be provided by _cont_iface_ in terms of the
+user-defined operations, will be provided.  After each requirements table,
+there's a table indicating how _cont_iface_ maps the user-defined operations
+to the operations it provides.  These mapping tables can be handy if you have
+a container that meets only some of the requirements of one of the
+requirements tables.
+
+In the tables, `X` is a user-defined type derived from _cont_iface_ containing
+objects of tyoe `T`; `a` and `b` are objects of type `X`; `i` and `j` are
+objects of type (possibly const) `X::iterator`; `u` is an identifier; `r` is a
+non-const value of type `X`; `rv_c` is a non-const rvalue of type `X`; `i` and
+`j` are forward iterators that refer to elements implicitly convertible to
+`T`; `[i, j)` is a range; `il` is an object of type
+`strd::initializer_list<T>`; `n` is a value of type `X​::​size_type`, `p` is a
+valid constant iterator to `a`; `q` is a valid dereferenceable constant
+iterator to `a`; `[q1, q2)` is a valid range of constant iterators to `a`; `t`
+is an lvalue or a const rvalue of T; and `rv` denotes a non-const rvalue of
+`T`. `Args` is a template parameter pack; `args` denotes a function parameter
+pack with the pattern `Args &&`.
+
+All containers must meet the requirements of this table:
+
+[table User-Defined Types and Operations for Containers
+    [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
+    [
+        [ `X​::​value_type` ]
+        [ `T` ]
+        [  ]
+        [ Compile time only. ]
+    ]
+    [
+        [ `X​::​reference` ]
+        [ `T &` ]
+        [  ]
+        [ Compile time only. ]
+    ]
+    [
+        [ `X​::​const_reference` ]
+        [ `T const &` ]
+        [  ]
+        [ Compile time only. ]
+    ]
+    [
+        [ `X​::​iterator` ]
+        [ An iterator whose `value_type` is `T`. ]
+        [  ]
+        [ Must meet the forward iterator requirements, and must be convertible to `X​::​const_iterator`.  Compile time only. ]
+    ]
+    [
+        [ `X​::​const_iterator` ]
+        [ A constant iterator whose `value_type` is `T`. ]
+        [  ]
+        [ Must meet the forward iterator requirements.  Compile time only. ]
+    ]
+    [
+        [ `X​::​difference_type` ]
+        [ A signed integer type. ]
+        [  ]
+        [ Identical to the diference type of `X::iterator` and `X::const_iterator`.  Compile time only. ]
+    ]
+    [
+        [ `X​::​size_type` ]
+        [ An unsigned integer type. ]
+        [  ]
+        [ Compile time only. ]
+    ]
+    [
+        [ `X u;` ]
+        [  ]
+        [  ]
+        [ ['Ensures:] `u.empty()` ]
+    ]
+    [
+        [ `X(a)` ]
+        [  ]
+        [  ]
+        [ ['Ensures:] `X(a) == a` ]
+    ]
+    [
+        [
+``X u(a);
+X u = a;
+`` ]
+        [  ]
+        [  ]
+        [ ['Ensures:] `u == a` ]
+    ]
+    [
+        [
+``X u(rv);
+X u = rv;
+`` ]
+        [  ]
+        [  ]
+        [ ['Ensures:] `u` is equal to the value `rv_c` had before this operation. ]
+    ]
+    [
+        [ `a = rv` ]
+        [ `X &` ]
+        [ All existing elements of `a` are either move assigned to or destroyed. ]
+        [ ['Ensures:] `u` is equal to the value `rv_c` had before this operation. ]
+    ]
+    [
+        [ `a.~X()` ]
+        [ ]
+        [ Destroys every element of `a`; any memory obtained is deallocated. ]
+        [ Containers that also meet the sequence container requirements do not need to define a destructor.  For sequence containers, _cont_iface_ calls `clear()` in its destructor. ]
+    ]
+    [
+        [ `a.begin()` ]
+        [ `X::iterator` ]
+        [ ]
+        [ This is the non-`const` overload; the `const` overload is not needed. ]
+    ]
+    [
+        [ `a == b` ]
+        [ Convertible to `bool`. ]
+        [ `std::equal(a.begin(), a.end(), b.begin(), b.end())` ]
+        [ ['Expects:] `T` is equality comparable. ]
+    ]
+    [
+        [ `a.swap(b)` ]
+        [ Convertible to `bool`. ]
+        [  ]
+        [ ['Effects:] exchanges the contents of `a` and `b`. ]
+    ]
+    [
+        [ `r = a` ]
+        [ `X &` ]
+        [ ]
+        [ ['Ensures:] `r` == `a`. ]
+    ]
+    [
+        [ `a.max_size()` ]
+        [ `X::size_type` ]
+        [ `std::distance(l.begin(), l.end())` for the largest possible container `l`. ]
+        [ ]
+    ]
+]]
+
+If you provide the types and operations above, _cont_iface_ will provide the
+rest of the container requirements, using this mapping:
+
+[table User-Defined Operations to _cont_iface_ Operations
+    [[user-Defined]   [_cont_iface_-Provided]   [Note]]
+    [
+        [
+``a.begin()
+a.end()`` ]
+        [
+``a.empty()
+a.size()
+a.begin()
+a.end()
+a.cbegin()
+a.cend()`` ]
+        [ The user-defined `begin()` and `end()` are non-`const`, and the _cont_iface_-provided ones are `const`.  _cont_iface_ can only provide `size()` if `X::const_iterator` is a random access iterator; otherwise, it must be user-defined. ]
+    ]
+        [ `a == b` ]
+        [ `a != b` ]
+        [ ]
+    ]
+    ]
+        [ `a.swap(b)` ]
+        [ `swap(a, b)` ]
+        [ ]
+    ]
+]]
+
+Containers that are reverse-iterable must meet the requirements of this table
+(in addition to the container requirements):
+
+[table User-Defined Types and Operations for Reversible Containers
+    [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
+    [
+        [ `X​::​reverse_iterator` ]
+        [ `boost::stl_interfaces::reverse_iterator<X::iterator>` ]
+        [  ]
+        [ Compile time only. ]
+    ]
+    [
+        [ `X​::​const_reverse_iterator` ]
+        [ `boost::stl_interfaces::reverse_iterator<X::const_iterator>` ]
+        [  ]
+        [ Compile time only. ]
+    ]
+]]
+
+If you provide the types and operations above, _cont_iface_ will provide the
+rest of the reversible container requirements, using this mapping:
+
+[table User-Defined Operations to _cont_iface_ Operations
+    [[user-Defined]   [_cont_iface_-Provided]   [Note]]
+    [
+        [
+``a.begin()
+a.end()`` ]
+        [
+``a.rbegin()
+a.rend()
+a.crbegin()
+a.crend()`` ]
+        [ The user-defined `begin()` and `end()` are non-`const`, and _cont_iface_ provides both `const` and non-`const` overloads of `rbegin()` and `rend()`.  _cont_iface_ can only provide these operations if `X::iterator` and `X::const_iterator` are bidirectional iterators. ]
+    ]
+]]
+
+Containers that are comparable with `<`, `>`, `<=`, and `>=` must meet the
+requirements of this table (in addition to the container requirements):
+
+[table Optional User-Defined Types and Operations for Containers
+    [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
+    [
+        [ `a < b` ]
+        [ Convertible to `bool`. ]
+        [ `std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end())` ]
+        [ ['Expects:] `T` is less-than comparable. ]
+    ]
+]]
+
+If you provide the types and operations above, _cont_iface_ will provide the
+rest of the optional container requirements, using this mapping:
+
+[table User-Defined Operations to _cont_iface_ Operations
+    [[user-Defined]   [_cont_iface_-Provided]   [Note]]
+    [
+        [ `a < b` ]
+        [
+``a <= b
+a > b
+a >= b`` ]
+        [ `a == b` is also required to be user-defined; it comes from the (non-optional) container requirements. ]
+    ]
+]]
+
+Sequence containers meet the requirements of this table (in addition to the
+container requirements):
+
+[table User-Defined Types and Operations for Sequence Containers
+    [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
+    [
+        [ `X u(n, t);` ]
+        [  ]
+        [ Constructs a sequence of `n` copies of `t`. ]
+        [ ['Ensures:] `distance(u.begin(), u.end()) == n` ]
+    ]
+    [
+        [ `X u(i, j);` ]
+        [  ]
+        [ Constructs a sequence equal to `[i, j)`. ]
+        [ ['Ensures:] `distance(u.begin(), u.end()) == distance(i, j)` ]
+    ]
+    [
+        [ `X u(il);` ]
+        [  ]
+        [ `X u(il.begin(), il.end());` ]
+        [ ]
+    ]
+    [
+        [ `a.emplace(p, args)` ]
+        [ `X::iterator` ]
+        [ Inserts an object of type T constructed with `std::forward<Args>(args)...` before `p`. ]
+        [ `args` may directly or indirectly refer to a value in `a`. ]
+    ]
+    [
+        [ `a.insert(p, i, j)` ]
+        [ `X::iterator` ]
+        [ Inserts copies of the elements in `[i, j)` before `p`. ]
+        [ ]
+    ]
+    [
+        [ `a.erase(q1, q2)` ]
+        [ `X::iterator` ]
+        [ Erases the elements in the range `[q1, q2)`. ]
+        [ ]
+    ]
+]
+
+If you provide the types and operations above, _cont_iface_ will provide the
+rest of the sequence container requirements, using this mapping:
+
+[table User-Defined Operations to _cont_iface_ Operations
+    [[user-Defined]   [_cont_iface_-Provided]   [Note]]
+    [
+        [ `X(il)` ]
+        [ `a = il` ]
+        [ ]
+    ]
+    [
+        [ `X(il)` ]
+        [ `a = il` ]
+        [ ]
+    ]
+    [
+        [ `a.emplace(p, args)` ]
+        [
+``a.insert(p, t)
+a.insert(p, rv)`` ]
+        [ ]
+    ]
+    [
+        [ `a.insert(p, i, j)` ]
+        [
+``a.insert(p, n, t)
+a.insert(p, il)`` ]
+        [ ]
+    ]
+    [
+        [ `a.erase(q1, q2)` ]
+        [
+``a.~X()
+a.erase(q)
+a.clear()`` ]
+        [ The _cont_iface_ destructor behavior is equivalent to `a.clear()`. ]
+    ]
+    [
+        [
+``a.erase(q1, q2)
+a.insert(p, i, j)`` ]
+        [
+``a.assign(i, j)
+a.assign(n, t)
+a.assign(il)`` ]
+        [ `a.erase(q1, q2)` and `a.insert(p, i, j)` must both be user-defined for _cont_iface_ to provide these operations. ]
+    ]
+]]
+
+Sequence containers with `front()`, `back()`, or any of the other operations
+in this table must define these operations (in addition to the container
+requirements):
+
+[table User-Defined Types and Operations for Sequence Containers
+    [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
+    [
+        [ `a.emplace_front(args)` ]
+        [ `X::reference` ]
+        [ Prepends an object of type `T` constructed with `std::forward<Args>(args)...`. ]
+        [ ]
+    ]
+    [
+        [ `a.emplace_back(args)` ]
+        [ `X::reference` ]
+        [ Appends an object of type `T` constructed with `std::forward<Args>(args)...`. ]
+        [ ]
+    ]
+]
+
+If you provide the types and operations above, _cont_iface_ will provide the
+rest of the optional sequence container requirements, using this mapping:
+
+[table User-Defined Operations to _cont_iface_ Operations
+    [[user-Defined]   [_cont_iface_-Provided]   [Note]]
+    [
+        [ `a.begin()` ]
+        [
+``a.front()
+a[n]
+a.at(n)
+`` ]
+        [ These operations are provided in `const` and non-`const` overloads.  _cont_iface_ can only provide `a[n]` and `a.at(n)` if `X::iterator` and `X::const_iterator` are random access iterators. ]
+    ]
+    [
+        [ `a.end()` ]
+        [ `a.back()` ]
+`` ]
+        [ `back()` is provided in `const` and non-`const` overloads.  _cont_iface_ can only provide `a.back()` if `X::iterator` and `X::const_iterator` are bidirectinal iterators. ]
+    ]
+    [
+        [ `a.emplace_front(args)` ]
+        [
+``a.push_front(t)
+a.push_front(rv)
+`` ]
+        [ ]
+    ]
+    [
+        [ `a.emplace_back(args)` ]
+        [
+``a.push_back(t)
+a.push_back(rv)
+`` ]
+        [ ]
+    ]
+    [
+        [
+``a.emplace_front(args)
+a.erase(q1, q2)``
+        [ `a.pop_front(t)` ]
+        [ `a.emplace_front(args)` and `a.erase(q1, q2)` must both be user-defined for _cont_iface_ to provide this operation. ]
+    ]
+    [
+        [
+``a.emplace_back(args)
+a.erase(q1, q2)``
+        [ `a.pop_back(t)` ]
+`` ]
+        [ `a.emplace_front(args)` and `a.erase(q1, q2)` must both be user-defined for _cont_iface_ to provide this operation. ]
+    ]
+]]
+
+_cont_iface_ will provide one more operation that is not part of the C++
+container requirements tables, but that is pretty commonly found on sequence
+containers.  If you define `resize(n, t)`, _cont_iface_ will provide a
+`reszize(n)` overload.
+
+User-defined functions required by the tables above must also meet these
+requirements:
+
+- If an excpetion is thrown by an `insert()` or `emplace()` while inserting a
+  single element, that function has no effects.
+
+- No `erase()` function throws an exception.
+
+- No copy constructor or assignment operator of a returned iterator throws an
+  exception.
+
+- No `swap()` function throws an exception.
+
+- The iterator returned from `a.emplace(p, args)` points to the new element
+  constructed from `args` into `a`.
+
+- The iterator returned from `a.insert(p, i, j)` points to the copy of the
+  first element inserted into `a`, or `p` if `i == j`.
+
+- The iterator returned by `a.erase(q1, q2)` points to the element pointed to
+  by `q2` prior to any elements being erased. If no such element exists,
+  `a.end()` is returned.
 
 Let's look at an example.  _Container_ contains a template called
 `boost::container::static_vector`, which is a fixed-capacity vector that does

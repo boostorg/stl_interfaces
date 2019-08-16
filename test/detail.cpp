@@ -72,6 +72,22 @@ static_assert(detail::common_range<std::list<double>>::value, "");
 static_assert(!detail::common_range<ridiculous_range>::value, "");
 
 
+struct no_clear
+{};
+
+TEST(detail, clear_impl)
+{
+    {
+        no_clear nc;
+        detail::clear_impl<no_clear>::call(nc);
+    }
+    {
+        std::vector<int> vec(10);
+        detail::clear_impl<std::vector<int>>::call(vec);
+        EXPECT_TRUE(vec.empty());
+    }
+}
+
 TEST(detail, n_iter)
 {
     std::array<int, 5> ints = {{0, 1, 2, 3, 4}};
