@@ -160,6 +160,10 @@ and `end()`.  C++20 has a template that doe exactly this,
 `std::ranges::view_interface`; _IFaces_ provides a pre-C++20-friendly
 implementation.
 
+Most daunting of all is the task of writing a container type or template that
+meets the container requirements in the standard.  _Ifaces_ provides another
+template called _cont_iface_ that reduces the burden dramatically.
+
 [endsect]
 
 [section This Library's Relationship to _Iterator_]

@@ -13,12 +13,18 @@
 
 
 //[ static_vector_defn
+// The sections of member functions below are marked as they are in the
+// standard for std::vector.  Each section has two numbers: the number of
+// member functions in that section, and the number that are missing, because
+// they are provided by container_interface.  The purely allocator-specific
+// members are neither present nor part of the count.
 template<typename T, std::size_t N>
 struct static_vector : boost::stl_interfaces::container_interface<
                            static_vector<T, N>,
                            boost::stl_interfaces::contiguous>
 {
-    // types
+    // These are the types required for reversible containers.  These must be
+    // user-defined.
     using value_type = T;
     using pointer = T *;
     using const_pointer = T const *;
@@ -32,9 +38,17 @@ struct static_vector : boost::stl_interfaces::container_interface<
     using const_reverse_iterator =
         boost::stl_interfaces::reverse_iterator<const_iterator>;
 
-    // [vector.cons], construct/copy/destroy (9 members, skipped 1)
+    // construct/copy/destroy (9 members, skipped 2)
+    //
+    // Constructors all must be user-provided.  Assignment from
+    // std::initializer_list and the destructor come from container_interfacey.
     static_vector() noexcept : size_(0) {}
-    explicit static_vector(size_type n) : size_(0) { this->assign(n, T()); }
+    explicit static_vector(size_type n) : size_(0)
+    {
+        // Note that you must write "this->" before all the member functions
+        // provided by container_interface, which is slightly annoying.
+        this->assign(n, T());
+    }
     explicit static_vector(size_type n, T const & x) : size_(0)
     {
         this->assign(n, x);
@@ -83,13 +97,21 @@ struct static_vector : boost::stl_interfaces::container_interface<
     }
 
     // iterators (2 members, skipped 10)
+    //
+    // This section is the first big win.  Instead of having to write 12
+    // overloads line begin, cbegin, rbegin, crbegin, etc., we can just write
+    // 2.
     iterator begin() noexcept { return reinterpret_cast<T *>(buf_); }
     iterator end() noexcept
     {
         return reinterpret_cast<T *>(buf_ + size_ * sizeof(T));
     }
 
-    // [vector.capacity], capacity (5 members, skipped 3)
+    // capacity (5 members, skipped 3)
+    //
+    // Most of these are not even part of the general requirements, because
+    // some are specific to std::vector and related types.  However, we do get
+    // empty, size, and the unary overload of resize from container_interface.
     size_type max_size() const noexcept { return N; }
     size_type capacity() const noexcept { return N; }
     void resize(size_type sz, T const & x) noexcept
@@ -105,9 +127,25 @@ struct static_vector : boost::stl_interfaces::container_interface<
     void shrink_to_fit() noexcept {}
 
     // element access (skipped 8)
-    // [vector.data], data access (skipped 2)
+    // data access (skipped 2)
+    //
+    // Another big win.  container_interface provides all of the overloads of
+    // operator[], at, front, back, and data.
 
-    // [vector.modifiers], modifiers (5 members, skipped 9)
+    // modifiers (5 members, skipped 9)
+    //
+    // In this section we again get most of the API from container_interface.
+
+    // emplace_back does not look very necessary -- just look at its trivial
+    // implementation -- but we can't provide it from container_interface,
+    // because it is an optional sequence container interface.  We would not
+    // want emplace_front to suddenly appear on our std::vector-like type, and
+    // there may be some other type for which emplace_back is a bad idea.
+    //
+    // However, by providing emplace_back here, we signal to the
+    // container_interface template that our container is
+    // back-mutation-friendly, and this allows it to provide all the overloads
+    // of push_back, and pop_back.
     template<typename... Args>
     reference emplace_back(Args &&... args)
     {
@@ -185,6 +223,10 @@ struct static_vector : boost::stl_interfaces::container_interface<
         shorter->size_ = long_size;
     }
 
+    // Since we're getting so many overloads from container_interface, and
+    // since many of those overloads are implemented in terms of a
+    // user-defined function of the same name, we need to add quite a few
+    // using declarations here.
     using base_type = boost::stl_interfaces::container_interface<
         static_vector<T, N>,
         boost::stl_interfaces::contiguous>;
@@ -194,7 +236,7 @@ struct static_vector : boost::stl_interfaces::container_interface<
     using base_type::insert;
     using base_type::erase;
 
-    // Comparisions (2 free functions, skipped 4)
+    // comparisons (2 free functions, skipped 4)
     friend bool operator==(static_vector const & lhs, static_vector const & rhs)
     {
         return lhs.size() == rhs.size() &&

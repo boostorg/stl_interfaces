@@ -55,6 +55,7 @@
 [def _iter_iface_          [classref boost::iterator_interface::iterator_interface `iterator_interface`]]
 [def _view_iface_          [classref boost::iterator_interface::view_interface `view_interface`]]
 [def _cont_iface_          [classref boost::iterator_interface::container_interface `container_interface`]]
+[def _rev_iter_            [classref boost::iterator_interface::reverse_iterator `reverse_iterator`]]
 [def _access_              [classref boost::iterator_interface::access `access`]]
 
 [def _concept_m_           [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT]]

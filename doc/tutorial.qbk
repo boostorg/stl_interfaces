@@ -307,7 +307,7 @@ well-formed and provides the corect types.  See _traits_m_.
 
 C++20 contains a _CRTP_ template, `std::ranges::view_interface`, which takes a
 range or view, and adds all the operations that view types have, using only
-the range's/view's `begin()` and `end()`.  This is a C++14-copatible version
+the range's/view's `begin()` and `end()`.  This is a C++14-compatible version
 of that template.
 
 As with _iter_iface_, _view_iface_ makes it possible to write very few
@@ -321,7 +321,7 @@ Here is the declaration of _view_iface_:
     template<typename Derived, bool Contiguous = discontiguous>
     struct view_interface;
 
-_view_iface_ only requires the derived type, and an optional `bool` non-type
+_view_iface_ only requires the derived type and an optional `bool` non-type
 template parameter that indicates whether `Derived`'s iterators are
 contiguous.  The `bool` parameter is necessary to support pre-C++20 code.
 
@@ -344,5 +344,70 @@ Now, let's look at code using these types, including operations defined by
 _view_iface_ that we did not have to write:
 
 [drop_while_view_usage]
+
+[endsect]
+
+[section Tutorial: _cont_iface_]
+
+[heading The _cont_iface_ Template]
+
+As mentioned earlier, writing containers is very tedious.  The sequence
+container requirements in the C++ standard are long and compicated.  The
+requirements often call for multiple overloads of a function, all of which
+could be implemented in terms of just one overload.
+
+There is a large development cost associated with implementing a
+standard-compliant container.  As a result very few people do so.
+_cont_iface_ exists to make bring that large development time way, way down.
+
+Here is its declaration:
+
+    template<typename Derived, bool Contiguous = discontiguous>
+    struct container_interface;
+
+Just as with _view_iface_, _cont_iface_ takes the derived type and an optional
+`bool` non-type template parameter that indicates whether `Derived`'s
+iterators are contiguous.  The `bool` parameter is necessary to support
+pre-C++20 code.
+
+TODO: Tables
+
+Let's look at an example.  Boost.Container contains a template called
+`boost::container::static_vector`, which is a fixed-capacity vector that does
+not allocate from the heap.  We have a similar template in this example,
+`static_vector`.  It is implemented by deriving from _cont_iface_, which
+provides much of the API specified in the STL, based on a subset of the API
+that the user must provide.
+
+`static_vector` meets all the container requirements ([tab:container.req]) and
+reversible container requirements ([tab:container.rev.req]) in the standard.
+It does not meet the allocator-aware container requirements, since it does not
+allocate.  In short, it has the same full API as `std::vector`, without all
+the allocatory bits.
+
+[static_vector_defn]
+
+That's quite a bit of code.  However, by using _cont_iface_, we were able to
+write only 23 member functions, and let _cont_iface_ provide the other 38.  9
+of the 23 members that we did have to write were constructors and special
+member functions, and those always have to be written in the derived class.
+
+[note _cont_iface_ does not support all the sets of container requirements in
+the standard.  In particular, it does not support the allocator-aware
+requirements, and it does not support the associative or unordered associative
+container requirements.]
+
+[endsect]
+
+[section Tutorial: _rev_iter_]
+
+There is a `std::reverse_iterator` template that has been around since C++98.
+In C++20 it is compatible with proxy iterators, and is `constexpr`- and and
+`noexcept`-friendly.  If you are using C++20 or later, just use
+`std::reverse_iterator`.  For code built against earlier versions of C++, you
+can use _rev_iter_.
+
+There's nothing much to document about it; it works just like
+`std::reverse_iterator`.
 
 [endsect]
