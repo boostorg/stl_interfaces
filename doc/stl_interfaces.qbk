@@ -52,17 +52,18 @@
 [/ Links ]
 
 [def _IFaces_              Boost.STLInterfaces]
-[def _iter_iface_          [classref boost::iterator_interface::iterator_interface `iterator_interface`]]
-[def _view_iface_          [classref boost::iterator_interface::view_interface `view_interface`]]
-[def _cont_iface_          [classref boost::iterator_interface::container_interface `container_interface`]]
-[def _rev_iter_            [classref boost::iterator_interface::reverse_iterator `reverse_iterator`]]
-[def _access_              [classref boost::iterator_interface::access `access`]]
+[def _iter_iface_          [classref boost::stl_interfaces::iterator_interface `iterator_interface`]]
+[def _view_iface_          [classref boost::stl_interfaces::view_interface `view_interface`]]
+[def _cont_iface_          [classref boost::stl_interfaces::container_interface `container_interface`]]
+[def _rev_iter_            [classref boost::stl_interfaces::reverse_iterator `reverse_iterator`]]
+[def _access_              [classref boost::stl_interfaces::access `access`]]
 
 [def _concept_m_           [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT]]
 [def _traits_m_            [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS]]
 
 [def _CRTP_                [@https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern CRTP]]
-[def _Iterator_            [@https://www.boost.org/doc/libs/release/libs/iterator/doc/index.html Boost.Iterator]]
+[def _Iterator_            [@https://www.boost.org/doc/libs/release/libs/iterator Boost.Iterator]]
+[def _Container_           [@https://www.boost.org/doc/libs/release/libs/container Boost.Container]]
 
 [def _emdash_              \u2014]
 

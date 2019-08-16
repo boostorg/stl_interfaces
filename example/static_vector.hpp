@@ -13,11 +13,11 @@
 
 
 //[ static_vector_defn
-// The sections of member functions below are marked as they are in the
+// The sections of member functions below are comemnted as they are in the
 // standard for std::vector.  Each section has two numbers: the number of
 // member functions in that section, and the number that are missing, because
 // they are provided by container_interface.  The purely allocator-specific
-// members are neither present nor part of the count.
+// members are neither present nor part of the counts.
 template<typename T, std::size_t N>
 struct static_vector : boost::stl_interfaces::container_interface<
                            static_vector<T, N>,
@@ -41,7 +41,7 @@ struct static_vector : boost::stl_interfaces::container_interface<
     // construct/copy/destroy (9 members, skipped 2)
     //
     // Constructors all must be user-provided.  Assignment from
-    // std::initializer_list and the destructor come from container_interfacey.
+    // std::initializer_list and the destructor come from container_interface.
     static_vector() noexcept : size_(0) {}
     explicit static_vector(size_type n) : size_(0)
     {
@@ -145,7 +145,7 @@ struct static_vector : boost::stl_interfaces::container_interface<
     // However, by providing emplace_back here, we signal to the
     // container_interface template that our container is
     // back-mutation-friendly, and this allows it to provide all the overloads
-    // of push_back, and pop_back.
+    // of push_back and pop_back.
     template<typename... Args>
     reference emplace_back(Args &&... args)
     {
