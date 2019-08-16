@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
 
 // Instantiate all the members we can.
 template struct static_vector<int, 1024>;
@@ -90,7 +91,7 @@ TEST(static_vec, other_ctors_assign)
     }
 
     {
-        std::array<int, 3> a = {1, 2, 3};
+        std::array<int, 3> a = {{1, 2, 3}};
 
         vec_type v(a.begin(), a.end());
         EXPECT_FALSE(v.empty());
@@ -101,7 +102,7 @@ TEST(static_vec, other_ctors_assign)
     }
 
     {
-        std::array<int, 3> a = {1, 2, 3};
+        std::array<int, 3> a = {{1, 2, 3}};
 
         vec_type v;
         v.assign(a.begin(), a.end());
@@ -316,8 +317,8 @@ TEST(static_vec, iterators)
                 vec_type::const_reverse_iterator>::value,
             "");
 
-        std::array<int, 3> const a = {3, 2, 1};
-        std::array<int, 3> const ra = {1, 2, 3};
+        std::array<int, 3> const a = {{3, 2, 1}};
+	std::array<int, 3> const ra = {{1, 2, 3}};
 
         EXPECT_TRUE(std::equal(v.begin(), v.end(), a.begin(), a.end()));
         EXPECT_TRUE(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
@@ -366,8 +367,8 @@ TEST(static_vec, iterators)
                 vec_type::const_reverse_iterator>::value,
             "");
 
-        std::array<int, 3> const a = {3, 2, 1};
-        std::array<int, 3> const ra = {1, 2, 3};
+        std::array<int, 3> const a = {{3, 2, 1}};
+        std::array<int, 3> const ra = {{1, 2, 3}};
 
         EXPECT_TRUE(std::equal(v.begin(), v.end(), a.begin(), a.end()));
         EXPECT_TRUE(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));

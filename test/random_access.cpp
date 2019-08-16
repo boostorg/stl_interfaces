@@ -281,16 +281,16 @@ std::array<std::tuple<int, int>, 10> tuples = {{
 std::array<int_t, 10> udts = {
     {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}}};
 std::array<std::tuple<int_t, int>, 10> udt_tuples = {{
-    {{0}, 1},
-    {{1}, 1},
-    {{2}, 1},
-    {{3}, 1},
-    {{4}, 1},
-    {{5}, 1},
-    {{6}, 1},
-    {{7}, 1},
-    {{8}, 1},
-    {{9}, 1},
+    std::tuple<int_t, int>{{0}, 1},
+    std::tuple<int_t, int>{{1}, 1},
+    std::tuple<int_t, int>{{2}, 1},
+    std::tuple<int_t, int>{{3}, 1},
+    std::tuple<int_t, int>{{4}, 1},
+    std::tuple<int_t, int>{{5}, 1},
+    std::tuple<int_t, int>{{6}, 1},
+    std::tuple<int_t, int>{{7}, 1},
+    std::tuple<int_t, int>{{8}, 1},
+    std::tuple<int_t, int>{{9}, 1},
 }};
 
 TEST(random_access, basic_coverage)
