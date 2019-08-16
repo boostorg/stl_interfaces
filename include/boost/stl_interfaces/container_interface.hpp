@@ -12,18 +12,8 @@
 namespace boost { namespace stl_interfaces {
 
     namespace detail {
-        template<typename T, typename = void>
-        struct has_reserve : std::false_type
-        {
-        };
-        template<typename T>
-        struct has_reserve<T, void_t<decltype(std::declval<T &>().reserve())>>
-            : std::true_type
-        {
-        };
-
         template<typename T, typename SizeType>
-        struct n_iter : boost::stl_interfaces::iterator_interface<
+        struct n_iter : iterator_interface<
                             n_iter<T, SizeType>,
                             std::random_access_iterator_tag,
                             T>
@@ -42,7 +32,7 @@ namespace boost { namespace stl_interfaces {
             }
 
         private:
-            friend boost::stl_interfaces::access;
+            friend access;
             constexpr T const *& base_reference() noexcept { return x_; }
             constexpr T const * base_reference() const noexcept { return x_; }
 
@@ -54,7 +44,10 @@ namespace boost { namespace stl_interfaces {
         constexpr auto make_n_iter(T const & x, SizeType n) noexcept(
             noexcept(n_iter<T, SizeType>(x, n)))
         {
-            return n_iter<T, SizeType>(x, SizeType(0));
+            using result_type = n_iter<T, SizeType>;
+            BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+                result_type, std::random_access_iterator)
+            return result_type(x, SizeType(0));
         }
         template<typename T, typename SizeType>
         constexpr auto make_n_iter_end(T const & x, SizeType n) noexcept(

@@ -55,11 +55,9 @@ namespace boost { namespace stl_interfaces {
         template<typename Range, typename = void>
         struct sentinel;
         template<typename Range>
-        struct sentinel<
-            Range,
-            void_t<decltype(std::declval<Range &>().begin())>>
+        struct sentinel<Range, void_t<decltype(std::declval<Range &>().end())>>
         {
-            using type = decltype(std::declval<Range &>().begin());
+            using type = decltype(std::declval<Range &>().end());
         };
         template<typename Range>
         using sentinel_t = typename sentinel<Range>::type;

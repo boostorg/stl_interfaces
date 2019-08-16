@@ -11,7 +11,6 @@
 
 namespace boost { namespace stl_interfaces {
 
-    // TODO: Tests.
     // TODO: Look in all the headers for ADL traps.
 
     /** This type is very similar to the C++20 version of
@@ -19,7 +18,7 @@ namespace boost { namespace stl_interfaces {
         proxy-friendly. */
     template<typename BidiIter>
     struct reverse_iterator
-        : boost::stl_interfaces::iterator_interface<
+        : iterator_interface<
               reverse_iterator<BidiIter>,
 #if 201703L < __cplusplus && defined(__cpp_lib_ranges)
               typename std::iterator_traits<BidiIter>::iterator_concept,
@@ -75,7 +74,7 @@ namespace boost { namespace stl_interfaces {
         }
 
     private:
-        friend boost::stl_interfaces::access;
+        friend access;
         constexpr BidiIter & base_reference() noexcept { return it_; }
         constexpr BidiIter const & base_reference() const noexcept
         {
