@@ -17,6 +17,9 @@ template struct static_vector<int, 1024>;
 using vec_type = static_vector<int, 10>;
 
 
+// TODO: Need tests of other containers (non-sequence, etc.), including
+// assertions of what is *not* provided.
+
 TEST(static_vec, default_ctor)
 {
     vec_type v;
