@@ -5,6 +5,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
+#include "ill_formed.hpp"
+
 #include <gtest/gtest.h>
 
 #include <array>
@@ -723,6 +725,44 @@ TEST(random_access, zip)
 ////////////////////
 #include "view_tests.hpp"
 
+template<typename T>
+using data_t = decltype(std::declval<T>().data());
+
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_random_access_iter,
+            basic_random_access_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_random_access_iter,
+            basic_random_access_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+template<typename T>
+using back_t = decltype(std::declval<T>().back());
+
+static_assert(
+    ill_formed<
+        back_t,
+        subrange<int *, int const *, boost::stl_interfaces::discontiguous>>::
+        value,
+    "");
+static_assert(
+    ill_formed<
+        back_t,
+        subrange<
+            int *,
+            int const *,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
 TEST(random_access, basic_subrange)
 {
     basic_random_access_iter first(ints.data());
@@ -865,7 +905,3 @@ TEST(random_access, zip_subrange)
         EXPECT_EQ(cr[2], (std::tuple<int, int>(2, 1)));
     }
 }
-
-// TODO: COMPILE-FAIL test that .data does not work on a discontiguous iterator.
-// TODO: COMPILE-FAIL test that .back does not work when common_range<> is false.
-// TODO: Document that proxy iterators are inherently discontiguous.

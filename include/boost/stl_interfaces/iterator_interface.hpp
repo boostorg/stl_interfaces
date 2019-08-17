@@ -187,25 +187,25 @@ namespace boost { namespace stl_interfaces {
 
         template<typename D = Derived>
         constexpr auto operator*() const
-            noexcept(noexcept(*access::base(std::declval<D &>())))
-                -> decltype(*access::base(std::declval<D &>()))
+            noexcept(noexcept(*access::base(std::declval<D const &>())))
+                -> decltype(*access::base(std::declval<D const &>()))
         {
             return *access::base(derived());
         }
 
         template<typename D = Derived>
         constexpr pointer operator->() const noexcept(
-            noexcept(detail::make_pointer<pointer>(*std::declval<D &>())))
+            noexcept(detail::make_pointer<pointer>(*std::declval<D const &>())))
         {
             return detail::make_pointer<pointer>(*derived());
         }
 
         template<typename D = Derived>
-        constexpr reference operator[](difference_type i) const
-            noexcept(noexcept(
-                D(std::declval<D &>()),
-                std::declval<D &>() += i,
-                *std::declval<D &>()))
+        constexpr auto operator[](difference_type i) const noexcept(noexcept(
+            D(std::declval<D const &>()),
+            std::declval<D &>() += i,
+            *std::declval<D &>()))
+            -> decltype(std::declval<D &>() += i, *std::declval<D &>())
         {
             D retval = derived();
             retval += i;
@@ -309,9 +309,10 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto operator-(D other) const noexcept(
-            noexcept(access::base(std::declval<D &>()) - access::base(other)))
-            -> decltype(access::base(std::declval<D &>()) - access::base(other))
+        constexpr auto operator-(D other) const noexcept(noexcept(
+            access::base(std::declval<D const &>()) - access::base(other)))
+            -> decltype(
+                access::base(std::declval<D const &>()) - access::base(other))
         {
             return access::base(derived()) - access::base(other);
         }

@@ -6,8 +6,8 @@
 #ifndef BOOST_STL_INTERFACES_FWD_HPP
 #define BOOST_STL_INTERFACES_FWD_HPP
 
-
 #include <iterator>
+
 
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
 
@@ -67,6 +67,18 @@ namespace boost { namespace stl_interfaces {
 
         template<typename Range>
         using common_range = std::is_same<iterator_t<Range>, sentinel_t<Range>>;
+
+        template<typename Range, typename = void>
+        struct decrementable_sentinel : std::false_type
+        {
+        };
+        template<typename Range>
+        struct decrementable_sentinel<
+            Range,
+            void_t<decltype(--std::declval<sentinel_t<Range> &>())>>
+            : std::true_type
+        {
+        };
     }
 
 }}

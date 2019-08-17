@@ -325,6 +325,8 @@ _view_iface_ only requires the derived type and an optional `bool` non-type
 template parameter that indicates whether `Derived`'s iterators are
 contiguous.  The `bool` parameter is necessary to support pre-C++20 code.
 
+[note Proxy iterators are inherently discontiguous.]
+
 In this example, we're implementing something very similar to
 `std::ranges::drop_while_view`.  First, we need helper view types `subrange`
 and `all_view`, and a function that takes a range and returns a view of the

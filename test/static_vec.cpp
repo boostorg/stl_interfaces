@@ -5,6 +5,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 #include "../example/static_vector.hpp"
 
+#include "ill_formed.hpp"
+
 #include <gtest/gtest.h>
 
 #include <array>
@@ -283,6 +285,50 @@ TEST(static_vec, swap)
     }
 }
 
+template<typename Iter>
+using writable_iter_t = decltype(
+    *std::declval<Iter>() =
+        std::declval<typename std::iterator_traits<Iter>::value_type>());
+
+static_assert(
+    ill_formed<
+        writable_iter_t,
+        decltype(std::declval<vec_type const &>().begin())>::value,
+    "");
+static_assert(
+    ill_formed<
+        writable_iter_t,
+        decltype(std::declval<vec_type const &>().end())>::value,
+    "");
+static_assert(
+    ill_formed<writable_iter_t, decltype(std::declval<vec_type &>().cbegin())>::
+        value,
+    "");
+static_assert(
+    ill_formed<writable_iter_t, decltype(std::declval<vec_type &>().cend())>::
+        value,
+    "");
+
+static_assert(
+    ill_formed<
+        writable_iter_t,
+        decltype(std::declval<vec_type const &>().rbegin())>::value,
+    "");
+static_assert(
+    ill_formed<
+        writable_iter_t,
+        decltype(std::declval<vec_type const &>().rend())>::value,
+    "");
+static_assert(
+    ill_formed<
+        writable_iter_t,
+        decltype(std::declval<vec_type &>().crbegin())>::value,
+    "");
+static_assert(
+    ill_formed<writable_iter_t, decltype(std::declval<vec_type &>().crend())>::
+        value,
+    "");
+
 TEST(static_vec, iterators)
 {
     {
@@ -376,9 +422,6 @@ TEST(static_vec, iterators)
         EXPECT_TRUE(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
         EXPECT_TRUE(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
     }
-
-    // TODO: COMPILE-FAIL test that the iterators from the generated
-    // const_iterator-returning members are not writable.
 }
 
 TEST(static_vec, emplace_insert)

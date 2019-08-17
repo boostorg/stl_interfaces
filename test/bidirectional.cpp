@@ -5,6 +5,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
+#include "ill_formed.hpp"
+
 #include <gtest/gtest.h>
 
 #include <array>
@@ -478,6 +480,66 @@ TEST(bidirectional, const_std_copy)
 ////////////////////
 #include "view_tests.hpp"
 
+template<typename T>
+using data_t = decltype(std::declval<T>().data());
+
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_bidirectional_iter,
+            basic_bidirectional_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_bidirectional_iter,
+            basic_bidirectional_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+template<typename T>
+using size_t_ = decltype(std::declval<T>().size());
+
+static_assert(
+    ill_formed<
+        size_t_,
+        subrange<
+            basic_bidirectional_iter,
+            basic_bidirectional_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        size_t_,
+        subrange<
+            basic_bidirectional_iter,
+            basic_bidirectional_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+template<typename T>
+using index_operator_t = decltype(std::declval<T>()[0]);
+
+static_assert(
+    ill_formed<
+        index_operator_t,
+        subrange<
+            basic_bidirectional_iter,
+            basic_bidirectional_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        index_operator_t,
+        subrange<
+            basic_bidirectional_iter,
+            basic_bidirectional_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
 TEST(bidirectional, basic_subrange)
 {
     basic_bidirectional_iter first(ints.data());
@@ -512,38 +574,6 @@ TEST(bidirectional, basic_subrange)
         EXPECT_FALSE(cempty);
     }
 
-#if 0 // TODO: COMPILE-FAIL test for this.
-    // data
-    {
-        EXPECT_NE(r.data(), nullptr);
-        EXPECT_EQ(r.data()[2], 2);
-
-        EXPECT_NE(empty.data(), nullptr);
-
-        auto const cr = r;
-        EXPECT_NE(cr.data(), nullptr);
-        EXPECT_EQ(cr.data()[2], 2);
-
-        auto const cempty = empty;
-        EXPECT_NE(cempty.data(), nullptr);
-    }
-#endif
-
-#if 0 // TODO: COMPILE-FAIL test for this.
-    // size
-    {
-        EXPECT_EQ(r.size(), 10u);
-
-        EXPECT_EQ(empty.size(), 0u);
-
-        auto const cr = r;
-        EXPECT_EQ(cr.size(), 10u);
-
-        auto const cempty = empty;
-        EXPECT_EQ(cempty.size(), 0u);
-    }
-#endif
-
     // front/back
     {
         EXPECT_EQ(r.front(), 0);
@@ -553,14 +583,4 @@ TEST(bidirectional, basic_subrange)
         EXPECT_EQ(cr.front(), 0);
         EXPECT_EQ(cr.back(), 9);
     }
-
-#if 0 // TODO: COMPILE-FAIL test for this.
-    // op[]
-    {
-        EXPECT_EQ(r[2], 2);
-
-        auto const cr = r;
-        EXPECT_EQ(cr[2], 2);
-    }
-#endif
 }
