@@ -1,12 +1,12 @@
 # stl_interfaces
 
-An updated C++20-friendly version of the `iterator_facade` part of
-Boost.Iterator (now called `iterator_interface`); a pre-C++20 version of
-C++20's `view_interface`; and a new template called `container_interface`,
-meant to aid the creation of new containers; all targeting standardization.
-This library requires at least C++14.
+An updated C++20-friendly version of the `iterator_facade` and
+`iterator_adaptor` parts of Boost.Iterator (now called `iterator_interface`);
+a pre-C++20 version of C++20's `view_interface`; and a new template called
+`container_interface`, meant to aid the creation of new containers; all
+targeting standardization.  This library requires at least C++14.
 
-In short, if you need to write an iterator, iterator_iterface turns this:
+For the iterator portion -- if you need to write an iterator, iterator_iterface turns this:
 
 ```c++
     struct repeated_chars_iterator
@@ -178,7 +178,9 @@ private:
 };
 ```
 
-If you don't ever write iterators, range views, or containers, this is not for you.
+The code size savigns are even more dramatic for `view_interface` and
+`container_interface`! If you don't ever write iterators, range views, or
+containers, this is not for you.
 
 Online docs: https://tzlaine.github.io/stl_interfaces.
 
