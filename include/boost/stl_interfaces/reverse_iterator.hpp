@@ -40,14 +40,14 @@ namespace boost { namespace stl_interfaces {
         reverse_iterator(reverse_iterator<BidiIter2> it) : it_(it.it_)
         {}
 
-        friend constexpr bool operator==(
+        friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR bool operator==(
             reverse_iterator lhs,
             reverse_iterator rhs) noexcept(noexcept(lhs.it_ == rhs.it_))
         {
             return lhs.it_ == rhs.it_;
         }
 
-        friend constexpr auto
+        friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR auto
         operator-(reverse_iterator lhs, reverse_iterator rhs) noexcept(
             noexcept(std::distance(lhs.it_, rhs.it_)))
         {

@@ -21,20 +21,14 @@ namespace boost { namespace stl_interfaces {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
 
         template<typename Derived>
-        using dummy_derived_t = detail::dummy<detail::void_t<decltype(
-            std::declval<Derived &>().base_reference())>>;
-
-        template<typename Derived>
-        static constexpr decltype(auto) base(
-            Derived & d,
-            dummy_derived_t<Derived> = dummy_derived_t<Derived>()) noexcept
+        static constexpr auto base(
+            Derived & d) noexcept -> decltype(d.base_reference())
         {
             return d.base_reference();
         }
         template<typename Derived>
-        static constexpr decltype(auto) base(
-            Derived const & d,
-            dummy_derived_t<Derived> = dummy_derived_t<Derived>()) noexcept
+        static constexpr auto base(
+            Derived const & d) noexcept -> decltype(d.base_reference())
         {
             return d.base_reference();
         }
