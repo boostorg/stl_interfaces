@@ -1,4 +1,10 @@
-[section Tutorial: _iter_iface_]
+[section Tutorial: `iterator_interface`]
+
+[note All the member functions provided by _iter_iface_ are in your iterator's
+base class _emdash_ _iter_iface_ _emdash_ and can therefore be hidden if you
+define a member function with the same name in your derived iterator.  If you
+don't like the semantics of any _iter_iface_-provided member function, feel
+free to replace it.]
 
 [heading The `iterator_interface` Template]
 
@@ -296,7 +302,13 @@ well-formed and provides the corect types.  See _traits_m_.
 
 [endsect]
 
-[section Tutorial: _view_iface_]
+[section Tutorial: `view_interface`]
+
+[note All the member functions provided by _view_iface_ are in your view's
+base class _emdash_ _view_iface_ _emdash_ and can therefore be hidden if you
+define a member function with the same name in your derived view.  If you
+don't like the semantics of any _view_iface_-provided member function, feel
+free to replace it.]
 
 [heading The `view_interface` Template]
 
@@ -348,7 +360,13 @@ too much detail here, for that reason.
 
 [endsect]
 
-[section Tutorial: _cont_iface_]
+[section Tutorial: `container_interface`]
+
+[note All the member functions provided by _cont_iface_ are in your
+container's base class _emdash_ _cont_iface_ _emdash_ and can therefore be
+hidden if you define a member function with the same name in your derived
+container.  If you don't like the semantics of any _cont_iface_-provided
+member function, feel free to replace it.]
 
 [heading The `container_interface` Template]
 
@@ -683,6 +701,11 @@ container requirements):
         [ ]
     ]
 ]
+
+[important In the notes for `a.emplace(p, args)`, it says: "`args` may
+directly or indirectly refer to a value in `a`".  Don't forget to handle that
+case in your implementation.  Otherwise, `a.emplace(a.begin(), a.back())` may
+do the wrong thing.]
 
 If you provide the types and operations above, _cont_iface_ will provide the
 rest of the sequence container requirements, using this mapping:
