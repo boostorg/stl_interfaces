@@ -17,9 +17,6 @@ template struct static_vector<int, 1024>;
 using vec_type = static_vector<int, 10>;
 
 
-// TODO: Need tests of other containers (non-sequence, etc.), including
-// assertions of what is *not* provided.
-
 TEST(static_vec, default_ctor)
 {
     vec_type v;
@@ -630,6 +627,22 @@ TEST(static_vec, erase)
         EXPECT_EQ(v, vec_type({3, 2}));
     }
 }
+
+template<
+    typename Container,
+    typename ValueType = typename Container::value_type>
+using lvalue_push_front_t = decltype(
+    std::declval<Container &>().push_front(std::declval<ValueType const &>()));
+template<
+    typename Container,
+    typename ValueType = typename Container::value_type>
+using rvalue_push_front_t = decltype(std::declval<Container &>().push_front(0));
+template<typename Container>
+using pop_front_t = decltype(std::declval<Container &>().pop_front());
+
+static_assert(ill_formed<lvalue_push_front_t, vec_type>::value, "");
+static_assert(ill_formed<rvalue_push_front_t, vec_type>::value, "");
+static_assert(ill_formed<pop_front_t, vec_type>::value, "");
 
 TEST(static_vec, front_back)
 {

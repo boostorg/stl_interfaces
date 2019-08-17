@@ -6,6 +6,8 @@
 #ifndef BOOST_STL_INTERFACES_ILL_FORMED_HPP
 #define BOOST_STL_INTERFACES_ILL_FORMED_HPP
 
+#include <type_traits>
+
 
 namespace test_detail {
     template<typename... T>
