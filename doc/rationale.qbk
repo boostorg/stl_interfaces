@@ -9,6 +9,9 @@ _view_iface_ and _cont_iface_:
         std::is_class<Derived>::value &&
         std::is_same<Derived, std::remove_cv_t<Derived>>::value>
 
+This prevents instantiating an interface template with an `int`, a `const`
+type, a reference type, etc.
+
 There are not more constraints (for instance, that _view_iface_ is given a
 `Derived` template parameter for a type that has a `begin()` and `end()`),
 because `Derived` is an incomplete type within each *`_interface` template.
