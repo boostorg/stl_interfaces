@@ -7,20 +7,33 @@
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
 <link rel="prev" href="this_library_s_relationship_to_boost_iterator.html" title="This Library's Relationship to Boost.Iterator">
-<link rel="next" href="tutorial___view_iface_.html" title="Tutorial: view_interface">
+<link rel="next" href="tutorial___view_interface_.html" title="Tutorial: view_interface">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <div class="spirit-nav">
-<a accesskey="p" href="this_library_s_relationship_to_boost_iterator.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial___view_iface_.html"><img src="../images/next.png" alt="Next"></a>
+<a accesskey="p" href="this_library_s_relationship_to_boost_iterator.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial___view_interface_.html"><img src="../images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_"></a><a class="link" href="tutorial___iter_iface_.html" title="Tutorial: iterator_interface">Tutorial:
-    iterator_interface</a>
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_"></a><a class="link" href="tutorial___iterator_interface_.html" title="Tutorial: iterator_interface">Tutorial:
+    <code class="computeroutput"><span class="identifier">iterator_interface</span></code></a>
 </h2></div></div></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        All the member functions provided by <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code> are in your
+        iterator's base class &#8212; <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code> &#8212;
+        and can therefore be hidden if you define a member function with the same
+        name in your derived iterator. If you don't like the semantics of any <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code>-provided
+        member function, feel free to replace it.
+      </p></td></tr>
+</table></div>
 <h4>
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.h0"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.the__code__phrase_role__identifier__iterator_interface__phrase___code__template"></a></span><a class="link" href="tutorial___iter_iface_.html#boost_stlinterfaces__proposed_.tutorial___iter_iface_.the__code__phrase_role__identifier__iterator_interface__phrase___code__template">The
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.h0"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.the__code__phrase_role__identifier__iterator_interface__phrase___code__template"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces__proposed_.tutorial___iterator_interface_.the__code__phrase_role__identifier__iterator_interface__phrase___code__template">The
       <code class="computeroutput"><span class="identifier">iterator_interface</span></code> Template</a>
     </h4>
 <p>
@@ -99,8 +112,8 @@
     <span class="identifier">DifferenceType</span><span class="special">&gt;;</span>
 </pre>
 <h4>
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.h1"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.user_defined_iterator_operations"></a></span><a class="link" href="tutorial___iter_iface_.html#boost_stlinterfaces__proposed_.tutorial___iter_iface_.user_defined_iterator_operations">User-Defined
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.h1"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.user_defined_iterator_operations"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces__proposed_.tutorial___iterator_interface_.user_defined_iterator_operations">User-Defined
       Iterator Operations</a>
     </h4>
 <p>
@@ -116,7 +129,7 @@
       and <code class="computeroutput"><span class="identifier">n</span></code> is a value of type <code class="computeroutput"><span class="identifier">difference_type</span></code>.
     </p>
 <div class="table">
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.t0"></a><p class="title"><b>Table&#160;1.1.&#160;User-Defined Operations</b></p>
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.t0"></a><p class="title"><b>Table&#160;1.1.&#160;User-Defined Operations</b></p>
 <div class="table-contents"><table class="table" summary="User-Defined Operations">
 <colgroup>
 <col>
@@ -310,7 +323,7 @@
       operations used with each iterator concept:
     </p>
 <div class="table">
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.t1"></a><p class="title"><b>Table&#160;1.2.&#160;Operations Required for Each Concept</b></p>
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.t1"></a><p class="title"><b>Table&#160;1.2.&#160;Operations Required for Each Concept</b></p>
 <div class="table-contents"><table class="table" summary="Operations Required for Each Concept">
 <colgroup>
 <col>
@@ -413,8 +426,8 @@
 </table></div>
 </div>
 <br class="table-break"><h4>
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.h2"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_"></a></span><a class="link" href="tutorial___iter_iface_.html#boost_stlinterfaces__proposed_.tutorial___iter_iface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_">An
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.h2"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces__proposed_.tutorial___iterator_interface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_">An
       Important Note About <code class="computeroutput"><span class="keyword">operator</span><span class="special">++()</span></code> and <code class="computeroutput"><span class="keyword">operator</span><span class="special">--()</span></code></a>
     </h4>
 <p>
@@ -463,8 +476,8 @@
       </p></td></tr>
 </table></div>
 <h4>
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.h3"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.putting_it_all_together"></a></span><a class="link" href="tutorial___iter_iface_.html#boost_stlinterfaces__proposed_.tutorial___iter_iface_.putting_it_all_together">Putting
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.h3"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.putting_it_all_together"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces__proposed_.tutorial___iterator_interface_.putting_it_all_together">Putting
       it All Together</a>
     </h4>
 <p>
@@ -615,8 +628,8 @@
 <p>
     </p>
 <h4>
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.h4"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.what_about_adapting_an_existing_iterator_"></a></span><a class="link" href="tutorial___iter_iface_.html#boost_stlinterfaces__proposed_.tutorial___iter_iface_.what_about_adapting_an_existing_iterator_">What
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.h4"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.what_about_adapting_an_existing_iterator_"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces__proposed_.tutorial___iterator_interface_.what_about_adapting_an_existing_iterator_">What
       About Adapting an Existing Iterator?</a>
     </h4>
 <p>
@@ -723,8 +736,8 @@
 <p>
     </p>
 <h4>
-<a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.h5"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iter_iface_.checking_your_work"></a></span><a class="link" href="tutorial___iter_iface_.html#boost_stlinterfaces__proposed_.tutorial___iter_iface_.checking_your_work">Checking
+<a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.h5"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.checking_your_work"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces__proposed_.tutorial___iterator_interface_.checking_your_work">Checking
       Your Work</a>
     </h4>
 <p>
@@ -763,7 +776,7 @@
     </p>
 <p>
       There's also a macro that can help you check that <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span></code>
-      is well-formed and provides the corect types. See <code class="computeroutput"><a class="link" href="../BOOST_STL_INTERFAC_idm8444.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
+      is well-formed and provides the corect types. See <code class="computeroutput"><a class="link" href="../BOOST_STL_INTERFAC_idm8502.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
@@ -776,7 +789,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="this_library_s_relationship_to_boost_iterator.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial___view_iface_.html"><img src="../images/next.png" alt="Next"></a>
+<a accesskey="p" href="this_library_s_relationship_to_boost_iterator.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial___view_interface_.html"><img src="../images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
