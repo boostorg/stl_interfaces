@@ -218,14 +218,14 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto operator[](detail::range_difference_t<D> n) noexcept(
+        constexpr auto operator[](typename D::size_type n) noexcept(
             noexcept(std::declval<D &>().begin()[n]))
             -> decltype(std::declval<D &>().begin()[n])
         {
             return derived().begin()[n];
         }
         template<typename D = Derived>
-        constexpr auto operator[](detail::range_difference_t<D> n) const
+        constexpr auto operator[](typename D::size_type n) const
             noexcept(noexcept(std::declval<D const &>().begin()[n]))
                 -> decltype(std::declval<D const &>().begin()[n])
         {
