@@ -31,6 +31,11 @@
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_same</span><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">remove_cv_t</span><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">&gt;&gt;::</span><span class="identifier">value</span><span class="special">&gt;</span>
 </pre>
 <p>
+      This prevents instantiating an interface template with an <code class="computeroutput"><span class="keyword">int</span></code>,
+      a <code class="computeroutput"><span class="keyword">const</span></code> type, a reference type,
+      etc.
+    </p>
+<p>
       There are not more constraints (for instance, that <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/view_interface.html" title="Struct template view_interface">view_interface</a></code> is given a <code class="computeroutput"><span class="identifier">Derived</span></code> template parameter for a type that
       has a <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
       and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code>),
