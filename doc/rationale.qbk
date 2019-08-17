@@ -9,10 +9,26 @@ because `Derived` is an incomplete type within _iter_iface_.
 
 The interface templates rely mostly on public members provided by their
 `Derived` template parameter.  However, _iter_iface_ requires you to supply
-`base_reference()` functions if you want it to act like an adaptor.  Since al
+`base_reference()` functions if you want it to act like an adaptor.  Since at
 least the non-`const` overload provides a non-`const` lvalue reference to one
 of your types data members, it will break the encapsulation of many types to
 leave `base_reference()` a public member.  To allow users to keep these
 overloads private, _access_ exists.
+
+[heading _iter_iface_ Takes a Lot of Template Parameters, And the Other Interface Templates Don't]
+
+_iter_iface_ does in fact take a lot of template parameters.  However, it
+usually only takes 3: the `Derived` type, the iterator category, and the
+iterator's `value_type`.
+
+When you make a proxy iterator, you typically use the _proxy_iter_iface_
+alias, and you again only need the same template parameters.  Though you can
+opt into more template parameters, the rest are seldom necessary.
+
+By contrast, the _view_iface_ and _cont_iface_ templates have very few
+template parameters.  For _view_iface_, this is because there are no member
+typedefs in the `view` concept.  For _cont_iface_, it was deemed ridiculous to
+create a template whose purpose is to reduce code size, which takes 14
+template parameters.]
 
 [endsect]

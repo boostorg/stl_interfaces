@@ -18,6 +18,9 @@
 // member functions in that section, and the number that are missing, because
 // they are provided by container_interface.  The purely allocator-specific
 // members are neither present nor part of the counts.
+//
+// We're passing boost::stl_interfaces::contiguous here, so that
+// container_interface knows that it should provide data().
 template<typename T, std::size_t N>
 struct static_vector : boost::stl_interfaces::container_interface<
                            static_vector<T, N>,
@@ -40,8 +43,11 @@ struct static_vector : boost::stl_interfaces::container_interface<
 
     // construct/copy/destroy (9 members, skipped 2)
     //
-    // Constructors all must be user-provided.  Assignment from
-    // std::initializer_list and the destructor come from container_interface.
+    // Constructors and special member functions all must be user-provided.
+    // Were they provided by container_interface, everything would break, due
+    // to the language rules related to them.  However, assignment from
+    // std::initializer_list and the destructor can come from
+    // container_interface.
     static_vector() noexcept : size_(0) {}
     explicit static_vector(size_type n) : size_(0)
     {

@@ -55,6 +55,7 @@
 
 [def _IFaces_              Boost.STLInterfaces]
 [def _iter_iface_          [classref boost::stl_interfaces::iterator_interface `iterator_interface`]]
+[def _proxy_iter_iface_    [classref boost::stl_interfaces::procy_iterator_interface `proxy_iterator_interface`]]
 [def _view_iface_          [classref boost::stl_interfaces::view_interface `view_interface`]]
 [def _cont_iface_          [classref boost::stl_interfaces::container_interface `container_interface`]]
 [def _rev_iter_            [classref boost::stl_interfaces::reverse_iterator `reverse_iterator`]]
