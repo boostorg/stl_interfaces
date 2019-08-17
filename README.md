@@ -178,7 +178,7 @@ private:
 };
 ```
 
-The code size savigns are even more dramatic for `view_interface` and
+The code size savings are even more dramatic for `view_interface` and
 `container_interface`! If you don't ever write iterators, range views, or
 containers, this is not for you.
 
