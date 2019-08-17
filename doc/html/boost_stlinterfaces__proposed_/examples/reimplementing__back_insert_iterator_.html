@@ -1,0 +1,112 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Reimplementing back_insert_iterator</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
+<link rel="up" href="../examples.html" title="Examples">
+<link rel="prev" href="zip_iterator___proxy_iterator.html" title="Zip Iterator / Proxy Iterator">
+<link rel="next" href="reimplementing__reverse_iterator_.html" title="Reimplementing reverse_iterator">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="zip_iterator___proxy_iterator.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="reimplementing__reverse_iterator_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_stlinterfaces__proposed_.examples.reimplementing__back_insert_iterator_"></a><a class="link" href="reimplementing__back_insert_iterator_.html" title="Reimplementing back_insert_iterator">Reimplementing
+      <code class="computeroutput"><span class="identifier">back_insert_iterator</span></code></a>
+</h3></div></div></div>
+<p>
+</p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">stl_interfaces</span><span class="special">/</span><span class="identifier">iterator_interface</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">algorithm</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">vector</span><span class="special">&gt;</span>
+
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">cassert</span><span class="special">&gt;</span>
+
+
+<span class="comment">// This is an output iterator that holds a reference to a container, and calls</span>
+<span class="comment">// push_back() on that container when it is written to, just like</span>
+<span class="comment">// std::back_insert_iterator.  This is not a lot less code to write than the</span>
+<span class="comment">// implementation of std::back_insert_iterator, but it demonstrates that</span>
+<span class="comment">// iterator_interface is flexible enough to handle this odd kind of iterator.</span>
+<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Container</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">back_insert_iterator</span> <span class="special">:</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">stl_interfaces</span><span class="special">::</span><span class="identifier">iterator_interface</span><span class="special">&lt;</span>
+                                  <span class="identifier">back_insert_iterator</span><span class="special">&lt;</span><span class="identifier">Container</span><span class="special">&gt;,</span>
+                                  <span class="identifier">std</span><span class="special">::</span><span class="identifier">output_iterator_tag</span><span class="special">,</span>
+                                  <span class="keyword">typename</span> <span class="identifier">Container</span><span class="special">::</span><span class="identifier">value_type</span><span class="special">,</span>
+                                  <span class="identifier">back_insert_iterator</span><span class="special">&lt;</span><span class="identifier">Container</span><span class="special">&gt;</span> <span class="special">&amp;&gt;</span>
+<span class="special">{</span>
+    <span class="comment">// For concept requirements.</span>
+    <span class="identifier">back_insert_iterator</span><span class="special">()</span> <span class="special">:</span> <span class="identifier">c_</span><span class="special">(</span><span class="keyword">nullptr</span><span class="special">)</span> <span class="special">{}</span>
+
+    <span class="comment">// Construct from a container.</span>
+    <span class="keyword">explicit</span> <span class="identifier">back_insert_iterator</span><span class="special">(</span><span class="identifier">Container</span> <span class="special">&amp;</span> <span class="identifier">c</span><span class="special">)</span> <span class="special">:</span> <span class="identifier">c_</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">addressof</span><span class="special">(</span><span class="identifier">c</span><span class="special">))</span> <span class="special">{}</span>
+
+    <span class="comment">// When writing to *this, copy v into the container via push_back().</span>
+    <span class="identifier">back_insert_iterator</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">typename</span> <span class="identifier">Container</span><span class="special">::</span><span class="identifier">value_type</span> <span class="keyword">const</span> <span class="special">&amp;</span> <span class="identifier">v</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">c_</span><span class="special">-&gt;</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">v</span><span class="special">);</span>
+        <span class="keyword">return</span> <span class="special">*</span><span class="keyword">this</span><span class="special">;</span>
+    <span class="special">}</span>
+    <span class="comment">// When writing to *this, move v into the container via push_back().</span>
+    <span class="identifier">back_insert_iterator</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">typename</span> <span class="identifier">Container</span><span class="special">::</span><span class="identifier">value_type</span> <span class="special">&amp;&amp;</span> <span class="identifier">v</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">c_</span><span class="special">-&gt;</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">v</span><span class="special">));</span>
+        <span class="keyword">return</span> <span class="special">*</span><span class="keyword">this</span><span class="special">;</span>
+    <span class="special">}</span>
+
+    <span class="comment">// Dereferencing *this just returns a reference to *this, so that the</span>
+    <span class="comment">// expression *it = value uses the operator=() overloads above.</span>
+    <span class="identifier">back_insert_iterator</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">*()</span> <span class="special">{</span> <span class="keyword">return</span> <span class="special">*</span><span class="keyword">this</span><span class="special">;</span> <span class="special">}</span>
+    <span class="comment">// There is no underlying sequence over which we are iterating, so there's</span>
+    <span class="comment">// nowhere to go in next().  Do nothing.</span>
+    <span class="identifier">back_insert_iterator</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">++()</span> <span class="special">{</span> <span class="keyword">return</span> <span class="special">*</span><span class="keyword">this</span><span class="special">;</span> <span class="special">}</span>
+
+    <span class="keyword">using</span> <span class="identifier">base_type</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">stl_interfaces</span><span class="special">::</span><span class="identifier">iterator_interface</span><span class="special">&lt;</span>
+        <span class="identifier">back_insert_iterator</span><span class="special">&lt;</span><span class="identifier">Container</span><span class="special">&gt;,</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">output_iterator_tag</span><span class="special">,</span>
+        <span class="keyword">typename</span> <span class="identifier">Container</span><span class="special">::</span><span class="identifier">value_type</span><span class="special">,</span>
+        <span class="identifier">back_insert_iterator</span><span class="special">&lt;</span><span class="identifier">Container</span><span class="special">&gt;</span> <span class="special">&amp;&gt;;</span>
+    <span class="keyword">using</span> <span class="identifier">base_type</span><span class="special">::</span><span class="keyword">operator</span><span class="special">++;</span>
+
+<span class="keyword">private</span><span class="special">:</span>
+    <span class="identifier">Container</span> <span class="special">*</span> <span class="identifier">c_</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="comment">// A convenience function that creates a back_insert_iterator&lt;Container&gt;.</span>
+<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Container</span><span class="special">&gt;</span>
+<span class="identifier">back_insert_iterator</span><span class="special">&lt;</span><span class="identifier">Container</span><span class="special">&gt;</span> <span class="identifier">back_inserter</span><span class="special">(</span><span class="identifier">Container</span> <span class="special">&amp;</span> <span class="identifier">c</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">back_insert_iterator</span><span class="special">&lt;</span><span class="identifier">Container</span><span class="special">&gt;(</span><span class="identifier">c</span><span class="special">);</span>
+<span class="special">}</span>
+
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">ints</span> <span class="special">=</span> <span class="special">{{</span><span class="number">0</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">,</span> <span class="number">3</span><span class="special">,</span> <span class="number">4</span><span class="special">,</span> <span class="number">5</span><span class="special">,</span> <span class="number">6</span><span class="special">,</span> <span class="number">7</span><span class="special">,</span> <span class="number">8</span><span class="special">,</span> <span class="number">9</span><span class="special">}};</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">ints_copy</span><span class="special">;</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">copy</span><span class="special">(</span><span class="identifier">ints</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">ints</span><span class="special">.</span><span class="identifier">end</span><span class="special">(),</span> <span class="special">::</span><span class="identifier">back_inserter</span><span class="special">(</span><span class="identifier">ints_copy</span><span class="special">));</span>
+    <span class="identifier">assert</span><span class="special">(</span><span class="identifier">ints_copy</span> <span class="special">==</span> <span class="identifier">ints</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2019 T. Zachary Laine<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="zip_iterator___proxy_iterator.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="reimplementing__reverse_iterator_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

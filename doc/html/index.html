@@ -1,24 +1,24 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Chapter&#160;1.&#160;Boost.IteratorFacade (Proposed)</title>
+<title>Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)</title>
 <link rel="stylesheet" href="boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.IteratorFacade (Proposed)">
-<link rel="next" href="boost_iteratorfacade__proposed_/introduction.html" title="Introduction">
+<link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
+<link rel="next" href="boost_stlinterfaces__proposed_/introduction.html" title="Introduction">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<div class="spirit-nav"><a accesskey="n" href="boost_iteratorfacade__proposed_/introduction.html"><img src="images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_stlinterfaces__proposed_/introduction.html"><img src="images/next.png" alt="Next"></a></div>
 <div class="chapter">
 <div class="titlepage"><div>
 <div><h2 class="title">
-<a name="iterator_facade"></a>Chapter&#160;1.&#160;Boost.IteratorFacade (Proposed)</h2></div>
+<a name="stl_interfaces"></a>Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)</h2></div>
 <div><div class="author"><h3 class="author">
 <span class="firstname">Zach</span> <span class="surname">Laine</span>
 </h3></div></div>
 <div><p class="copyright">Copyright &#169; 2019 T. Zachary Laine</p></div>
 <div><div class="legalnotice">
-<a name="iterator_facade.legal"></a><p>
+<a name="stl_interfaces.legal"></a><p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
@@ -27,38 +27,56 @@
 <div class="toc">
 <p><b>Table of Contents</b></p>
 <dl class="toc">
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/introduction.html">Introduction</a></span></dt>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/a_bit_of_background.html">A
-    Bit of Background</a></span></dt>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/tutorial.html">Tutorial</a></span></dt>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/examples.html">Examples</a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/introduction.html">Introduction</a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/this_library_s_relationship_to_boost_iterator.html">This
+    Library's Relationship to Boost.Iterator</a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/tutorial___iter_iface_.html">Tutorial:
+    <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code></a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/tutorial___view_iface_.html">Tutorial:
+    <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/view_interface.html" title="Struct template view_interface">view_interface</a></code></a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/tutorial___cont_iface_.html">Tutorial:
+    <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/container_interface.html" title="Struct template container_interface">container_interface</a></code></a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/tutorial___rev_iter_.html">Tutorial:
+    <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a></code></a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/examples.html">Examples</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/examples/random_access_iterator.html">Random
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/examples/random_access_iterator.html">Random
       Access Iterator</a></span></dt>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/examples/mutable_and_constant_iterator_interoperability.html">Mutable
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/examples/mutable_and_constant_iterator_interoperability.html">Mutable
       and Constant Iterator Interoperability</a></span></dt>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/examples/zip_iterator___proxy_iterator.html">Zip
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/examples/zip_iterator___proxy_iterator.html">Zip
       Iterator / Proxy Iterator</a></span></dt>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/examples/reimplementing__back_insert_iterator_.html">Reimplementing
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/examples/reimplementing__back_insert_iterator_.html">Reimplementing
       <code class="computeroutput"><span class="identifier">back_insert_iterator</span></code></a></span></dt>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/examples/reimplementing__reverse_iterator_.html">Reimplementing
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/examples/reimplementing__reverse_iterator_.html">Reimplementing
       <code class="computeroutput"><span class="identifier">reverse_iterator</span></code></a></span></dt>
 </dl></dd>
-<dt><span class="section"><a href="iterator_facade/compiler_support.html">Compiler Support</a></span></dt>
+<dt><span class="section"><a href="stl_interfaces/compiler_support.html">Compiler Support</a></span></dt>
 <dt><span class="section"><a href="reference.html">Reference</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="header/boost/iterator_facade/iterator_facade_hpp.html">Header &lt;boost/iterator_facade/iterator_facade.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="header/boost/stl_interfaces/container_interface_hpp.html">Header &lt;boost/stl_interfaces/container_interface.hpp&gt;</a></span></dt>
+<dd><dl></dl></dd>
+<dt><span class="section"><a href="header/boost/stl_interfaces/fwd_hpp.html">Header &lt;boost/stl_interfaces/fwd.hpp&gt;</a></span></dt>
+<dd><dl></dl></dd>
+<dt><span class="section"><a href="header/boost/stl_interfaces/iterator_interface_hpp.html">Header &lt;boost/stl_interfaces/iterator_interface.hpp&gt;</a></span></dt>
+<dd><dl></dl></dd>
+<dt><span class="section"><a href="header/boost/stl_interfaces/reverse_iterator_hpp.html">Header &lt;boost/stl_interfaces/reverse_iterator.hpp&gt;</a></span></dt>
+<dd><dl></dl></dd>
+<dt><span class="section"><a href="header/boost/stl_interfaces/view_interface_hpp.html">Header &lt;boost/stl_interfaces/view_interface.hpp&gt;</a></span></dt>
 <dd><dl></dl></dd>
 </dl></dd>
-<dt><span class="section"><a href="boost_iteratorfacade__proposed_/rationale.html">Rationale</a></span></dt>
+<dt><span class="section"><a href="boost_stlinterfaces__proposed_/rationale.html">Rationale</a></span></dt>
 </dl>
 </div>
+<p>
+    / Images ]
+  </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: August 11, 2019 at 15:12:05 GMT</small></p></td>
+<td align="left"><p><small>Last revised: August 17, 2019 at 04:23:01 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="boost_iteratorfacade__proposed_/introduction.html"><img src="images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_stlinterfaces__proposed_/introduction.html"><img src="images/next.png" alt="Next"></a></div>
 </body>
 </html>

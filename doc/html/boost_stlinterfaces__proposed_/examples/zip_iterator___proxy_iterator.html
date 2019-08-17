@@ -1,0 +1,152 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Zip Iterator / Proxy Iterator</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
+<link rel="up" href="../examples.html" title="Examples">
+<link rel="prev" href="mutable_and_constant_iterator_interoperability.html" title="Mutable and Constant Iterator Interoperability">
+<link rel="next" href="reimplementing__back_insert_iterator_.html" title="Reimplementing back_insert_iterator">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="mutable_and_constant_iterator_interoperability.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="reimplementing__back_insert_iterator_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_stlinterfaces__proposed_.examples.zip_iterator___proxy_iterator"></a><a class="link" href="zip_iterator___proxy_iterator.html" title="Zip Iterator / Proxy Iterator">Zip
+      Iterator / Proxy Iterator</a>
+</h3></div></div></div>
+<p>
+</p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">stl_interfaces</span><span class="special">/</span><span class="identifier">iterator_interface</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">algorithm</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">array</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">tuple</span><span class="special">&gt;</span>
+
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">cassert</span><span class="special">&gt;</span>
+
+
+<span class="comment">// This is a zip iterator, meaning that it iterates over a notional sequence</span>
+<span class="comment">// of pairs that is formed from two actual sequences of scalars.  To make this</span>
+<span class="comment">// iterator writable, it needs to have a reference type that is not actually a</span>
+<span class="comment">// reference -- the reference type is a pair of references, std::tuple&lt;int &amp;,</span>
+<span class="comment">// int &amp;&gt;.</span>
+<span class="keyword">struct</span> <span class="identifier">zip_iterator</span> <span class="special">:</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">stl_interfaces</span><span class="special">::</span><span class="identifier">proxy_iterator_interface</span><span class="special">&lt;</span>
+                      <span class="identifier">zip_iterator</span><span class="special">,</span>
+                      <span class="identifier">std</span><span class="special">::</span><span class="identifier">random_access_iterator_tag</span><span class="special">,</span>
+                      <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="keyword">int</span><span class="special">&gt;,</span>
+                      <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">int</span> <span class="special">&amp;,</span> <span class="keyword">int</span> <span class="special">&amp;&gt;&gt;</span>
+<span class="special">{</span>
+    <span class="keyword">constexpr</span> <span class="identifier">zip_iterator</span><span class="special">()</span> <span class="keyword">noexcept</span> <span class="special">:</span> <span class="identifier">it1_</span><span class="special">(),</span> <span class="identifier">it2_</span><span class="special">()</span> <span class="special">{}</span>
+    <span class="keyword">constexpr</span> <span class="identifier">zip_iterator</span><span class="special">(</span><span class="keyword">int</span> <span class="special">*</span> <span class="identifier">it1</span><span class="special">,</span> <span class="keyword">int</span> <span class="special">*</span> <span class="identifier">it2</span><span class="special">)</span> <span class="keyword">noexcept</span> <span class="special">:</span> <span class="identifier">it1_</span><span class="special">(</span><span class="identifier">it1</span><span class="special">),</span> <span class="identifier">it2_</span><span class="special">(</span><span class="identifier">it2</span><span class="special">)</span>
+    <span class="special">{}</span>
+
+    <span class="keyword">constexpr</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">int</span> <span class="special">&amp;,</span> <span class="keyword">int</span> <span class="special">&amp;&gt;</span> <span class="keyword">operator</span><span class="special">*()</span> <span class="keyword">const</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">int</span> <span class="special">&amp;,</span> <span class="keyword">int</span> <span class="special">&amp;&gt;{*</span><span class="identifier">it1_</span><span class="special">,</span> <span class="special">*</span><span class="identifier">it2_</span><span class="special">};</span>
+    <span class="special">}</span>
+    <span class="keyword">constexpr</span> <span class="identifier">zip_iterator</span> <span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">+=</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ptrdiff_t</span> <span class="identifier">i</span><span class="special">)</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="identifier">it1_</span> <span class="special">+=</span> <span class="identifier">i</span><span class="special">;</span>
+        <span class="identifier">it2_</span> <span class="special">+=</span> <span class="identifier">i</span><span class="special">;</span>
+        <span class="keyword">return</span> <span class="special">*</span><span class="keyword">this</span><span class="special">;</span>
+    <span class="special">}</span>
+    <span class="keyword">constexpr</span> <span class="keyword">auto</span> <span class="keyword">operator</span><span class="special">-(</span><span class="identifier">zip_iterator</span> <span class="identifier">other</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="keyword">return</span> <span class="identifier">it1_</span> <span class="special">-</span> <span class="identifier">other</span><span class="special">.</span><span class="identifier">it1_</span><span class="special">;</span>
+    <span class="special">}</span>
+
+<span class="keyword">private</span><span class="special">:</span>
+    <span class="keyword">int</span> <span class="special">*</span> <span class="identifier">it1_</span><span class="special">;</span>
+    <span class="keyword">int</span> <span class="special">*</span> <span class="identifier">it2_</span><span class="special">;</span>
+<span class="special">};</span>
+
+
+<span class="keyword">namespace</span> <span class="identifier">std</span> <span class="special">{</span>
+    <span class="comment">// Required for std::sort to work with zip_iterator.  Without this</span>
+    <span class="comment">// overload, std::sort eventually tries to call std::swap(*it1, *it2),</span>
+    <span class="comment">// *it1 and *it2 are rvalues, and std::swap() takes mutable lvalue</span>
+    <span class="comment">// references.  That makes std::swap(*it1, *it2) ill-formed.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Note that this overload does not conflict with any other swap()</span>
+    <span class="comment">// overloads, since this one takes rvalue reference parameters.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Also note that this overload has to be in namespace std only because</span>
+    <span class="comment">// ADL cannot find it anywhere else.  If</span>
+    <span class="comment">// zip_iterator::reference/std::tuple's template parameters were not</span>
+    <span class="comment">// builtins, this overload could be in whatever namespace those template</span>
+    <span class="comment">// parameters were declared in.</span>
+    <span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">zip_iterator</span><span class="special">::</span><span class="identifier">reference</span> <span class="special">&amp;&amp;</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">zip_iterator</span><span class="special">::</span><span class="identifier">reference</span> <span class="special">&amp;&amp;</span> <span class="identifier">rhs</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="keyword">using</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">swap</span><span class="special">;</span>
+        <span class="identifier">swap</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">lhs</span><span class="special">),</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">rhs</span><span class="special">));</span>
+        <span class="identifier">swap</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">lhs</span><span class="special">),</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">rhs</span><span class="special">));</span>
+    <span class="special">}</span>
+<span class="special">}</span>
+
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="number">10</span><span class="special">&gt;</span> <span class="identifier">ints</span> <span class="special">=</span> <span class="special">{{</span><span class="number">2</span><span class="special">,</span> <span class="number">0</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">5</span><span class="special">,</span> <span class="number">3</span><span class="special">,</span> <span class="number">6</span><span class="special">,</span> <span class="number">8</span><span class="special">,</span> <span class="number">4</span><span class="special">,</span> <span class="number">9</span><span class="special">,</span> <span class="number">7</span><span class="special">}};</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="number">10</span><span class="special">&gt;</span> <span class="identifier">ones</span> <span class="special">=</span> <span class="special">{{</span><span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">}};</span>
+
+    <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="keyword">int</span><span class="special">&gt;,</span> <span class="number">10</span><span class="special">&gt;</span> <span class="keyword">const</span> <span class="identifier">result</span> <span class="special">=</span> <span class="special">{{</span>
+            <span class="special">{</span><span class="number">2</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">0</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">5</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">3</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">6</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">8</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">4</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">9</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">7</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+        <span class="special">}};</span>
+
+        <span class="identifier">zip_iterator</span> <span class="identifier">first</span><span class="special">(</span><span class="identifier">ints</span><span class="special">.</span><span class="identifier">data</span><span class="special">(),</span> <span class="identifier">ones</span><span class="special">.</span><span class="identifier">data</span><span class="special">());</span>
+        <span class="identifier">zip_iterator</span> <span class="identifier">last</span><span class="special">(</span><span class="identifier">ints</span><span class="special">.</span><span class="identifier">data</span><span class="special">()</span> <span class="special">+</span> <span class="identifier">ints</span><span class="special">.</span><span class="identifier">size</span><span class="special">(),</span> <span class="identifier">ones</span><span class="special">.</span><span class="identifier">data</span><span class="special">()</span> <span class="special">+</span> <span class="identifier">ones</span><span class="special">.</span><span class="identifier">size</span><span class="special">());</span>
+        <span class="identifier">assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">equal</span><span class="special">(</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">last</span><span class="special">,</span> <span class="identifier">result</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">result</span><span class="special">.</span><span class="identifier">end</span><span class="special">()));</span>
+    <span class="special">}</span>
+
+    <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="keyword">int</span><span class="special">&gt;,</span> <span class="number">10</span><span class="special">&gt;</span> <span class="keyword">const</span> <span class="identifier">result</span> <span class="special">=</span> <span class="special">{{</span>
+            <span class="special">{</span><span class="number">0</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">2</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">3</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">4</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">5</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">6</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">7</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">8</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+            <span class="special">{</span><span class="number">9</span><span class="special">,</span> <span class="number">1</span><span class="special">},</span>
+        <span class="special">}};</span>
+        <span class="identifier">zip_iterator</span> <span class="identifier">first</span><span class="special">(</span><span class="identifier">ints</span><span class="special">.</span><span class="identifier">data</span><span class="special">(),</span> <span class="identifier">ones</span><span class="special">.</span><span class="identifier">data</span><span class="special">());</span>
+        <span class="identifier">zip_iterator</span> <span class="identifier">last</span><span class="special">(</span><span class="identifier">ints</span><span class="special">.</span><span class="identifier">data</span><span class="special">()</span> <span class="special">+</span> <span class="identifier">ints</span><span class="special">.</span><span class="identifier">size</span><span class="special">(),</span> <span class="identifier">ones</span><span class="special">.</span><span class="identifier">data</span><span class="special">()</span> <span class="special">+</span> <span class="identifier">ones</span><span class="special">.</span><span class="identifier">size</span><span class="special">());</span>
+        <span class="identifier">assert</span><span class="special">(!</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">equal</span><span class="special">(</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">last</span><span class="special">,</span> <span class="identifier">result</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">result</span><span class="special">.</span><span class="identifier">end</span><span class="special">()));</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">sort</span><span class="special">(</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">last</span><span class="special">);</span>
+        <span class="identifier">assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">equal</span><span class="special">(</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">last</span><span class="special">,</span> <span class="identifier">result</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">result</span><span class="special">.</span><span class="identifier">end</span><span class="special">()));</span>
+    <span class="special">}</span>
+<span class="special">}</span>
+</pre>
+<p>
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2019 T. Zachary Laine<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="mutable_and_constant_iterator_interoperability.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="reimplementing__back_insert_iterator_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
