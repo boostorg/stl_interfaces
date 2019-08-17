@@ -23,10 +23,37 @@
       course makes it error-prone.
     </p>
 <p>
-      As a quick example, let's say that we wanted to make a random access iterator
-      that represents a string of arbitrary length constructed by repeating a shorter
-      string. Let's call this iterator <code class="computeroutput"><span class="identifier">repeated_chars_iterator</span></code>.
-      Here it is in action:
+      Iterators have numerous typedefs and operations, even though all the operations
+      of a givenn iterator can be implemented in terms of at most four operations
+      (and usually only three). Writing all the other operations yields very similar-looking
+      code that is hard to review, and all but requires that you write full-coverage
+      tests for each iterator.
+    </p>
+<p>
+      Writing view types like those found in <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ranges</span></code>
+      is also laborious, considering that most of each view type's API can be derived
+      from <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
+      and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code>.
+      C++20 has a template that doe exactly this, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ranges</span><span class="special">::</span><span class="identifier">view_interface</span></code>;
+      Boost.STLInterfaces provides a pre-C++20-friendly implementation.
+    </p>
+<p>
+      Most daunting of all is the task of writing a type or template that meets the
+      container requirements in the standard. Boost.STLInterfaces provides another
+      template called <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/container_interface.html" title="Struct template container_interface">container_interface</a></code> that reduces
+      the implementation and testing burden dramatically.
+    </p>
+<h4>
+<a name="boost_stlinterfaces__proposed_.introduction.h0"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.introduction.a_quick_example"></a></span><a class="link" href="introduction.html#boost_stlinterfaces__proposed_.introduction.a_quick_example">A Quick
+      Example</a>
+    </h4>
+<p>
+      Here is an example of the iterator portion of the library. Let's say that we
+      wanted to make a random access iterator that represents a string of arbitrary
+      length constructed by repeating a shorter string. Let's call this iterator
+      <code class="computeroutput"><span class="identifier">repeated_chars_iterator</span></code>. Here
+      it is in action:
     </p>
 <p>
 </p>
@@ -228,20 +255,6 @@
         implements iterators that model the C++20 iterator concepts.
       </p></td></tr>
 </table></div>
-<p>
-      Writing view types like those found in <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ranges</span></code>
-      is also laborious, considering that most of each view type's API can be derived
-      from <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
-      and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code>.
-      C++20 has a template that doe exactly this, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ranges</span><span class="special">::</span><span class="identifier">view_interface</span></code>;
-      Boost.STLInterfaces provides a pre-C++20-friendly implementation.
-    </p>
-<p>
-      Most daunting of all is the task of writing a container type or template that
-      meets the container requirements in the standard. Boost.STLInterfaces provides
-      another template called <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/container_interface.html" title="Struct template container_interface">container_interface</a></code> that reduces
-      the burden dramatically.
-    </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
