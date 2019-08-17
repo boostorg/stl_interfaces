@@ -41,8 +41,6 @@
 [import ../example/static_vector.hpp]
 [import ../example/static_vector.cpp]
 
-[/ TODO: The top-level intro docs need some attention.  Right now, it looks like the library is only (or mostly) concerned with iterators. ]
-
 / Images ]
 
 [def __note__              [$images/note.png]]
