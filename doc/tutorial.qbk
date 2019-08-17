@@ -874,7 +874,7 @@ container requirements.]
 
 [endsect]
 
-[section Tutorial: _rev_iter_]
+[section Tutorial: `reverse_iterator`]
 
 There is a `std::reverse_iterator` template that has been around since C++98.
 In C++20 it is compatible with proxy iterators, and is `constexpr`- and and

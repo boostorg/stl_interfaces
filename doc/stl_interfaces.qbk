@@ -41,7 +41,7 @@
 [import ../example/static_vector.hpp]
 [import ../example/static_vector.cpp]
 
-/ Images ]
+[/ Images ]
 
 [def __note__              [$images/note.png]]
 [def __tip__               [$images/tip.png]]
@@ -78,7 +78,7 @@ _IFaces_ is written against the C++14 standard.  It is targetting
 standardization, and the changes required to make it C++11-compatible were
 considered too great.
 
-_IFaces_ should work with any conforming C++14 compiler.
+_IFaces_ should work with any conforming C++14 compiler.  It has been tested with Clang, GCC, and Visual Studio.
 
 [endsect]
 
