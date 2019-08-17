@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ interoperability
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -16,7 +16,7 @@
 // template parameter allows us easily to define const and non-const iterators
 // from the same template.
 template<typename ValueType>
-struct random_access_iterator : boost::iterator_facade::iterator_facade<
+struct random_access_iterator : boost::stl_interfaces::iterator_interface<
                                     random_access_iterator<ValueType>,
                                     std::random_access_iterator_tag,
                                     ValueType>
@@ -41,15 +41,18 @@ struct random_access_iterator : boost::iterator_facade::iterator_facade<
     constexpr random_access_iterator(ValueType2 other) noexcept : it_(other.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    constexpr ValueType & dereference() const noexcept { return *it_; }
-    constexpr void advance(std::ptrdiff_t i) noexcept { it_ += i; }
-    constexpr auto compare(random_access_iterator other) const noexcept
+    constexpr ValueType & operator*() const noexcept { return *it_; }
+    constexpr random_access_iterator & operator+=(std::ptrdiff_t i) noexcept
+    {
+        it_ += i;
+        return *this;
+    }
+    constexpr auto operator-(random_access_iterator other) const noexcept
     {
         return it_ - other.it_;
     }
 
+private:
     ValueType * it_;
 
     // This friendship is necessary to enable the implicit conversion

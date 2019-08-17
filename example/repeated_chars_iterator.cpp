@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <string>
 
@@ -11,11 +11,11 @@
 
 
 //[ repeated_chars_iterator
-struct repeated_chars_iterator : boost::iterator_facade::iterator_facade<
+struct repeated_chars_iterator : boost::stl_interfaces::iterator_interface<
                                      repeated_chars_iterator,
                                      std::random_access_iterator_tag,
                                      char,
-                                     char const>
+                                     char>
 {
     constexpr repeated_chars_iterator() noexcept :
         first_(nullptr),
@@ -29,18 +29,18 @@ struct repeated_chars_iterator : boost::iterator_facade::iterator_facade<
         n_(n)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    constexpr char const dereference() const noexcept
+    constexpr char operator*() const noexcept { return first_[n_ % size_]; }
+    constexpr repeated_chars_iterator & operator+=(std::ptrdiff_t i) noexcept
     {
-        return first_[n_ % size_];
+        n_ += i;
+        return *this;
     }
-    constexpr void advance(std::ptrdiff_t i) noexcept { n_ += i; }
-    constexpr auto compare(repeated_chars_iterator other) const noexcept
+    constexpr auto operator-(repeated_chars_iterator other) const noexcept
     {
         return n_ - other.n_;
     }
 
+private:
     char const * first_;
     difference_type size_;
     difference_type n_;

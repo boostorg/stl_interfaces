@@ -3,7 +3,9 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
+
+#include "ill_formed.hpp"
 
 #include <gtest/gtest.h>
 
@@ -12,7 +14,7 @@
 #include <type_traits>
 
 
-struct basic_random_access_iter : boost::iterator_facade::iterator_facade<
+struct basic_random_access_iter : boost::stl_interfaces::iterator_interface<
                                       basic_random_access_iter,
                                       std::random_access_iterator_tag,
                                       int>
@@ -20,21 +22,25 @@ struct basic_random_access_iter : boost::iterator_facade::iterator_facade<
     basic_random_access_iter() {}
     basic_random_access_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
-    void advance(std::ptrdiff_t i) { it_ += i; }
-    auto compare(basic_random_access_iter other) const
+    int & operator*() const { return *it_; }
+    basic_random_access_iter & operator+=(std::ptrdiff_t i)
     {
-        return it_ - other.it_;
+        it_ += i;
+        return *this;
+    }
+    friend std::ptrdiff_t operator-(
+        basic_random_access_iter lhs, basic_random_access_iter rhs) noexcept
+    {
+        return lhs.it_ - rhs.it_;
     }
 
+private:
     int * it_;
 };
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_random_access_iter, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_random_access_iter,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
@@ -43,8 +49,41 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
+static_assert(
+    boost::stl_interfaces::detail::
+        plus_eq<basic_random_access_iter, std::ptrdiff_t>::value,
+    "");
+
+struct basic_adapted_random_access_iter
+    : boost::stl_interfaces::iterator_interface<
+          basic_adapted_random_access_iter,
+          std::random_access_iterator_tag,
+          int>
+{
+    basic_adapted_random_access_iter() {}
+    basic_adapted_random_access_iter(int * it) : it_(it) {}
+
+private:
+    friend boost::stl_interfaces::access;
+    int *& base_reference() noexcept { return it_; }
+    int * base_reference() const noexcept { return it_; }
+
+    int * it_;
+};
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    basic_adapted_random_access_iter, std::random_access_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_adapted_random_access_iter,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
 template<typename ValueType>
-struct random_access_iter : boost::iterator_facade::iterator_facade<
+struct random_access_iter : boost::stl_interfaces::iterator_interface<
                                 random_access_iter<ValueType>,
                                 std::random_access_iterator_tag,
                                 ValueType>
@@ -59,12 +98,19 @@ struct random_access_iter : boost::iterator_facade::iterator_facade<
     random_access_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType & dereference() const { return *it_; }
-    void advance(std::ptrdiff_t i) { it_ += i; }
-    auto compare(random_access_iter other) const { return it_ - other.it_; }
+    ValueType & operator*() const { return *it_; }
+    random_access_iter & operator+=(std::ptrdiff_t i)
+    {
+        it_ += i;
+        return *this;
+    }
+    friend std::ptrdiff_t
+    operator-(random_access_iter lhs, random_access_iter rhs) noexcept
+    {
+        return lhs.it_ - rhs.it_;
+    }
 
+private:
     ValueType * it_;
 
     template<typename ValueType2>
@@ -74,9 +120,9 @@ private:
 using random_access = random_access_iter<int>;
 using const_random_access = random_access_iter<int const>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     random_access, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     random_access,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
@@ -85,9 +131,9 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     const_random_access, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_random_access,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
@@ -97,7 +143,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 // TODO: Call ranges algorithms with this.
-struct zip_iter : boost::iterator_facade::proxy_iterator_facade<
+struct zip_iter : boost::stl_interfaces::proxy_iterator_interface<
                       zip_iter,
                       std::random_access_iterator_tag,
                       std::tuple<int, int>,
@@ -106,22 +152,22 @@ struct zip_iter : boost::iterator_facade::proxy_iterator_facade<
     zip_iter() : it1_(nullptr), it2_(nullptr) {}
     zip_iter(int * it1, int * it2) : it1_(it1), it2_(it2) {}
 
-private:
-    friend boost::iterator_facade::access;
-    std::tuple<int &, int &> dereference() const
+    std::tuple<int &, int &> operator*() const
     {
         return std::tuple<int &, int &>{*it1_, *it2_};
     }
-    void advance(std::ptrdiff_t i)
+    zip_iter & operator+=(std::ptrdiff_t i)
     {
         it1_ += i;
         it2_ += i;
+        return *this;
     }
-    auto compare(zip_iter other) const
+    friend std::ptrdiff_t operator-(zip_iter lhs, zip_iter rhs) noexcept
     {
-        return it1_ - other.it1_;
+        return lhs.it1_ - rhs.it1_;
     }
 
+private:
     int * it1_;
     int * it2_;
 };
@@ -129,15 +175,15 @@ private:
 using int_pair = std::tuple<int, int>;
 using int_refs_pair = std::tuple<int &, int &>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     zip_iter, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     zip_iter,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
     int_pair,
     int_refs_pair,
-    boost::iterator_facade::proxy_arrow_result<int_refs_pair>,
+    boost::stl_interfaces::proxy_arrow_result<int_refs_pair>,
     std::ptrdiff_t)
 
 struct int_t
@@ -157,7 +203,7 @@ struct int_t
     friend bool operator<(int lhs, int_t rhs) { return lhs < rhs.value_; }
 };
 
-struct udt_zip_iter : boost::iterator_facade::proxy_iterator_facade<
+struct udt_zip_iter : boost::stl_interfaces::proxy_iterator_interface<
                           udt_zip_iter,
                           std::random_access_iterator_tag,
                           std::tuple<int_t, int>,
@@ -166,22 +212,22 @@ struct udt_zip_iter : boost::iterator_facade::proxy_iterator_facade<
     udt_zip_iter() : it1_(nullptr), it2_(nullptr) {}
     udt_zip_iter(int_t * it1, int * it2) : it1_(it1), it2_(it2) {}
 
-private:
-    friend boost::iterator_facade::access;
-    std::tuple<int_t &, int &> dereference() const
+    std::tuple<int_t &, int &> operator*() const
     {
         return std::tuple<int_t &, int &>{*it1_, *it2_};
     }
-    void advance(std::ptrdiff_t i)
+    udt_zip_iter & operator+=(std::ptrdiff_t i)
     {
         it1_ += i;
         it2_ += i;
+        return *this;
     }
-    auto compare(udt_zip_iter other) const
+    friend std::ptrdiff_t operator-(udt_zip_iter lhs, udt_zip_iter rhs) noexcept
     {
-        return it1_ - other.it1_;
+        return lhs.it1_ - rhs.it1_;
     }
 
+private:
     int_t * it1_;
     int * it2_;
 };
@@ -189,15 +235,15 @@ private:
 using int_t_int_pair = std::tuple<int_t, int>;
 using int_t_int_refs_pair = std::tuple<int_t &, int &>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     udt_zip_iter, std::random_access_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     udt_zip_iter,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
     int_t_int_pair,
     int_t_int_refs_pair,
-    boost::iterator_facade::proxy_arrow_result<int_t_int_refs_pair>,
+    boost::stl_interfaces::proxy_arrow_result<int_t_int_refs_pair>,
     std::ptrdiff_t)
 
 namespace std {
@@ -237,16 +283,16 @@ std::array<std::tuple<int, int>, 10> tuples = {{
 std::array<int_t, 10> udts = {
     {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}}};
 std::array<std::tuple<int_t, int>, 10> udt_tuples = {{
-    {{0}, 1},
-    {{1}, 1},
-    {{2}, 1},
-    {{3}, 1},
-    {{4}, 1},
-    {{5}, 1},
-    {{6}, 1},
-    {{7}, 1},
-    {{8}, 1},
-    {{9}, 1},
+    std::tuple<int_t, int>{{0}, 1},
+    std::tuple<int_t, int>{{1}, 1},
+    std::tuple<int_t, int>{{2}, 1},
+    std::tuple<int_t, int>{{3}, 1},
+    std::tuple<int_t, int>{{4}, 1},
+    std::tuple<int_t, int>{{5}, 1},
+    std::tuple<int_t, int>{{6}, 1},
+    std::tuple<int_t, int>{{7}, 1},
+    std::tuple<int_t, int>{{8}, 1},
+    std::tuple<int_t, int>{{9}, 1},
 }};
 
 TEST(random_access, basic_coverage)
@@ -350,6 +396,110 @@ TEST(random_access, basic_std_copy)
     }
 }
 
+TEST(random_access, basic_adapted_coverage)
+{
+    basic_adapted_random_access_iter first(ints.data());
+    basic_adapted_random_access_iter last(ints.data() + ints.size());
+
+    EXPECT_EQ(*first, 0);
+    EXPECT_EQ(*(first + 1), 1);
+    EXPECT_EQ(*(first + 2), 2);
+    EXPECT_EQ(*(1 + first), 1);
+    EXPECT_EQ(*(2 + first), 2);
+
+    EXPECT_EQ(first[0], 0);
+    EXPECT_EQ(first[1], 1);
+    EXPECT_EQ(first[2], 2);
+
+    EXPECT_EQ(*(last - 1), 9);
+    EXPECT_EQ(*(last - 2), 8);
+    EXPECT_EQ(*(last - 3), 7);
+
+    EXPECT_EQ(last[-1], 9);
+    EXPECT_EQ(last[-2], 8);
+    EXPECT_EQ(last[-3], 7);
+
+    EXPECT_EQ(last - first, 10);
+    EXPECT_EQ(first, first);
+    EXPECT_NE(first, last);
+    EXPECT_LT(first, last);
+    EXPECT_LE(first, last);
+    EXPECT_LE(first, first);
+    EXPECT_GT(last, first);
+    EXPECT_GE(last, first);
+    EXPECT_GE(last, last);
+
+    {
+        auto first_copy = first;
+        first_copy += 10;
+        EXPECT_EQ(first_copy, last);
+    }
+
+    {
+        auto last_copy = last;
+        last_copy -= 10;
+        EXPECT_EQ(last_copy, first);
+    }
+}
+
+TEST(random_access, basic_adapted_std_copy)
+{
+    {
+        std::array<int, 10> ints_copy;
+        basic_adapted_random_access_iter first(ints.data());
+        basic_adapted_random_access_iter last(ints.data() + ints.size());
+        std::copy(first, last, ints_copy.begin());
+        EXPECT_EQ(ints_copy, ints);
+    }
+
+    {
+        std::array<int, 10> ints_copy;
+        basic_adapted_random_access_iter first(ints.data());
+        basic_adapted_random_access_iter last(ints.data() + ints.size());
+        std::copy(
+            std::make_reverse_iterator(last),
+            std::make_reverse_iterator(first),
+            ints_copy.begin());
+        std::reverse(ints_copy.begin(), ints_copy.end());
+        EXPECT_EQ(ints_copy, ints);
+    }
+
+    {
+        std::array<int, 10> iota_ints;
+        basic_adapted_random_access_iter first(iota_ints.data());
+        basic_adapted_random_access_iter last(
+            iota_ints.data() + iota_ints.size());
+        std::iota(first, last, 0);
+        EXPECT_EQ(iota_ints, ints);
+    }
+
+    {
+        std::array<int, 10> iota_ints;
+        basic_adapted_random_access_iter first(iota_ints.data());
+        basic_adapted_random_access_iter last(
+            iota_ints.data() + iota_ints.size());
+        std::iota(
+            std::make_reverse_iterator(last),
+            std::make_reverse_iterator(first),
+            0);
+        std::reverse(iota_ints.begin(), iota_ints.end());
+        EXPECT_EQ(iota_ints, ints);
+    }
+
+    {
+        std::array<int, 10> iota_ints;
+        basic_adapted_random_access_iter first(iota_ints.data());
+        basic_adapted_random_access_iter last(
+            iota_ints.data() + iota_ints.size());
+        std::iota(
+            std::make_reverse_iterator(last),
+            std::make_reverse_iterator(first),
+            0);
+        std::sort(first, last);
+        EXPECT_EQ(iota_ints, ints);
+    }
+}
+
 TEST(random_access, mutable_to_const_conversions)
 {
     random_access first(ints.data());
@@ -357,6 +507,51 @@ TEST(random_access, mutable_to_const_conversions)
     const_random_access first_copy(first);
     const_random_access last_copy(last);
     std::equal(first, last, first_copy, last_copy);
+}
+
+TEST(random_access, postincrement_preincrement)
+{
+    {
+        random_access first(ints.data());
+        random_access last(ints.data() + ints.size());
+        while (first != last)
+            first++;
+    }
+
+    {
+        random_access first(ints.data());
+        random_access last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
+
+    {
+        basic_random_access_iter first(ints.data());
+        basic_random_access_iter last(ints.data() + ints.size());
+        while (first != last)
+            first++;
+    }
+
+    {
+        basic_random_access_iter first(ints.data());
+        basic_random_access_iter last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
+
+    {
+        basic_adapted_random_access_iter first(ints.data());
+        basic_adapted_random_access_iter last(ints.data() + ints.size());
+        while (first != last)
+            first++;
+    }
+
+    {
+        basic_adapted_random_access_iter first(ints.data());
+        basic_adapted_random_access_iter last(ints.data() + ints.size());
+        while (first != last)
+            last--;
+    }
 }
 
 TEST(random_access, coverage)
@@ -521,5 +716,192 @@ TEST(random_access, zip)
         std::sort(first, last);
         EXPECT_TRUE(
             std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
+    }
+}
+
+
+////////////////////
+// view_interface //
+////////////////////
+#include "view_tests.hpp"
+
+template<typename T>
+using data_t = decltype(std::declval<T>().data());
+
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_random_access_iter,
+            basic_random_access_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_random_access_iter,
+            basic_random_access_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+template<typename T>
+using back_t = decltype(std::declval<T>().back());
+
+static_assert(
+    ill_formed<
+        back_t,
+        subrange<int *, int const *, boost::stl_interfaces::discontiguous>>::
+        value,
+    "");
+static_assert(
+    ill_formed<
+        back_t,
+        subrange<
+            int *,
+            int const *,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+TEST(random_access, basic_subrange)
+{
+    basic_random_access_iter first(ints.data());
+    basic_random_access_iter last(ints.data() + ints.size());
+
+    auto r = range<boost::stl_interfaces::contiguous>(first, last);
+    auto empty = range<boost::stl_interfaces::contiguous>(first, first);
+
+    // range begin/end
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(r.begin(), r.end(), ints_copy.begin());
+        EXPECT_EQ(ints_copy, ints);
+
+        EXPECT_EQ(empty.begin(), empty.end());
+    }
+
+    // empty/op bool
+    {
+        EXPECT_FALSE(r.empty());
+        EXPECT_TRUE(r);
+
+        EXPECT_TRUE(empty.empty());
+        EXPECT_FALSE(empty);
+
+        auto const cr = r;
+        EXPECT_FALSE(cr.empty());
+        EXPECT_TRUE(cr);
+
+        auto const cempty = empty;
+        EXPECT_TRUE(cempty.empty());
+        EXPECT_FALSE(cempty);
+    }
+
+    // data
+    {
+        EXPECT_NE(r.data(), nullptr);
+        EXPECT_EQ(r.data()[2], 2);
+
+        EXPECT_NE(empty.data(), nullptr);
+
+        auto const cr = r;
+        EXPECT_NE(cr.data(), nullptr);
+        EXPECT_EQ(cr.data()[2], 2);
+
+        auto const cempty = empty;
+        EXPECT_NE(cempty.data(), nullptr);
+    }
+
+    // size
+    {
+        EXPECT_EQ(r.size(), 10u);
+
+        EXPECT_EQ(empty.size(), 0u);
+
+        auto const cr = r;
+        EXPECT_EQ(cr.size(), 10u);
+
+        auto const cempty = empty;
+        EXPECT_EQ(cempty.size(), 0u);
+    }
+
+    // front/back
+    {
+        EXPECT_EQ(r.front(), 0);
+        EXPECT_EQ(r.back(), 9);
+
+        auto const cr = r;
+        EXPECT_EQ(cr.front(), 0);
+        EXPECT_EQ(cr.back(), 9);
+    }
+
+    // op[]
+    {
+        EXPECT_EQ(r[2], 2);
+
+        auto const cr = r;
+        EXPECT_EQ(cr[2], 2);
+    }
+}
+
+TEST(random_access, zip_subrange)
+{
+    zip_iter first(ints.data(), ones.data());
+    zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
+
+    auto r = range<boost::stl_interfaces::discontiguous>(first, last);
+    auto empty = range<boost::stl_interfaces::discontiguous>(first, first);
+
+    // range begin/end
+    {
+        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
+    }
+
+    // empty/op bool
+    {
+        EXPECT_FALSE(r.empty());
+        EXPECT_TRUE(r);
+
+        EXPECT_TRUE(empty.empty());
+        EXPECT_FALSE(empty);
+
+        auto const cr = r;
+        EXPECT_FALSE(cr.empty());
+        EXPECT_TRUE(cr);
+
+        auto const cempty = empty;
+        EXPECT_TRUE(cempty.empty());
+        EXPECT_FALSE(cempty);
+    }
+
+    // size
+    {
+        EXPECT_EQ(r.size(), 10u);
+
+        EXPECT_EQ(empty.size(), 0u);
+
+        auto const cr = r;
+        EXPECT_EQ(cr.size(), 10u);
+
+        auto const cempty = empty;
+        EXPECT_EQ(cempty.size(), 0u);
+    }
+
+    // front/back
+    {
+        EXPECT_EQ(r.front(), (std::tuple<int, int>(0, 1)));
+        EXPECT_EQ(r.back(), (std::tuple<int, int>(9, 1)));
+
+        auto const cr = r;
+        EXPECT_EQ(cr.front(), (std::tuple<int, int>(0, 1)));
+        EXPECT_EQ(cr.back(), (std::tuple<int, int>(9, 1)));
+    }
+
+    // op[]
+    {
+        EXPECT_EQ(r[2], (std::tuple<int, int>(2, 1)));
+
+        auto const cr = r;
+        EXPECT_EQ(cr[2], (std::tuple<int, int>(2, 1)));
     }
 }

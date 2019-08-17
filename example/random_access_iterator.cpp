@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ random_access_iterator
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -13,11 +13,12 @@
 
 
 // This is a minimal random access iterator.  It uses default template
-// parameters for most iterator_facade template parameters.
-struct simple_random_access_iterator : boost::iterator_facade::iterator_facade<
-                                           simple_random_access_iterator,
-                                           std::random_access_iterator_tag,
-                                           int>
+// parameters for most stl_interfaces template parameters.
+struct simple_random_access_iterator
+    : boost::stl_interfaces::iterator_interface<
+          simple_random_access_iterator,
+          std::random_access_iterator_tag,
+          int>
 {
     // This default constructor does not initialize it_, since that's how int *
     // works as well.  This allows optimum performance in code paths where
@@ -26,15 +27,18 @@ struct simple_random_access_iterator : boost::iterator_facade::iterator_facade<
     simple_random_access_iterator() noexcept {}
     simple_random_access_iterator(int * it) noexcept : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const noexcept { return *it_; }
-    void advance(std::ptrdiff_t i) noexcept { it_ += i; }
-    auto compare(simple_random_access_iterator other) const noexcept
+    int & operator*() const noexcept { return *it_; }
+    simple_random_access_iterator & operator+=(std::ptrdiff_t i) noexcept
+    {
+        it_ += i;
+        return *this;
+    }
+    auto operator-(simple_random_access_iterator other) const noexcept
     {
         return it_ - other.it_;
     }
 
+private:
     int * it_;
 };
 

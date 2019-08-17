@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ back_insert_iterator
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -16,9 +16,9 @@
 // push_back() on that container when it is written to, just like
 // std::back_insert_iterator.  This is not a lot less code to write than the
 // implementation of std::back_insert_iterator, but it demonstrates that
-// iterator_facade is flexible enough to handle this odd kind of iterator.
+// iterator_interface is flexible enough to handle this odd kind of iterator.
 template<typename Container>
-struct back_insert_iterator : boost::iterator_facade::iterator_facade<
+struct back_insert_iterator : boost::stl_interfaces::iterator_interface<
                                   back_insert_iterator<Container>,
                                   std::output_iterator_tag,
                                   typename Container::value_type,
@@ -43,15 +43,21 @@ struct back_insert_iterator : boost::iterator_facade::iterator_facade<
         return *this;
     }
 
-private:
-    friend boost::iterator_facade::access;
     // Dereferencing *this just returns a reference to *this, so that the
     // expression *it = value uses the operator=() overloads above.
-    back_insert_iterator & dereference() { return *this; }
-    // There is no underlying sequence over which we are iteratung, so there's
+    back_insert_iterator & operator*() { return *this; }
+    // There is no underlying sequence over which we are iterating, so there's
     // nowhere to go in next().  Do nothing.
-    void next() {}
+    back_insert_iterator & operator++() { return *this; }
 
+    using base_type = boost::stl_interfaces::iterator_interface<
+        back_insert_iterator<Container>,
+        std::output_iterator_tag,
+        typename Container::value_type,
+        back_insert_iterator<Container> &>;
+    using base_type::operator++;
+
+private:
     Container * c_;
 };
 

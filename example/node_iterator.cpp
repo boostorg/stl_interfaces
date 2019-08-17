@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -24,8 +24,8 @@ struct node
 //[ node_iterator_class_head
 template<typename T>
 struct node_iterator
-    : boost::iterator_facade::
-          iterator_facade<node_iterator<T>, std::forward_iterator_tag, T>
+    : boost::stl_interfaces::
+          iterator_interface<node_iterator<T>, std::forward_iterator_tag, T>
 //]
 {
     //[ node_iterator_ctors
@@ -33,25 +33,34 @@ struct node_iterator
     constexpr node_iterator(node<T> * it) noexcept : it_(it) {}
     //]
 
-    //[ node_iterator_private
-private:
-    friend boost::iterator_facade::access;
-    constexpr T & dereference() const noexcept { return it_->value_; }
-    constexpr void next() noexcept { it_ = it_->next_; }
-    constexpr bool equals(node_iterator other) const noexcept
+    //[ node_iterator_user_ops
+    constexpr T & operator*() const noexcept { return it_->value_; }
+    constexpr node_iterator & operator++() noexcept
     {
-        return it_ == other.it_;
+        it_ = it_->next_;
+        return *this;
     }
+    friend constexpr bool
+    operator==(node_iterator lhs, node_iterator rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
+    //]
 
+    //[ node_iterator_using_declaration
+    using base_type = boost::stl_interfaces::
+        iterator_interface<node_iterator<T>, std::forward_iterator_tag, T>;
+    using base_type::operator++;
+    //]
+
+private:
     node<T> * it_;
 };
-//]
 
 //[ node_iterator_concept_check Equivalent to
 // static_assert(std::forward_iterator<node_iterator>, ""), or nothing in
 // C++17 and earlier.
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
-    node_iterator, std::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(node_iterator, std::forward_iterator)
 //]
 
 
@@ -72,7 +81,7 @@ int main()
     //[ node_iterator_usage
     node_iterator<int> const first(&nodes[0]);
     node_iterator<int> const last;
-    for (auto it = first; it != last; ++it) {
+    for (auto it = first; it != last; it++) {
         std::cout << *it << " "; // Prints 0 1 2 3 4
     }
     std::cout << "\n";

@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <gtest/gtest.h>
 
@@ -13,24 +13,31 @@
 
 
 struct basic_output_iter
-    : boost::iterator_facade::
-          iterator_facade<basic_output_iter, std::output_iterator_tag, int>
+    : boost::stl_interfaces::
+          iterator_interface<basic_output_iter, std::output_iterator_tag, int>
 {
     basic_output_iter() : it_(nullptr) {}
     basic_output_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
-    void next() { ++it_; }
+    int & operator*() noexcept { return *it_; }
+    basic_output_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
 
+    using base_type = boost::stl_interfaces::
+        iterator_interface<basic_output_iter, std::output_iterator_tag, int>;
+    using base_type::operator++;
+
+private:
     int * it_;
 };
 
 using output = basic_output_iter;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(output, std::output_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(output, std::output_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     output,
     std::output_iterator_tag,
     std::output_iterator_tag,
@@ -40,7 +47,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename Container>
-struct back_insert_iter : boost::iterator_facade::iterator_facade<
+struct back_insert_iter : boost::stl_interfaces::iterator_interface<
                               back_insert_iter<Container>,
                               std::output_iterator_tag,
                               typename Container::value_type,
@@ -48,6 +55,9 @@ struct back_insert_iter : boost::iterator_facade::iterator_facade<
 {
     back_insert_iter() : c_(nullptr) {}
     back_insert_iter(Container & c) : c_(std::addressof(c)) {}
+
+    back_insert_iter & operator*() noexcept { return *this; }
+    back_insert_iter & operator++() noexcept { return *this; }
 
     back_insert_iter & operator=(typename Container::value_type const & v)
     {
@@ -60,18 +70,21 @@ struct back_insert_iter : boost::iterator_facade::iterator_facade<
         return *this;
     }
 
-private:
-    friend boost::iterator_facade::access;
-    back_insert_iter & dereference() { return *this; }
-    void next() {}
+    using base_type = boost::stl_interfaces::iterator_interface<
+        back_insert_iter<Container>,
+        std::output_iterator_tag,
+        typename Container::value_type,
+        back_insert_iter<Container> &>;
+    using base_type::operator++;
 
+private:
     Container * c_;
 };
 
 using back_insert = back_insert_iter<std::vector<int>>;
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(back_insert, std::output_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(back_insert, std::output_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     back_insert,
     std::output_iterator_tag,
     std::output_iterator_tag,
@@ -87,7 +100,7 @@ std::vector<int> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 TEST(output, basic_std_copy)
 {
     std::vector<int> ints_copy(ints.size());
-    std::copy(ints.begin(), ints.end(), output(ints_copy.data()));
+    std::copy(ints.begin(), ints.end(), output(&ints_copy[0]));
     EXPECT_EQ(ints_copy, ints);
 }
 
@@ -96,4 +109,12 @@ TEST(output, back_insert_std_copy)
     std::vector<int> ints_copy;
     std::copy(ints.begin(), ints.end(), back_insert(ints_copy));
     EXPECT_EQ(ints_copy, ints);
+}
+
+TEST(output, postincrement)
+{
+    std::vector<int> ints_copy;
+    back_insert out(ints_copy);
+    for (int i = 0; i < 10; ++i)
+        out++;
 }

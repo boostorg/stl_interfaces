@@ -3,7 +3,9 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
+
+#include "ill_formed.hpp"
 
 #include <gtest/gtest.h>
 
@@ -13,24 +15,34 @@
 
 
 struct basic_input_iter
-    : boost::iterator_facade::
-          iterator_facade<basic_input_iter, std::input_iterator_tag, int>
+    : boost::stl_interfaces::
+          iterator_interface<basic_input_iter, std::input_iterator_tag, int>
 {
     basic_input_iter() : it_(nullptr) {}
     basic_input_iter(int * it) : it_(it) {}
 
-private:
-    friend boost::iterator_facade::access;
-    int & dereference() const { return *it_; }
-    void next() { ++it_; }
-    bool equals(basic_input_iter other) const { return it_ == other.it_; }
+    int & operator*() const noexcept { return *it_; }
+    basic_input_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
+    friend bool operator==(basic_input_iter lhs, basic_input_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+    using base_type = boost::stl_interfaces::
+        iterator_interface<basic_input_iter, std::input_iterator_tag, int>;
+    using base_type::operator++;
+
+private:
     int * it_;
 };
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_input_iter, std::input_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_input_iter,
     std::input_iterator_tag,
     std::input_iterator_tag,
@@ -40,7 +52,7 @@ BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct input_iter : boost::iterator_facade::iterator_facade<
+struct input_iter : boost::stl_interfaces::iterator_interface<
                         input_iter<ValueType>,
                         std::input_iterator_tag,
                         ValueType>
@@ -55,21 +67,33 @@ struct input_iter : boost::iterator_facade::iterator_facade<
     input_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType & dereference() const { return *it_; }
-    void next() { ++it_; }
-    bool equals(input_iter other) const { return it_ == other.it_; }
+    ValueType & operator*() const noexcept { return *it_; }
+    input_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
+    friend bool operator==(input_iter lhs, input_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+    using base_type = boost::stl_interfaces::iterator_interface<
+        input_iter<ValueType>,
+        std::input_iterator_tag,
+        ValueType>;
+    using base_type::operator++;
+
+private:
     ValueType * it_;
 
     template<typename ValueType2>
     friend struct input_iter;
 };
 
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     input_iter<int>, std::input_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     input_iter<int>,
     std::input_iterator_tag,
     std::input_iterator_tag,
@@ -84,7 +108,7 @@ using pair_input = input_iter<std::pair<int, int>>;
 using const_pair_input = input_iter<std::pair<int, int> const>;
 
 template<typename ValueType>
-struct proxy_input_iter : boost::iterator_facade::proxy_iterator_facade<
+struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
                               proxy_input_iter<ValueType>,
                               std::input_iterator_tag,
                               ValueType>
@@ -99,12 +123,24 @@ struct proxy_input_iter : boost::iterator_facade::proxy_iterator_facade<
     proxy_input_iter(ValueType2 it) : it_(it.it_)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    ValueType dereference() const { return *it_; }
-    void next() { ++it_; }
-    bool equals(proxy_input_iter other) const { return it_ == other.it_; }
+    ValueType operator*() const noexcept { return *it_; }
+    proxy_input_iter & operator++() noexcept
+    {
+        ++it_;
+        return *this;
+    }
+    friend bool operator==(proxy_input_iter lhs, proxy_input_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
 
+    using base_type = boost::stl_interfaces::proxy_iterator_interface<
+        proxy_input_iter<ValueType>,
+        std::input_iterator_tag,
+        ValueType>;
+    using base_type::operator++;
+
+private:
     ValueType * it_;
 
     template<typename ValueType2>
@@ -112,15 +148,15 @@ private:
 };
 
 using int_pair = std::pair<int, int>;
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_CONCEPT(
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     proxy_input_iter<int_pair>, std::input_iterator)
-BOOST_ITERATOR_FACADE_STATIC_ASSERT_ITERATOR_TRAITS(
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     proxy_input_iter<int_pair>,
     std::input_iterator_tag,
     std::input_iterator_tag,
     int_pair,
     int_pair,
-    boost::iterator_facade::proxy_arrow_result<int_pair>,
+    boost::stl_interfaces::proxy_arrow_result<int_pair>,
     std::ptrdiff_t)
 
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
@@ -160,6 +196,14 @@ TEST(input, mutable_to_const_conversions)
     const_int_input first_copy(first);
     const_int_input last_copy(last);
     std::equal(first, last, first_copy, last_copy);
+}
+
+TEST(input, postincrement)
+{
+    int_input first(ints.data());
+    int_input last(ints.data() + ints.size());
+    while (first != last)
+        first++;
 }
 
 TEST(input, std_copy)
@@ -238,5 +282,134 @@ TEST(input, const_std_copy)
             *out++ = first->first;
         }
         EXPECT_EQ(firsts_copy, ints);
+    }
+}
+
+
+////////////////////
+// view_interface //
+////////////////////
+#include "view_tests.hpp"
+
+template<typename T>
+using data_t = decltype(std::declval<T>().data());
+
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+template<typename T>
+using size_t_ = decltype(std::declval<T>().size());
+
+static_assert(
+    ill_formed<
+        size_t_,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        size_t_,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+template<typename T>
+using back_t_ = decltype(std::declval<T>().back());
+
+static_assert(
+    ill_formed<
+        back_t_,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        back_t_,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+template<typename T>
+using index_operator_t = decltype(std::declval<T>()[0]);
+
+static_assert(
+    ill_formed<
+        index_operator_t,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        index_operator_t,
+        subrange<
+            basic_input_iter,
+            basic_input_iter,
+            boost::stl_interfaces::discontiguous> const>::value,
+    "");
+
+TEST(input, basic_subrange)
+{
+    basic_input_iter first(ints.data());
+    basic_input_iter last(ints.data() + ints.size());
+
+    auto r = range<boost::stl_interfaces::discontiguous>(first, last);
+    auto empty = range<boost::stl_interfaces::discontiguous>(first, first);
+
+    // range begin/end
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(r.begin(), r.end(), ints_copy.begin());
+        EXPECT_EQ(ints_copy, ints);
+
+        EXPECT_EQ(empty.begin(), empty.end());
+    }
+
+    // empty/op bool
+    {
+        EXPECT_FALSE(r.empty());
+        EXPECT_TRUE(r);
+
+        EXPECT_TRUE(empty.empty());
+        EXPECT_FALSE(empty);
+
+        auto const cr = r;
+        EXPECT_FALSE(cr.empty());
+        EXPECT_TRUE(cr);
+
+        auto const cempty = empty;
+        EXPECT_TRUE(cempty.empty());
+        EXPECT_FALSE(cempty);
+    }
+
+    // front/back
+    {
+        EXPECT_EQ(r.front(), 0);
+
+        auto const cr = r;
+        EXPECT_EQ(cr.front(), 0);
     }
 }

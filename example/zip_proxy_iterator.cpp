@@ -4,7 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //[ zip_proxy_iterator
-#include <boost/iterator_facade/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
 #include <array>
@@ -18,7 +18,7 @@
 // iterator writable, it needs to have a reference type that is not actually a
 // reference -- the reference type is a pair of references, std::tuple<int &,
 // int &>.
-struct zip_iterator : boost::iterator_facade::proxy_iterator_facade<
+struct zip_iterator : boost::stl_interfaces::proxy_iterator_interface<
                       zip_iterator,
                       std::random_access_iterator_tag,
                       std::tuple<int, int>,
@@ -28,22 +28,22 @@ struct zip_iterator : boost::iterator_facade::proxy_iterator_facade<
     constexpr zip_iterator(int * it1, int * it2) noexcept : it1_(it1), it2_(it2)
     {}
 
-private:
-    friend boost::iterator_facade::access;
-    constexpr std::tuple<int &, int &> dereference() const noexcept
+    constexpr std::tuple<int &, int &> operator*() const noexcept
     {
         return std::tuple<int &, int &>{*it1_, *it2_};
     }
-    constexpr void advance(std::ptrdiff_t i) noexcept
+    constexpr zip_iterator & operator += (std::ptrdiff_t i) noexcept
     {
         it1_ += i;
         it2_ += i;
+        return *this;
     }
-    constexpr auto compare(zip_iterator other) const noexcept
+    constexpr auto operator-(zip_iterator other) const noexcept
     {
         return it1_ - other.it1_;
     }
 
+private:
     int * it1_;
     int * it2_;
 };
