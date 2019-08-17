@@ -77,16 +77,6 @@ namespace boost { namespace stl_interfaces {
         };
     }
 
-    // TODO (maybe one day...)
-    // Associative container requirements (only those not covered by the earlier tables):
-    // try_emplace -> all unique emplaces and inserts, except emplace_hint,
-    // hinted insert, and node handle inserts emplace (in absence of
-    // try_emplace) -> all non-unique emplaces and inserts, except emplace_hint,
-    // hinted insert, and node handle inserts emplace_hint -> hinted insert
-    // lower_bound,upper_bound ->
-    // equal_range,find(tran?),count(tran?),contains(tran?) erase(q),equal_range
-    // -> erase(k),erase(r),erase(q1,q2)
-
     /** A CRTP template that one may derive from to make it easier to define
         container types. */
     template<

@@ -151,10 +151,14 @@ namespace boost { namespace stl_interfaces {
         typename ValueType,
         typename Reference = ValueType &,
         typename Pointer = ValueType *,
-        typename DifferenceType = std::ptrdiff_t,
+        typename DifferenceType = std::ptrdiff_t
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+        ,
         typename E = std::enable_if_t<
             std::is_class<Derived>::value &&
-            std::is_same<Derived, std::remove_cv_t<Derived>>::value>>
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+#endif
+        >
     struct iterator_interface
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
