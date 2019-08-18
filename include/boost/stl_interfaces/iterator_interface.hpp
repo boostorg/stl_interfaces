@@ -487,6 +487,19 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 namespace boost { namespace stl_interfaces { namespace v2 {
 
+    /** A CRTP template that one may derive from to make defining iterators
+        easier. */
+    template<
+      typename Derived,
+      typename IteratorConcept,
+      typename ValueType,
+      typename Reference = ValueType &,
+      typename Pointer = ValueType *,
+      typename DifferenceType = std::ptrdiff_t>
+      requires std::is_class_v<Derived> &&
+               std::same_as<Derived, std::remove_cv_t<Derived>>
+    struct iterator_interface;
+
     namespace detail {
         template<
             typename Derived,
@@ -505,16 +518,15 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     }
 
     // clang-format off
-    /** A CRTP template that one may derive from to make defining iterators
-        easier. */
     template<
       typename Derived,
       typename IteratorConcept,
       typename ValueType,
-      typename Reference = ValueType &,
-      typename Pointer = ValueType *,
-      typename DifferenceType = std::ptrdiff_t>
-      requires is_class_v<Derived> && same_as<Derived, remove_cv_t<Derived>>
+      typename Reference,
+      typename Pointer,
+      typename DifferenceType>
+      requires std::is_class_v<Derived> &&
+               std::same_as<Derived, std::remove_cv_t<Derived>>
     struct iterator_interface {
     private:
       constexpr Derived& derived() noexcept {

@@ -572,4 +572,270 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 }}}
 
+
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts) || BOOST_STL_INTERFACES_DOXYGEN
+
+namespace boost { namespace stl_interfaces { namespace v2 {
+
+    /** A CRTP template that one may derive from to make it easier to define
+        container types. */
+    template<typename Derived, bool Contiguous = discontiguous>
+      requires std::is_class_v<Derived> &&
+               std::same_as<Derived, std::remove_cv_t<Derived>>
+    struct container_interface;
+
+    namespace detail {
+        template<typename Derived, bool Contiguous>
+        void
+        derived_container(container_interface<Derived, Contiguous> const &);
+    }
+
+    // clang-format off
+    template<
+      typename Derived, bool Contiguous>
+      requires std::is_class_v<Derived> &&
+               std::same_as<Derived, std::remove_cv_t<Derived>>
+    struct container_interface {
+    private:
+      constexpr Derived& derived() noexcept {
+        return static_cast<Derived&>(*this);
+      }
+      constexpr const Derived& derived() const noexcept {
+        return static_cast<const Derived&>(*this);
+      }
+      constexpr Derived & mutable_derived() const noexcept {
+        return const_cast<Derived&>(static_cast<const Derived&>(*this));
+      }
+      static constexpr void clear_impl(Derived& d) noexcept {}
+      static constexpr void clear_impl(Derived& d) noexcept
+        requires requires { d.clear()); } {
+          d.clear();
+        }
+
+    public:
+      ~container_interface() { clear_impl(derived()); }
+
+      constexpr bool empty() requires std::forward_range<Derived> {
+        return std::ranges::begin(derived()) == std::ranges::end(derived());
+      }
+      constexpr bool empty() const requires std::forward_range<const Derived> {
+        return std::ranges::begin(derived()) == std::ranges::end(derived());
+      }
+
+      constexpr auto data() requires std::contiguous_iterator<std::iterator_t<Derived>> {
+        return std::to_address(std::ranges::begin(derived()));
+      }
+      constexpr auto data() const
+        requires std::range<const Derived> &&
+          std::contiguous_iterator<std::iterator_t<const Derived>> {
+            return std::to_address(std::ranges::begin(derived()));
+          }
+
+      constexpr auto size() requires std::forward_range<Derived> &&
+        std::sized_sentinel_for<std::sentinel_t<Derived>, std::iterator_t<Derived>>
+        -> Derived::size_type {
+          return Derived::size_type(
+            std::ranges::end(derived()) - std::ranges::begin(derived()));
+        }
+      constexpr auto size() const requires std::forward_range<const Derived> &&
+        std::sized_sentinel_for<std::sentinel_t<const Derived>, std::iterator_t<const Derived>>
+        -> Derived::size_type {
+          return Derived::size_type(
+            std::ranges::end(derived()) - std::ranges::begin(derived()));
+        }
+
+      constexpr decltype(auto) front() requires std::forward_range<Derived> {
+        BOOST_ASSERT(!empty());
+        return *std::ranges::begin(derived());
+      }
+      constexpr decltype(auto) front() const
+        requires std::forward_range<const Derived> {
+          BOOST_ASSERT(!empty());
+          return *std::ranges::begin(derived());
+        }
+
+      constexpr void push_front(const Derived::value_type& x)
+        requires std::forward_range<Derived> &&
+          requires { derived().emplace_front(x); } {
+            return derived().emplace_front(x);
+          }
+      constexpr void push_front(Derived::value_type&& x)
+        requires std::forward_range<Derived> &&
+          requires { derived().emplace_front(std::move(x)); } {
+            return derived().emplace_front(std::move(x));
+          }
+      constexpr void pop_front() noexcept
+          requires std::forward_range<Derived> &&
+            requires (Derived::value_type x, Derived::const_iterator position) {
+            derived().emplace_front(x); derived().erase(position); } {
+              return derived().erase(std::ranges::begin(derived()));
+            }
+
+      constexpr decltype(auto) back()
+        requires std::bidirectional_range<Derived> && std::common_range<Derived> {
+          BOOST_ASSERT(!empty());
+          return *std::ranges::prev(std::ranges::begin(derived()));
+        }
+      constexpr decltype(auto) back() const
+        requires std::bidirectional_range<const Derived> && std::common_range<const Derived> {
+          BOOST_ASSERT(!empty());
+          return *std::ranges::prev(std::ranges::begin(derived()));
+        }
+
+      constexpr void push_back(const Derived::value_type& x)
+        requires std::bidirectional_range<Derived> && std::common_range<Derived> &&
+          requires { derived().emplace_back(x); } {
+            return derived().emplace_back(x);
+          }
+      constexpr void push_back(Derived::value_type&& x)
+        requires std::bidirectional_range<Derived> && std::common_range<Derived> &&
+          requires { derived().emplace_back(std::move(x)); } {
+            return derived().emplace_back(std::move(x));
+          }
+      constexpr void pop_back() noexcept
+          requires std::bidirectional_range<Derived> && std::common_range<Derived> &&
+            requires (Derived::value_type x, Derived::const_iterator position) {
+            derived().emplace_back(x); derived().erase(position); } {
+              return derived().erase(std::ranges::prev(std::ranges::end(derived())));
+            }
+
+      template<std::random_access_range Container = Derived>
+      constexpr decltype(auto) operator[](Derived::size_type n) {
+        return std::ranges::begin(derived())[n];
+      }
+      template<std::random_access_range Container = const Derived>
+      constexpr decltype(auto) operator[](Derived::size_type n) const {
+        return std::ranges::begin(derived())[n];
+      }
+
+      template<std::random_access_range Container = Derived>
+      constexpr decltype(auto) at(Derived::size_type n) {
+        if (derived().size() < n)
+          throw std::out_of_range("Bounds check failed in container_interface::at()");
+        return std::ranges::begin(derived())[n];
+      }
+      template<std::random_access_range Container = const Derived>
+      constexpr decltype(auto) at(Derived::size_type n) const {
+        if (derived().size() < n)
+          throw std::out_of_range("Bounds check failed in container_interface::at()");
+        return std::ranges::begin(derived())[n];
+      }
+
+      constexpr void resize(Derived::size_type n)
+        requires std::forward_range<Derived> &&
+          requires { derived().resize(n, Derived::value_type()); } {
+            derived().resize(n, Derived::value_type());
+          }
+
+      constexpr auto begin() const requires std::forward_range<Derived> {
+        return Derived::const_iterator(std::ranges::begin(mutable_derived()));
+      }
+      constexpr auto end() const requires std::forward_range<Derived> {
+        return Derived::const_iterator(std::ranges::end(mutable_derived()));
+      }
+
+      constexpr auto cbegin() const requires std::forward_range<Derived> {
+        return std::ranges::begin(derived());
+      }
+      constexpr auto cend() const requires std::forward_range<Derived> {
+        return std::ranges::end(derived());
+      }
+
+      constexpr auto rbegin() requires std::bidirectional_range<Derived> {
+        return std::reverse_iterator(std::ranges::end(derived()));
+      }
+      constexpr auto rend() requires std::bidirectional_range<Derived> {
+        return std::reverse_iterator(std::ranges::begin(derived()));
+      }
+
+      constexpr auto rbegin() const requires std::bidirectional_range<Derived> {
+        return Derived::reverse_const_iterator(std::ranges::rbegin(mutable_derived()));
+      }
+      constexpr auto rend() const requires std::bidirectional_range<Derived> {
+        return Derived::reverse_const_iterator(std::ranges::rend(mutable_derived()));
+      }
+
+      constexpr auto crbegin() const requires std::bidirectional_range<Derived> {
+        return std::ranges::rbegin(derived());
+      }
+      constexpr auto crend() const requires std::bidirectional_range<Derived> {
+        return std::ranges::rend(derived());
+      }
+
+      constexpr auto insert(Derived::const_iterator position, const Derived::value_type& x)
+        requires std::forward_range<Derived> && requires {
+          derived().emplace(position, x); } {
+            derived().emplace(position, x);
+          }
+      constexpr auto insert(Derived::const_iterator position, Derived::value_type&& x)
+        requires std::forward_range<Derived> && requires {
+          derived().emplace(position, std::move(x)); } {
+            derived().emplace(position, std::move(x));
+          }
+      constexpr auto insert(Derived::const_iterator position, Derived::size_type n,
+                            const Derived::value_type& x)
+        requires std::forward_range<Derived> && requires {
+          derived().insert(position, v1::detail::make_n_iter(x, n),
+                           v1::detail::make_n_iter_end(x, n)); } {
+            derived().insert(position,  v1::detail::make_n_iter(x, n),
+                             v1::detail::make_n_iter_end(x, n));
+          }
+      constexpr auto insert(Derived::const_iterator position,
+                            std::initializer_list<Derived::value_type> il)
+        requires std::forward_range<Derived> && requires {
+          derived().insert(position, il.begin(), il.end()); } {
+            derived().insert(position, il.begin(), il.end());
+          }
+
+      constexpr void erase(Derived::const_iterator position)
+          requires std::forward_range<Derived> && requires {
+            derived().erase(position, std::ranges::next(position)); } {
+              derived().erase(position, std::ranges::next(position));
+            }
+
+      template<std::forward_iterator Iter>
+        constexpr void assign(Iter first, Iter last)
+            requires std::forward_range<Derived> && requires {
+              derived().clear();
+              derived().insert(std::ranges::begin(derived()), first, last); } {
+                derived().clear();
+                derived().insert(std::ranges::begin(derived()), first, last);
+              }
+      constexpr void assign(Derived::size_type n, const Derived::value_type& x)
+          requires std::forward_range<Derived> && requires {
+            derived().clear();
+            derived().insert(std::ranges::begin(derived()),
+                             v1::detail::make_n_iter(x, n),
+                             v1::detail::make_n_iter_end(x, n)); } {
+              derived().clear();
+              derived().insert(std::ranges::begin(derived()),
+                               v1::detail::make_n_iter(x, n),
+                               v1::detail::make_n_iter_end(x, n));
+            }
+      constexpr void assign(std::initializer_list<Derived::value_type> il)
+          requires std::forward_range<Derived> && requires {
+            derived().clear();
+            derived().insert(std::ranges::begin(derived()), il.begin(), il.end()); } {
+              derived().clear();
+              derived().insert(std::ranges::begin(derived()), il.begin(), il.end());
+            }
+
+      constexpr void clear() noexcept
+        requires std::forward_range<Derived> && requires {
+          derived().erase(std::ranges::begin(derived()), std::ranges::end(derived())); } {
+            derived().erase(std::ranges::begin(derived()), std::ranges::end(derived()));
+          }
+
+      constexpr decltype(auto) operator=(std::initializer_list<Derived::value_type> il)
+        requires std::forward_range<Derived> && requires {
+          derived().assign(il.begin(), il.end()); } {
+            derived().assign(il.begin(), il.end());
+          }
+    };
+    // clang-format on
+
+}}}
+
+#endif
+
 #endif
