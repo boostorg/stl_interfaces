@@ -95,5 +95,5 @@ TEST(detail, n_iter)
     detail::n_iter<int, int> first = detail::make_n_iter(new_value, 3);
     detail::n_iter<int, int> last = detail::make_n_iter_end(new_value, 3);
     std::copy(first, last, &ints[1]);
-    EXPECT_EQ(ints, (std::array<int, 5>{0, 6, 6, 6, 4}));
+    EXPECT_EQ(ints, (std::array<int, 5>{{0, 6, 6, 6, 4}}));
 }

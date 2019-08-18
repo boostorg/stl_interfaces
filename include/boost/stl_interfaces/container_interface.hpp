@@ -330,12 +330,24 @@ namespace boost { namespace stl_interfaces {
         constexpr auto insert(
             typename D::const_iterator pos,
             typename D::size_type n,
-            typename D::value_type const &
-                x) noexcept(noexcept(std::declval<D &>()
-                                         .insert(
-                                             pos,
-                                             detail::make_n_iter(x, n),
-                                             detail::make_n_iter_end(x, n))))
+            typename D::value_type const & x)
+            // If you see an error in this noexcept() expression, that's
+            // because this function is not properly constrained.  In other
+            // words, Derived does not have a "range" insert like
+            // insert(position, first, last).  If that is the case, this
+            // function should be removed via SFINAE from overload resolution.
+            // However, both the trailing decltype code below and a
+            // std::enable_if in the template parameters do not work.  Sorry
+            // about that.  See below for details.
+            noexcept(noexcept(std::declval<D &>().insert(
+                pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n))))
+        // This causes the compiler to infinitely recurse into this function's
+        // declaration, even though the call below does not match the
+        // signature of this function.
+#if 0
+            -> decltype(std::declval<D &>().insert(
+                pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n)))
+#endif
         {
             return derived().insert(
                 pos, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n));
