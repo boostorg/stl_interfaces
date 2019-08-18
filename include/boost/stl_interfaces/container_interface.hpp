@@ -13,6 +13,20 @@
 
 namespace boost { namespace stl_interfaces { inline namespace v1 {
 
+    /** A CRTP template that one may derive from to make it easier to define
+        container types. */
+    template<
+        typename Derived,
+        bool Contiguous = discontiguous
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+        ,
+        typename E = std::enable_if_t<
+            std::is_class<Derived>::value &&
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+#endif
+        >
+    struct container_interface;
+
     namespace detail {
         template<typename T, typename SizeType>
         struct n_iter : iterator_interface<
@@ -75,18 +89,18 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         {
             static constexpr void call(Derived & d) noexcept { d.clear(); }
         };
+
+        template<typename Derived, bool Contiguous>
+        void
+        derived_container(container_interface<Derived, Contiguous> const &);
     }
 
-    /** A CRTP template that one may derive from to make it easier to define
-        container types. */
     template<
         typename Derived,
-        bool Contiguous = discontiguous
+        bool Contiguous
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
-        typename E = std::enable_if_t<
-            std::is_class<Derived>::value &&
-            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+        typename E
 #endif
         >
     struct container_interface
@@ -108,8 +122,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 #endif
 
     public:
-        using derived_container_type = Derived;
-
         ~container_interface() { detail::clear_impl<Derived>::call(derived()); }
 
         template<typename D = Derived>
@@ -520,10 +532,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto swap(
         ContainerInterface & lhs,
         ContainerInterface & rhs) noexcept(noexcept(lhs.swap(rhs)))
-        -> decltype(
-            detail::dummy<
-                typename ContainerInterface::derived_container_type>(),
-            lhs.swap(rhs))
+        -> decltype(detail::derived_container(lhs), lhs.swap(rhs))
     {
         return lhs.swap(rhs);
     }
@@ -534,10 +543,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator<=(
         ContainerInterface lhs,
         ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
-        -> decltype(
-            detail::dummy<
-                typename ContainerInterface::derived_container_type>(),
-            lhs < rhs)
+        -> decltype(detail::derived_container(lhs), lhs < rhs)
     {
         return !(rhs < lhs);
     }
@@ -548,10 +554,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator>(
         ContainerInterface lhs,
         ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
-        -> decltype(
-            detail::dummy<
-                typename ContainerInterface::derived_container_type>(),
-            lhs < rhs)
+        -> decltype(detail::derived_container(lhs), lhs < rhs)
     {
         return rhs < lhs;
     }
@@ -562,10 +565,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator>=(
         ContainerInterface lhs,
         ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
-        -> decltype(
-            detail::dummy<
-                typename ContainerInterface::derived_container_type>(),
-            lhs < rhs)
+        -> decltype(detail::derived_container(lhs), lhs < rhs)
     {
         return !(lhs < rhs);
     }

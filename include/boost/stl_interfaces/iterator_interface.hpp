@@ -61,6 +61,24 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         T value_;
     };
 
+    /** A CRTP template that one may derive from to make defining iterators
+        easier. */
+    template<
+        typename Derived,
+        typename IteratorConcept,
+        typename ValueType,
+        typename Reference = ValueType &,
+        typename Pointer = ValueType *,
+        typename DifferenceType = std::ptrdiff_t
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+        ,
+        typename E = std::enable_if_t<
+            std::is_class<Derived>::value &&
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+#endif
+        >
+    struct iterator_interface;
+
     namespace detail {
         template<typename Pointer, typename T>
         struct ptr_and_ref : std::is_same<
@@ -141,22 +159,33 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             : std::true_type
         {
         };
+
+        template<
+            typename Derived,
+            typename IteratorConcept,
+            typename ValueType,
+            typename Reference,
+            typename Pointer,
+            typename DifferenceType>
+        void derived_iterator(iterator_interface<
+                              Derived,
+                              IteratorConcept,
+                              ValueType,
+                              Reference,
+                              Pointer,
+                              DifferenceType> const &);
     }
 
-    /** A CRTP template that one may derive from to make defining iterators
-        easier. */
     template<
         typename Derived,
         typename IteratorConcept,
         typename ValueType,
-        typename Reference = ValueType &,
-        typename Pointer = ValueType *,
-        typename DifferenceType = std::ptrdiff_t
+        typename Reference,
+        typename Pointer,
+        typename DifferenceType
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
-        typename E = std::enable_if_t<
-            std::is_class<Derived>::value &&
-            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+        typename E
 #endif
         >
     struct iterator_interface
@@ -180,8 +209,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         using reference = Reference;
         using pointer = detail::pointer_t<Pointer, iterator_concept>;
         using difference_type = DifferenceType;
-
-        using derived_iterator_type = Derived;
 
         template<typename D = Derived>
         constexpr auto operator*() const
@@ -335,8 +362,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator!=(
         IteratorInterface lhs,
         IteratorInterface rhs) noexcept(noexcept(lhs == rhs))
-        -> decltype(
-            typename IteratorInterface::derived_iterator_type(), lhs == rhs)
+        -> decltype(detail::derived_iterator(lhs), lhs == rhs)
     {
         return !(lhs == rhs);
     }
@@ -369,8 +395,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator==(
         IteratorInterface lhs,
         IteratorInterface rhs) noexcept(noexcept(lhs - rhs))
-        -> decltype(
-            typename IteratorInterface::derived_iterator_type(), lhs - rhs)
+        -> decltype(detail::derived_iterator(lhs), lhs - rhs)
     {
         return (lhs - rhs) == 0;
     }
@@ -385,8 +410,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator!=(
         IteratorInterface lhs,
         IteratorInterface rhs) noexcept(noexcept(lhs - rhs))
-        -> decltype(
-            typename IteratorInterface::derived_iterator_type(), lhs - rhs)
+        -> decltype(detail::derived_iterator(lhs), lhs - rhs)
     {
         return (lhs - rhs) != 0;
     }
@@ -398,8 +422,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator<(
         IteratorInterface lhs,
         IteratorInterface rhs) noexcept(noexcept(lhs - rhs))
-        -> decltype(
-            typename IteratorInterface::derived_iterator_type(), lhs - rhs)
+        -> decltype(detail::derived_iterator(lhs), lhs - rhs)
     {
         return (lhs - rhs) < 0;
     }
@@ -411,8 +434,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator<=(
         IteratorInterface lhs,
         IteratorInterface rhs) noexcept(noexcept(lhs - rhs))
-        -> decltype(
-            typename IteratorInterface::derived_iterator_type(), lhs - rhs)
+        -> decltype(detail::derived_iterator(lhs), lhs - rhs)
     {
         return (lhs - rhs) <= 0;
     }
@@ -424,8 +446,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator>(
         IteratorInterface lhs,
         IteratorInterface rhs) noexcept(noexcept(lhs - rhs))
-        -> decltype(
-            typename IteratorInterface::derived_iterator_type(), lhs - rhs)
+        -> decltype(detail::derived_iterator(lhs), lhs - rhs)
     {
         return (lhs - rhs) > 0;
     }
@@ -437,8 +458,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator>=(
         IteratorInterface lhs,
         IteratorInterface rhs) noexcept(noexcept(lhs - rhs))
-        -> decltype(
-            typename IteratorInterface::derived_iterator_type(), lhs - rhs)
+        -> decltype(detail::derived_iterator(lhs), lhs - rhs)
     {
         return (lhs - rhs) >= 0;
     }

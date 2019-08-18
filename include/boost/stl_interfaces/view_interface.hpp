@@ -25,6 +25,21 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             std::is_same<Derived, std::remove_cv_t<Derived>>::value>
 #endif
         >
+    struct view_interface;
+
+    namespace detail {
+        template<typename Derived, bool Contiguous>
+        void derived_view(view_interface<Derived, Contiguous> const &);
+    }
+
+    template<
+        typename Derived,
+        bool Contiguous
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+        ,
+        typename E
+#endif
+        >
     struct view_interface
     {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
@@ -40,8 +55,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 #endif
 
     public:
-        using derived_view_type = Derived;
-
         template<typename D = Derived>
         constexpr auto empty() noexcept(
             noexcept(std::declval<D &>().begin() == std::declval<D &>().end()))
@@ -173,10 +186,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         `view_interface`.  */
     template<typename ViewInterface>
     constexpr auto operator!=(ViewInterface lhs, ViewInterface rhs) noexcept(
-        noexcept(lhs == rhs))
-        -> decltype(
-            detail::dummy<typename ViewInterface::derived_view_type>(),
-            lhs == rhs)
+        noexcept(lhs == rhs)) -> decltype(detail::derived_view(lhs), lhs == rhs)
     {
         return !(lhs == rhs);
     }

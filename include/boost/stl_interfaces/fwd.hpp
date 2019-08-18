@@ -31,11 +31,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         template<typename... T>
         using void_t = void;
 
-        template<typename T>
-        struct dummy
-        {
-        };
-
         template<typename Iter>
         using iter_difference_t =
             typename std::iterator_traits<Iter>::difference_type;
