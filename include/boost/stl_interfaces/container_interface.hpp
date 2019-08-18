@@ -196,6 +196,31 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             return *derived().begin();
         }
 
+        template<typename D = Derived>
+        constexpr auto push_front(typename D::value_type const & x) noexcept(
+            noexcept(std::declval<D &>().emplace_front(x)))
+            -> decltype((void)std::declval<D &>().emplace_front(x))
+        {
+            derived().emplace_front(x);
+        }
+
+        template<typename D = Derived>
+        constexpr auto push_front(typename D::value_type && x) noexcept(
+            noexcept(std::declval<D &>().emplace_front(std::move(x))))
+            -> decltype((void)std::declval<D &>().emplace_front(std::move(x)))
+        {
+            derived().emplace_front(std::move(x));
+        }
+
+        template<typename D = Derived>
+        constexpr auto pop_front() noexcept -> decltype(
+            std::declval<D &>().emplace_front(
+                std::declval<typename D::value_type &>()),
+            (void)std::declval<D &>().erase(std::declval<D &>().begin()))
+        {
+            derived().erase(derived().begin());
+        }
+
         template<
             typename D = Derived,
             typename Enable = std::enable_if_t<
@@ -220,6 +245,32 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
 
         template<typename D = Derived>
+        constexpr auto push_back(typename D::value_type const & x) noexcept(
+            noexcept(std::declval<D &>().emplace_back(x)))
+            -> decltype((void)std::declval<D &>().emplace_back(x))
+        {
+            derived().emplace_back(x);
+        }
+
+        template<typename D = Derived>
+        constexpr auto push_back(typename D::value_type && x) noexcept(
+            noexcept(std::declval<D &>().emplace_back(std::move(x))))
+            -> decltype((void)std::declval<D &>().emplace_back(std::move(x)))
+        {
+            derived().emplace_back(std::move(x));
+        }
+
+        template<typename D = Derived>
+        constexpr auto pop_back() noexcept -> decltype(
+            std::declval<D &>().emplace_back(
+                std::declval<typename D::value_type &>()),
+            (void)std::declval<D &>().erase(
+                std::prev(std::declval<D &>().end())))
+        {
+            derived().erase(std::prev(derived().end()));
+        }
+
+        template<typename D = Derived>
         constexpr auto operator[](typename D::size_type n) noexcept(
             noexcept(std::declval<D &>().begin()[n]))
             -> decltype(std::declval<D &>().begin()[n])
@@ -232,6 +283,28 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
                 -> decltype(std::declval<D const &>().begin()[n])
         {
             return derived().begin()[n];
+        }
+
+        template<typename D = Derived>
+        constexpr auto at(typename D::size_type i)
+            -> decltype(std::declval<D &>().size(), std::declval<D &>()[i])
+        {
+            if (derived().size() <= i) {
+                throw std::out_of_range(
+                    "Bounds check failed in container_interface::at()");
+            }
+            return derived()[i];
+        }
+
+        template<typename D = Derived>
+        constexpr auto at(typename D::size_type i) const -> decltype(
+            std::declval<D const &>().size(), std::declval<D const &>()[i])
+        {
+            if (derived().size() <= i) {
+                throw std::out_of_range(
+                    "Bounds check failed in container_interface::at()");
+            }
+            return derived()[i];
         }
 
         template<typename D = Derived>
@@ -442,79 +515,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         {
             derived().assign(il.begin(), il.end());
             return *this;
-        }
-
-        template<typename D = Derived>
-        constexpr auto push_front(typename D::value_type const & x) noexcept(
-            noexcept(std::declval<D &>().emplace_front(x)))
-            -> decltype((void)std::declval<D &>().emplace_front(x))
-        {
-            derived().emplace_front(x);
-        }
-
-        template<typename D = Derived>
-        constexpr auto push_front(typename D::value_type && x) noexcept(
-            noexcept(std::declval<D &>().emplace_front(std::move(x))))
-            -> decltype((void)std::declval<D &>().emplace_front(std::move(x)))
-        {
-            derived().emplace_front(std::move(x));
-        }
-
-        template<typename D = Derived>
-        constexpr auto pop_front() noexcept -> decltype(
-            std::declval<D &>().emplace_front(
-                std::declval<typename D::value_type &>()),
-            (void)std::declval<D &>().erase(std::declval<D &>().begin()))
-        {
-            derived().erase(derived().begin());
-        }
-
-        template<typename D = Derived>
-        constexpr auto push_back(typename D::value_type const & x) noexcept(
-            noexcept(std::declval<D &>().emplace_back(x)))
-            -> decltype((void)std::declval<D &>().emplace_back(x))
-        {
-            derived().emplace_back(x);
-        }
-
-        template<typename D = Derived>
-        constexpr auto push_back(typename D::value_type && x) noexcept(
-            noexcept(std::declval<D &>().emplace_back(std::move(x))))
-            -> decltype((void)std::declval<D &>().emplace_back(std::move(x)))
-        {
-            derived().emplace_back(std::move(x));
-        }
-
-        template<typename D = Derived>
-        constexpr auto pop_back() noexcept -> decltype(
-            std::declval<D &>().emplace_back(
-                std::declval<typename D::value_type &>()),
-            (void)std::declval<D &>().erase(
-                std::prev(std::declval<D &>().end())))
-        {
-            derived().erase(std::prev(derived().end()));
-        }
-
-        template<typename D = Derived>
-        constexpr auto at(typename D::size_type i)
-            -> decltype(std::declval<D &>().size(), std::declval<D &>()[i])
-        {
-            if (derived().size() <= i) {
-                throw std::out_of_range(
-                    "Bounds check failed in static_vector::at()");
-            }
-            return derived()[i];
-        }
-
-        template<typename D = Derived>
-        constexpr auto at(typename D::size_type i) const -> decltype(
-            std::declval<D const &>().size(), std::declval<D const &>()[i])
-        {
-            if (derived().size() <= i) {
-                throw std::out_of_range(
-                    "Bounds check failed in static_vector::at()");
-            }
-            return derived()[i];
         }
 
         template<typename D = Derived>
