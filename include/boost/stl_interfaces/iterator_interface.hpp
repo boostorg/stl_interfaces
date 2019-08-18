@@ -487,115 +487,148 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 namespace boost { namespace stl_interfaces { namespace v2 {
 
-  // clang-format off
-  /** A CRTP template that one may derive from to make defining iterators
-      easier. */
-  template<
-    typename Derived,
-    typename IteratorConcept,
-    typename ValueType,
-    typename Reference = ValueType &,
-    typename Pointer = ValueType *,
-    typename DifferenceType = std::ptrdiff_t>
-    requires is_class_v<Derived> && same_as<Derived, remove_cv_t<Derived>>
-  struct iterator_interface : public std::view_base {
-  private:
-    constexpr Derived& derived() noexcept {
-      return static_cast<Derived&>(*this);
-    }
-    constexpr const Derived& derived() const noexcept {
-      return static_cast<const Derived&>(*this);
-    }
-  public:
-    using iterator_concept = IteratorConcept;
-    using iterator_category = detail::concept_category_t<iterator_concept>;
-    using value_type = ValueType;
-    using reference = Reference;
-    using pointer = detail::pointer_t<Pointer, iterator_concept>;
-    using difference_type = DifferenceType;
-
-    // TODO: Require a return type of reference here?
-    constexpr decltype(auto) operator*()
-      requires requires { *v1::access::base(derived()); } {
-        return *v1::access::base(derived());
-      }
-    constexpr decltype(auto) operator*() const
-      requires requires { *v1::access::base(derived()); } {
-        return *v1::access::base(derived());
-      }
-
-    constexpr auto operator->()
-      requires requires { v1::detail::make_pointer<pointer>(*derived()); } {
-        return v1::detail::make_pointer<pointer>(*derived());
-      }
-    constexpr auto operator->() const
-      requires requires { v1::detail::make_pointer<pointer>(*derived()); } {
-        return v1::detail::make_pointer<pointer>(*derived());
-      }
-
-    constexpr decltype(auto) operator[](difference_type n) const {
-      Derived retval = derived();
-      retval += i;
-      return *retval;
+    namespace detail {
+        template<
+            typename Derived,
+            typename IteratorConcept,
+            typename ValueType,
+            typename Reference,
+            typename Pointer,
+            typename DifferenceType>
+        void derived_iterator(iterator_interface<
+                              Derived,
+                              IteratorConcept,
+                              ValueType,
+                              Reference,
+                              Pointer,
+                              DifferenceType> const &);
     }
 
-    // TODO: Require a return type of Derived & here (and below)?
-    // TODO: Are these two operator++()'s ambiguous (same with op-- below)?
-    constexpr decltype(auto) operator++()
-      requires requires { ++v1::access::base(derived()); } {
-        return ++v1::access::base(derived());
+    // clang-format off
+    /** A CRTP template that one may derive from to make defining iterators
+        easier. */
+    template<
+      typename Derived,
+      typename IteratorConcept,
+      typename ValueType,
+      typename Reference = ValueType &,
+      typename Pointer = ValueType *,
+      typename DifferenceType = std::ptrdiff_t>
+      requires is_class_v<Derived> && same_as<Derived, remove_cv_t<Derived>>
+    struct iterator_interface {
+    private:
+      constexpr Derived& derived() noexcept {
+        return static_cast<Derived&>(*this);
       }
-    constexpr decltype(auto) operator++()
-      requires requires { derived() += difference_type(1); } {
-        return derived() += difference_type(1);
-      }
-    constexpr auto operator++(int) requires requires { ++derived(); } {
-      Derived retval = derived();
-      ++derived();
-      return retval;
-    }
-    constexpr decltype(auto) operator+=(difference_type n)
-      requires requires { v1::access::base(derived()) += n; } {
-        return v1::access::base(derived()) += n;
-      }
-    friend constexpr auto operator+(Derived it, difference_type n)
-      requires requires { it += n; } {
-        return it += n;
-      }
-    friend constexpr auto operator+(difference_type n, Derived it)
-      requires requires { it + n; } {
-        return it + n;
+      constexpr const Derived& derived() const noexcept {
+        return static_cast<const Derived&>(*this);
       }
 
-    constexpr decltype(auto) operator--()
-      requires requires { --v1::access::base(derived()); } {
-        return --v1::access::base(derived());
-      }
-    constexpr decltype(auto) operator--()
-      requires requires { derived() -= difference_type(1); } {
-        return derived() -= difference_type(1);
-      }
-    constexpr auto operator--(int) requires requires { --derived(); } {
-      Derived retval = derived();
-      --derived();
-      return retval;
-    }
-    constexpr decltype(auto) operator-=(difference_type n)
-      requires requires { derived() += -n; } {
-        return derived() += -n;
-      }
-    friend constexpr auto operator-(Derived lhs, Derived rhs)
-      requires requires { v1::access::base(lhs) - v1::access::base(rhs); } {
-        return it += n;
-      }
-    friend constexpr auto operator-(Derived it, difference_type n)
-      requires requires { it -= n; } {
-        return it -= n;
+    public:
+      using iterator_concept = IteratorConcept;
+      using iterator_category = detail::concept_category_t<iterator_concept>;
+      using value_type = ValueType;
+      using reference = Reference;
+      using pointer = detail::pointer_t<Pointer, iterator_concept>;
+      using difference_type = DifferenceType;
+
+      // TODO: Require a return type of reference here?
+      constexpr decltype(auto) operator*()
+        requires requires { *v1::access::base(derived()); } {
+          return *v1::access::base(derived());
+        }
+      constexpr decltype(auto) operator*() const
+        requires requires { *v1::access::base(derived()); } {
+          return *v1::access::base(derived());
+        }
+
+      constexpr auto operator->()
+        requires requires { v1::detail::make_pointer<pointer>(*derived()); } {
+          return v1::detail::make_pointer<pointer>(*derived());
+        }
+      constexpr auto operator->() const
+        requires requires { v1::detail::make_pointer<pointer>(*derived()); } {
+          return v1::detail::make_pointer<pointer>(*derived());
+        }
+
+      constexpr decltype(auto) operator[](difference_type n) const {
+        Derived retval = derived();
+        retval += i;
+        return *retval;
       }
 
-    // TODO: Comparisons.
-  };
-  // clang-format on
+      // TODO: Require a return type of Derived & here (and below)?
+      // TODO: Are these two operator++()'s ambiguous (same with op-- below)?
+      constexpr decltype(auto) operator++()
+        requires requires { ++v1::access::base(derived()); } {
+          return ++v1::access::base(derived());
+        }
+      constexpr decltype(auto) operator++()
+        requires requires { derived() += difference_type(1); } {
+          return derived() += difference_type(1);
+        }
+      constexpr auto operator++(int) requires requires { ++derived(); } {
+        Derived retval = derived();
+        ++derived();
+        return retval;
+      }
+      constexpr decltype(auto) operator+=(difference_type n)
+        requires requires { v1::access::base(derived()) += n; } {
+          return v1::access::base(derived()) += n;
+        }
+      friend constexpr auto operator+(Derived it, difference_type n)
+        requires requires { it += n; } {
+          return it += n;
+        }
+      friend constexpr auto operator+(difference_type n, Derived it)
+        requires requires { it + n; } {
+          return it + n;
+        }
+
+      constexpr decltype(auto) operator--()
+        requires requires { --v1::access::base(derived()); } {
+          return --v1::access::base(derived());
+        }
+      constexpr decltype(auto) operator--()
+        requires requires { derived() += -difference_type(1); } {
+          return derived() += -difference_type(1);
+        }
+      constexpr auto operator--(int) requires requires { --derived(); } {
+        Derived retval = derived();
+        --derived();
+        return retval;
+      }
+      constexpr decltype(auto) operator-=(difference_type n)
+        requires requires { derived() += -n; } {
+          return derived() += -n;
+        }
+      friend constexpr auto operator-(Derived lhs, Derived rhs)
+        requires requires { v1::access::base(lhs) - v1::access::base(rhs); } {
+          return v1::access::base(lhs) - v1::access::base(rhs);
+        }
+      friend constexpr auto operator-(Derived it, difference_type n)
+        requires requires { it += -n; } {
+          return it += -n;
+        }
+
+      friend constexpr auto operator==(Derived lhs, Derived rhs)
+        requires requires { v1::access::base(lhs) == v1::access::base(rhs); } {
+          return v1::access::base(lhs) == v1::access::base(rhs);
+        }
+
+      friend constexpr auto operator<=>(Derived lhs, Derived rhs)
+        requires requires {
+          v1::access::base(lhs) == v1::access::base(rhs);
+          v1::access::base(lhs) <=> v1::access::base(rhs);
+        } {
+          return v1::access::base(lhs) <=> v1::access::base(rhs);
+        }
+      friend constexpr std::strong_ordering operator<=>(Derived lhs, Derived rhs)
+          requires requires { detail::derived_iterator(lhs); lhs - rhs; } {
+          return (lhs - rhs) <=> 0;
+        }
+    };
+    // clang-format on
 
 }}}
 
