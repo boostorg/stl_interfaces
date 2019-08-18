@@ -11,7 +11,7 @@
 #include <stdexcept>
 
 
-namespace boost { namespace stl_interfaces {
+namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     namespace detail {
         template<typename T, typename SizeType>
@@ -570,6 +570,6 @@ namespace boost { namespace stl_interfaces {
         return !(lhs < rhs);
     }
 
-}}
+}}}
 
 #endif

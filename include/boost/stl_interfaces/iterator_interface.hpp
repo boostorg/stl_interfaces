@@ -12,7 +12,7 @@
 #include <type_traits>
 
 
-namespace boost { namespace stl_interfaces {
+namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** A type for granting access to the private members of an iterator
         derived from `iterator_interface`. */
@@ -460,7 +460,7 @@ namespace boost { namespace stl_interfaces {
         proxy_arrow_result<Reference>,
         DifferenceType>;
 
-}}
+}}}
 
 
 #ifdef BOOST_STL_INTERFACES_DOXYGEN

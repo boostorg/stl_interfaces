@@ -20,7 +20,7 @@
 #endif
 
 
-namespace boost { namespace stl_interfaces {
+namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** An enumeration used to indicate whether the underlying data have a
         contiguous layout when instantiating `view_interface` and
@@ -81,6 +81,6 @@ namespace boost { namespace stl_interfaces {
         };
     }
 
-}}
+}}}
 
 #endif

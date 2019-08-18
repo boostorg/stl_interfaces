@@ -9,7 +9,7 @@
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 
-namespace boost { namespace stl_interfaces {
+namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** This type is very similar to the C++20 version of
         `std::reverse_iterator`; it is `constexpr`-, `noexcept`-, and
@@ -93,6 +93,6 @@ namespace boost { namespace stl_interfaces {
         return reverse_iterator<BidiIter>(it);
     }
 
-}}
+}}}
 
 #endif

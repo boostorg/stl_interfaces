@@ -9,7 +9,7 @@
 #include <boost/stl_interfaces/fwd.hpp>
 
 
-namespace boost { namespace stl_interfaces {
+namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** A CRTP template that one may derive from to make it easier to define
         `std::ranges::view`-like types with a container-like interface.  This
@@ -181,6 +181,6 @@ namespace boost { namespace stl_interfaces {
         return !(lhs == rhs);
     }
 
-}}
+}}}
 
 #endif
