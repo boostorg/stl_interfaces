@@ -734,7 +734,7 @@ static_assert(
         subrange<
             basic_random_access_iter,
             basic_random_access_iter,
-            boost::stl_interfaces::discontiguous>>::value,
+            boost::stl_interfaces::v1::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -742,7 +742,7 @@ static_assert(
         subrange<
             basic_random_access_iter,
             basic_random_access_iter,
-            boost::stl_interfaces::discontiguous> const>::value,
+            boost::stl_interfaces::v1::discontiguous> const>::value,
     "");
 
 template<typename T>
@@ -751,7 +751,7 @@ using back_t = decltype(std::declval<T>().back());
 static_assert(
     ill_formed<
         back_t,
-        subrange<int *, int const *, boost::stl_interfaces::discontiguous>>::
+        subrange<int *, int const *, boost::stl_interfaces::v1::discontiguous>>::
         value,
     "");
 static_assert(
@@ -760,7 +760,7 @@ static_assert(
         subrange<
             int *,
             int const *,
-            boost::stl_interfaces::discontiguous> const>::value,
+            boost::stl_interfaces::v1::discontiguous> const>::value,
     "");
 
 TEST(random_access, basic_subrange)
@@ -849,8 +849,8 @@ TEST(random_access, zip_subrange)
     zip_iter first(ints.data(), ones.data());
     zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
 
-    auto r = range<boost::stl_interfaces::discontiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::discontiguous>(first, first);
+    auto r = range<boost::stl_interfaces::v1::discontiguous>(first, last);
+    auto empty = range<boost::stl_interfaces::v1::discontiguous>(first, first);
 
     // range begin/end
     {

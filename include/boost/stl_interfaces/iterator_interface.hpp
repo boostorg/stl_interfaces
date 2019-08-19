@@ -10,6 +10,9 @@
 
 #include <utility>
 #include <type_traits>
+#if 201711L <= __cpp_lib_three_way_comparison
+#include <compare>
+#endif
 
 
 namespace boost { namespace stl_interfaces { inline namespace v1 {
@@ -538,7 +541,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return v1::detail::make_pointer<pointer>(*derived());
         }
 
-      constexpr decltype(auto) operator[](difference_type n) const {
+      constexpr decltype(auto) operator[](difference_type n) const
+        requires requires { derived() += n; } {
         Derived retval = derived();
         retval += i;
         return *retval;
@@ -626,9 +630,10 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         concept bool base_incr =
             requires (Derived & d) { ++v1::access::base(d); };
 
-        template<typename Derived>
-        concept bool make_ptr =
-            requires (Derived & d) { v1::detail::make_pointer<Derived::pointer>(*d); };
+//         TODO: Needed?
+//         template<typename Derived>
+//         concept bool make_ptr =
+//             requires (Derived & d) { v1::detail::make_pointer<Derived::pointer>(*d); };
 
         template<typename Derived>
         concept bool base_deref =
@@ -702,15 +707,16 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
 
       constexpr auto operator->()
-        requires detail::make_ptr<Derived> {
+        /* TODO: Needed? requires detail::make_ptr<Derived> */ {
           return v1::detail::make_pointer<pointer>(*derived());
         }
       constexpr auto operator->() const
-        requires detail::make_ptr<const Derived> {
+        /* TODO: Needed? requires detail::make_ptr<const Derived> */ {
           return v1::detail::make_pointer<pointer>(*derived());
         }
 
-      constexpr decltype(auto) operator[](difference_type n) const {
+      constexpr decltype(auto) operator[](difference_type n) const
+        requires detail::plus_eq<Derived> {
         Derived retval = derived();
         retval += n;
         return *retval;
@@ -769,15 +775,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return it += -n;
         }
 
-#if 1 // TODO: No support for <=> yet.
-      friend constexpr bool operator!=(Derived lhs, Derived rhs) {
-          if constexpr (detail::base_eq<Derived> && !detail::sub<Derived>) {
-            return v1::access::base(lhs) == v1::access::base(rhs);
-          } else if constexpr (detail::eq<Derived> && !detail::sub<Derived>) {
-            return lhs == rhs;
-          }
-        }
-#else
+#if 201711L <= __cpp_lib_three_way_comparison
       friend constexpr std::strong_equality operator<=>(Derived lhs, Derived rhs)
         requires requires { v1::access::base(lhs) == v1::access::base(rhs); } &&
           !requires { lhs - rhs; } {
@@ -794,8 +792,40 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           requires requires { lhs - rhs; } {
           return (lhs - rhs) <=> 0;
         }
+#else
+      friend constexpr bool operator==(Derived lhs, Derived rhs)
+        requires detail::base_eq<Derived> {
+          return v1::access::base(lhs) == v1::access::base(rhs);
+        }
+
+      friend constexpr bool operator!=(Derived lhs, Derived rhs)
+        requires detail::base_eq<Derived> || detail::eq<Derived> || detail::sub<Derived> {
+        if constexpr (detail::sub<Derived>) {
+          return (lhs - rhs) != typename Derived::difference_type(0);
+        } else if constexpr (detail::base_eq<Derived>) {
+          return !(v1::access::base(lhs) == v1::access::base(rhs));
+        } else if constexpr (detail::eq<Derived>) {
+          return !(lhs == rhs);
+        }
+      }
 #endif
     };
+
+    /** A template alias useful for defining proxy iterators.  \see
+        `iterator_interface`. */
+    template<
+        typename Derived,
+        typename IteratorConcept,
+        typename ValueType,
+        typename Reference = ValueType,
+        typename DifferenceType = std::ptrdiff_t>
+    using proxy_iterator_interface = iterator_interface<
+        Derived,
+        IteratorConcept,
+        ValueType,
+        Reference,
+        proxy_arrow_result<Reference>,
+        DifferenceType>;
 
 #endif
     // clang-format on

@@ -15,7 +15,9 @@
 #include <type_traits>
 
 
-struct basic_bidirectional_iter : boost::stl_interfaces::iterator_interface<
+namespace bsi = boost::stl_interfaces::v2;
+
+struct basic_bidirectional_iter : bsi::iterator_interface<
                                       basic_bidirectional_iter,
                                       std::bidirectional_iterator_tag,
                                       int>
@@ -40,7 +42,7 @@ struct basic_bidirectional_iter : boost::stl_interfaces::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
+    using base_type = bsi::iterator_interface<
         basic_bidirectional_iter,
         std::bidirectional_iterator_tag,
         int>;
@@ -68,7 +70,7 @@ static_assert(
     "");
 
 struct basic_adapted_bidirectional_ptr_iter
-    : boost::stl_interfaces::iterator_interface<
+    : bsi::iterator_interface<
           basic_adapted_bidirectional_ptr_iter,
           std::bidirectional_iterator_tag,
           int>
@@ -96,7 +98,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 struct basic_adapted_bidirectional_list_iter
-    : boost::stl_interfaces::iterator_interface<
+    : bsi::iterator_interface<
           basic_adapted_bidirectional_list_iter,
           std::bidirectional_iterator_tag,
           int>
@@ -124,7 +126,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
+struct bidirectional_iter : bsi::iterator_interface<
                                 bidirectional_iter<ValueType>,
                                 std::bidirectional_iterator_tag,
                                 ValueType>
@@ -156,7 +158,7 @@ struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
+    using base_type = bsi::iterator_interface<
         bidirectional_iter<ValueType>,
         std::bidirectional_iterator_tag,
         ValueType>;
@@ -196,7 +198,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 #if 0 // TODO: Call ranges algorithms with this.
-struct basic_proxy_bidirectional_iter : boost::stl_interfaces::iterator_interface<
+struct basic_proxy_bidirectional_iter : bsi::iterator_interface<
                                             basic_proxy_bidirectional_iter,
                                             std::bidirectional_iterator_tag,
                                             int,
@@ -215,7 +217,7 @@ struct basic_proxy_bidirectional_iter : boost::stl_interfaces::iterator_interfac
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
+    using base_type = bsi::iterator_interface<
         basic_proxy_bidirectional_iter,
         std::bidirectional_iterator_tag,
         int,

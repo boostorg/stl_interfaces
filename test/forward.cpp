@@ -246,7 +246,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous>>::value,
+            boost::stl_interfaces::v1::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -254,7 +254,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous> const>::value,
+            boost::stl_interfaces::v1::discontiguous> const>::value,
     "");
 
 template<typename T>
@@ -266,7 +266,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous>>::value,
+            boost::stl_interfaces::v1::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -274,7 +274,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous> const>::value,
+            boost::stl_interfaces::v1::discontiguous> const>::value,
     "");
 
 template<typename T>
@@ -286,7 +286,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous>>::value,
+            boost::stl_interfaces::v1::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -294,7 +294,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous> const>::value,
+            boost::stl_interfaces::v1::discontiguous> const>::value,
     "");
 
 template<typename T>
@@ -306,7 +306,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous>>::value,
+            boost::stl_interfaces::v1::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -314,7 +314,7 @@ static_assert(
         subrange<
             basic_forward_iter,
             basic_forward_iter,
-            boost::stl_interfaces::discontiguous> const>::value,
+            boost::stl_interfaces::v1::discontiguous> const>::value,
     "");
 
 TEST(forward, basic_subrange)
@@ -322,8 +322,8 @@ TEST(forward, basic_subrange)
     basic_forward_iter first(ints.data());
     basic_forward_iter last(ints.data() + ints.size());
 
-    auto r = range<boost::stl_interfaces::discontiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::discontiguous>(first, first);
+    auto r = range<boost::stl_interfaces::v1::discontiguous>(first, last);
+    auto empty = range<boost::stl_interfaces::v1::discontiguous>(first, first);
 
     // range begin/end
     {

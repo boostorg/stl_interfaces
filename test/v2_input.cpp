@@ -14,9 +14,10 @@
 #include <type_traits>
 
 
+namespace bsi = boost::stl_interfaces::v2;
+
 struct basic_input_iter
-    : boost::stl_interfaces::
-          iterator_interface<basic_input_iter, std::input_iterator_tag, int>
+    : bsi::iterator_interface<basic_input_iter, std::input_iterator_tag, int>
 {
     basic_input_iter() : it_(nullptr) {}
     basic_input_iter(int * it) : it_(it) {}
@@ -32,8 +33,8 @@ struct basic_input_iter
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::
-        iterator_interface<basic_input_iter, std::input_iterator_tag, int>;
+    using base_type =
+        bsi::iterator_interface<basic_input_iter, std::input_iterator_tag, int>;
     using base_type::operator++;
 
 private:
@@ -52,7 +53,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct input_iter : boost::stl_interfaces::iterator_interface<
+struct input_iter : bsi::iterator_interface<
                         input_iter<ValueType>,
                         std::input_iterator_tag,
                         ValueType>
@@ -78,7 +79,7 @@ struct input_iter : boost::stl_interfaces::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
+    using base_type = bsi::iterator_interface<
         input_iter<ValueType>,
         std::input_iterator_tag,
         ValueType>;
@@ -108,7 +109,7 @@ using pair_input = input_iter<std::pair<int, int>>;
 using const_pair_input = input_iter<std::pair<int, int> const>;
 
 template<typename ValueType>
-struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
+struct proxy_input_iter : bsi::proxy_iterator_interface<
                               proxy_input_iter<ValueType>,
                               std::input_iterator_tag,
                               ValueType>
@@ -134,7 +135,7 @@ struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::proxy_iterator_interface<
+    using base_type = bsi::proxy_iterator_interface<
         proxy_input_iter<ValueType>,
         std::input_iterator_tag,
         ValueType>;
@@ -172,9 +173,6 @@ std::array<std::pair<int, int>, 10> pairs = {{
     {8, 1},
     {9, 1},
 }};
-
-
-// TODO: Call std::ranges::copy below too.
 
 
 TEST(input, basic_std_copy)
