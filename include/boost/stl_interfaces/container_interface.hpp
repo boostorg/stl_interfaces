@@ -590,20 +590,18 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
     /** A CRTP template that one may derive from to make it easier to define
         container types. */
-    template<typename Derived, bool Contiguous = discontiguous>
+    template<typename Derived>
       requires std::is_class_v<Derived> &&
                std::same_as<Derived, std::remove_cv_t<Derived>>
     struct container_interface;
 
     namespace detail {
-        template<typename Derived, bool Contiguous>
-        void
-        derived_container(container_interface<Derived, Contiguous> const &);
+        template<typename Derived>
+        void derived_container(container_interface<Derived> const &);
     }
 
     // clang-format off
-    template<
-      typename Derived, bool Contiguous>
+    template<typename Derived>
       requires std::is_class_v<Derived> &&
                std::same_as<Derived, std::remove_cv_t<Derived>>
     struct container_interface {
