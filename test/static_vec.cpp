@@ -194,6 +194,10 @@ TEST(static_vec, comparisons)
     EXPECT_FALSE(sm == md);
     EXPECT_FALSE(sm == lg);
 
+    EXPECT_FALSE(sm != sm);
+    EXPECT_TRUE(sm != md);
+    EXPECT_TRUE(sm != lg);
+
     EXPECT_FALSE(sm < sm);
     EXPECT_TRUE(sm < md);
     EXPECT_TRUE(sm < lg);

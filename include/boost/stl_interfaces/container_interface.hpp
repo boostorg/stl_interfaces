@@ -537,12 +537,23 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         return lhs.swap(rhs);
     }
 
+    /** Implementation of `operator!=()` for all containers derived from
+        `container_interface`.  */
+    template<typename ContainerInterface>
+    constexpr auto operator!=(
+        ContainerInterface const & lhs,
+        ContainerInterface const & rhs) noexcept(noexcept(lhs == rhs))
+        -> decltype(detail::derived_container(lhs), lhs == rhs)
+    {
+        return !(lhs == rhs);
+    }
+
     /** Implementation of `operator<=()` for all containers derived from
         `container_interface`.  */
     template<typename ContainerInterface>
     constexpr auto operator<=(
-        ContainerInterface lhs,
-        ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
+        ContainerInterface const & lhs,
+        ContainerInterface const & rhs) noexcept(noexcept(lhs < rhs))
         -> decltype(detail::derived_container(lhs), lhs < rhs)
     {
         return !(rhs < lhs);
@@ -552,8 +563,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         `container_interface`.  */
     template<typename ContainerInterface>
     constexpr auto operator>(
-        ContainerInterface lhs,
-        ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
+        ContainerInterface const & lhs,
+        ContainerInterface const & rhs) noexcept(noexcept(lhs < rhs))
         -> decltype(detail::derived_container(lhs), lhs < rhs)
     {
         return rhs < lhs;
@@ -563,8 +574,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         `container_interface`.  */
     template<typename ContainerInterface>
     constexpr auto operator>=(
-        ContainerInterface lhs,
-        ContainerInterface rhs) noexcept(noexcept(lhs < rhs))
+        ContainerInterface const & lhs,
+        ContainerInterface const & rhs) noexcept(noexcept(lhs < rhs))
         -> decltype(detail::derived_container(lhs), lhs < rhs)
     {
         return !(lhs < rhs);
