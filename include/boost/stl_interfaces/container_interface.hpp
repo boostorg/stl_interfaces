@@ -588,19 +588,9 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 namespace boost { namespace stl_interfaces { namespace v2 {
 
+    // clang-format off
     /** A CRTP template that one may derive from to make it easier to define
         container types. */
-    template<typename Derived>
-      requires std::is_class_v<Derived> &&
-               std::same_as<Derived, std::remove_cv_t<Derived>>
-    struct container_interface;
-
-    namespace detail {
-        template<typename Derived>
-        void derived_container(container_interface<Derived> const &);
-    }
-
-    // clang-format off
     template<typename Derived>
       requires std::is_class_v<Derived> &&
                std::same_as<Derived, std::remove_cv_t<Derived>>
@@ -840,6 +830,17 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           derived().assign(il.begin(), il.end()); } {
             derived().assign(il.begin(), il.end());
           }
+
+      friend constexpr void swap(Derived& lhs, Derived& rhs)
+        requires requires { lhs.swap(rhs); } {
+          return lhs.swap(rhs);
+      }
+
+      friend constexpr std::strong_ordering operator<=>(const Derived& lhs,
+                                                        const Derived& rhs) {
+          return std::lexicographical_compare_three_way(lhs.begin(), lhs.end(),
+                                                        rhs.begin(), rhs.end());
+      }
     };
     // clang-format on
 

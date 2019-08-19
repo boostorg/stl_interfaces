@@ -487,6 +487,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 namespace boost { namespace stl_interfaces { namespace v2 {
 
+    // clang-format off
     /** A CRTP template that one may derive from to make defining iterators
         easier. */
     template<
@@ -496,35 +497,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       typename Reference = ValueType &,
       typename Pointer = ValueType *,
       typename DifferenceType = std::ptrdiff_t>
-      requires std::is_class_v<Derived> &&
-               std::same_as<Derived, std::remove_cv_t<Derived>>
-    struct iterator_interface;
-
-    namespace detail {
-        template<
-            typename Derived,
-            typename IteratorConcept,
-            typename ValueType,
-            typename Reference,
-            typename Pointer,
-            typename DifferenceType>
-        void derived_iterator(iterator_interface<
-                              Derived,
-                              IteratorConcept,
-                              ValueType,
-                              Reference,
-                              Pointer,
-                              DifferenceType> const &);
-    }
-
-    // clang-format off
-    template<
-      typename Derived,
-      typename IteratorConcept,
-      typename ValueType,
-      typename Reference,
-      typename Pointer,
-      typename DifferenceType>
       requires std::is_class_v<Derived> &&
                std::same_as<Derived, std::remove_cv_t<Derived>>
     struct iterator_interface {
@@ -623,20 +595,20 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return it += -n;
         }
 
-      friend constexpr auto operator==(Derived lhs, Derived rhs)
-        requires requires { v1::access::base(lhs) == v1::access::base(rhs); } {
-          return v1::access::base(lhs) == v1::access::base(rhs);
-        }
-
+      friend constexpr std::strong_equality operator<=>(Derived lhs, Derived rhs)
+        requires requires { v1::access::base(lhs) == v1::access::base(rhs); } &&
+          !requires { lhs - rhs; } {
+            return v1::access::base(lhs) == v1::access::base(rhs);
+          }
       friend constexpr auto operator<=>(Derived lhs, Derived rhs)
         requires requires {
           v1::access::base(lhs) == v1::access::base(rhs);
           v1::access::base(lhs) <=> v1::access::base(rhs);
-        } {
+        } && !requires { lhs - rhs; } {
           return v1::access::base(lhs) <=> v1::access::base(rhs);
         }
       friend constexpr std::strong_ordering operator<=>(Derived lhs, Derived rhs)
-          requires requires { detail::derived_iterator(lhs); lhs - rhs; } {
+          requires requires { lhs - rhs; } {
           return (lhs - rhs) <=> 0;
         }
     };
