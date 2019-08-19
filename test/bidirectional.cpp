@@ -63,7 +63,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 static_assert(
-    !boost::stl_interfaces::detail::
+    !boost::stl_interfaces::v1::v1_dtl::
         plus_eq<basic_bidirectional_iter, std::ptrdiff_t>::value,
     "");
 

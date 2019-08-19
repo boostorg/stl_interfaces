@@ -17,16 +17,17 @@
 
 
 namespace detail = boost::stl_interfaces::detail;
+namespace v1_dtl = boost::stl_interfaces::v1::v1_dtl;
 
 
 // iter_difference_t
 BOOST_MPL_ASSERT(
-    (std::is_same<detail::iter_difference_t<int *>, std::ptrdiff_t>));
+    (std::is_same<v1_dtl::iter_difference_t<int *>, std::ptrdiff_t>));
 BOOST_MPL_ASSERT((std::is_same<
-                  detail::iter_difference_t<std::vector<double>::iterator>,
+                  v1_dtl::iter_difference_t<std::vector<double>::iterator>,
                   std::vector<double>::difference_type>));
 BOOST_MPL_ASSERT((std::is_same<
-                  detail::iter_difference_t<std::list<double>::iterator>,
+                  v1_dtl::iter_difference_t<std::list<double>::iterator>,
                   std::list<double>::difference_type>));
 
 struct ridiculous_range
@@ -37,53 +38,53 @@ struct ridiculous_range
 
 // iterator_t
 BOOST_MPL_ASSERT((std::is_same<
-                  detail::iterator_t<std::vector<double>>,
+                  v1_dtl::iterator_t<std::vector<double>>,
                   std::vector<double>::iterator>));
 BOOST_MPL_ASSERT((std::is_same<
-                  detail::iterator_t<std::list<double>>,
+                  v1_dtl::iterator_t<std::list<double>>,
                   std::list<double>::iterator>));
-BOOST_MPL_ASSERT((std::is_same<detail::iterator_t<ridiculous_range>, int *>));
+BOOST_MPL_ASSERT((std::is_same<v1_dtl::iterator_t<ridiculous_range>, int *>));
 
 // sentinel_t
 BOOST_MPL_ASSERT((std::is_same<
-                  detail::sentinel_t<std::vector<double>>,
+                  v1_dtl::sentinel_t<std::vector<double>>,
                   std::vector<double>::iterator>));
 BOOST_MPL_ASSERT((std::is_same<
-                  detail::sentinel_t<std::list<double>>,
+                  v1_dtl::sentinel_t<std::list<double>>,
                   std::list<double>::iterator>));
-BOOST_MPL_ASSERT((std::is_same<detail::sentinel_t<ridiculous_range>, double>));
+BOOST_MPL_ASSERT((std::is_same<v1_dtl::sentinel_t<ridiculous_range>, double>));
 
 // range_difference_t
 BOOST_MPL_ASSERT(
     (std::is_same<
-        detail::range_difference_t<std::vector<double>>,
+        v1_dtl::range_difference_t<std::vector<double>>,
         std::iterator_traits<std::vector<double>::iterator>::difference_type>));
 BOOST_MPL_ASSERT(
     (std::is_same<
-        detail::range_difference_t<std::list<double>>,
+        v1_dtl::range_difference_t<std::list<double>>,
         std::iterator_traits<std::list<double>::iterator>::difference_type>));
 BOOST_MPL_ASSERT((std::is_same<
-                  detail::range_difference_t<ridiculous_range>,
+                  v1_dtl::range_difference_t<ridiculous_range>,
                   std::ptrdiff_t>));
 
 // common_range
-static_assert(detail::common_range<std::vector<double>>::value, "");
-static_assert(detail::common_range<std::list<double>>::value, "");
-static_assert(!detail::common_range<ridiculous_range>::value, "");
+static_assert(v1_dtl::common_range<std::vector<double>>::value, "");
+static_assert(v1_dtl::common_range<std::list<double>>::value, "");
+static_assert(!v1_dtl::common_range<ridiculous_range>::value, "");
 
 
 struct no_clear
 {};
 
-TEST(detail, clear_impl)
+TEST(v1_dtl, clear_impl)
 {
     {
         no_clear nc;
-        detail::clear_impl<no_clear>::call(nc);
+        v1_dtl::clear_impl<no_clear>::call(nc);
     }
     {
         std::vector<int> vec(10);
-        detail::clear_impl<std::vector<int>>::call(vec);
+        v1_dtl::clear_impl<std::vector<int>>::call(vec);
         EXPECT_TRUE(vec.empty());
     }
 }

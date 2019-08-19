@@ -31,7 +31,7 @@ namespace boost { namespace stl_interfaces {
             `container_interface`. */
         enum element_layout : bool { discontiguous = false, contiguous = true };
 
-        namespace detail {
+        namespace v1_dtl {
             template<typename... T>
             using void_t = void;
 

@@ -11,6 +11,54 @@
 #include <stdexcept>
 
 
+namespace boost { namespace stl_interfaces { namespace detail {
+
+    template<typename T, typename SizeType>
+    struct n_iter : iterator_interface<
+                        n_iter<T, SizeType>,
+                        std::random_access_iterator_tag,
+                        T>
+    {
+        n_iter() : x_(nullptr), n_(0) {}
+        n_iter(T const & x, SizeType n) : x_(&x), n_(n) {}
+
+        constexpr std::ptrdiff_t operator-(n_iter other) const noexcept
+        {
+            return std::ptrdiff_t(n_) - std::ptrdiff_t(other.n_);
+        }
+        n_iter & operator+=(std::ptrdiff_t offset)
+        {
+            n_ += offset;
+            return *this;
+        }
+
+    private:
+        friend access;
+        constexpr T const *& base_reference() noexcept { return x_; }
+        constexpr T const * base_reference() const noexcept { return x_; }
+
+        T const * x_;
+        SizeType n_;
+    };
+
+    template<typename T, typename SizeType>
+    constexpr auto make_n_iter(T const & x, SizeType n) noexcept(
+        noexcept(n_iter<T, SizeType>(x, n)))
+    {
+        using result_type = n_iter<T, SizeType>;
+        BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+            result_type, std::random_access_iterator)
+        return result_type(x, SizeType(0));
+    }
+    template<typename T, typename SizeType>
+    constexpr auto make_n_iter_end(T const & x, SizeType n) noexcept(
+        noexcept(n_iter<T, SizeType>(x, n)))
+    {
+        return n_iter<T, SizeType>(x, n);
+    }
+
+}}}
+
 namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** A CRTP template that one may derive from to make it easier to define
@@ -27,51 +75,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         >
     struct container_interface;
 
-    namespace detail {
-        template<typename T, typename SizeType>
-        struct n_iter : iterator_interface<
-                            n_iter<T, SizeType>,
-                            std::random_access_iterator_tag,
-                            T>
-        {
-            n_iter() : x_(nullptr), n_(0) {}
-            n_iter(T const & x, SizeType n) : x_(&x), n_(n) {}
-
-            constexpr std::ptrdiff_t operator-(n_iter other) const noexcept
-            {
-                return std::ptrdiff_t(n_) - std::ptrdiff_t(other.n_);
-            }
-            n_iter & operator+=(std::ptrdiff_t offset)
-            {
-                n_ += offset;
-                return *this;
-            }
-
-        private:
-            friend access;
-            constexpr T const *& base_reference() noexcept { return x_; }
-            constexpr T const * base_reference() const noexcept { return x_; }
-
-            T const * x_;
-            SizeType n_;
-        };
-
-        template<typename T, typename SizeType>
-        constexpr auto make_n_iter(T const & x, SizeType n) noexcept(
-            noexcept(n_iter<T, SizeType>(x, n)))
-        {
-            using result_type = n_iter<T, SizeType>;
-            BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-                result_type, std::random_access_iterator)
-            return result_type(x, SizeType(0));
-        }
-        template<typename T, typename SizeType>
-        constexpr auto make_n_iter_end(T const & x, SizeType n) noexcept(
-            noexcept(n_iter<T, SizeType>(x, n)))
-        {
-            return n_iter<T, SizeType>(x, n);
-        }
-
+    namespace v1_dtl {
         template<typename Iter>
         using in_iter = std::is_convertible<
             typename std::iterator_traits<Iter>::iterator_category,
@@ -122,7 +126,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 #endif
 
     public:
-        ~container_interface() { detail::clear_impl<Derived>::call(derived()); }
+        ~container_interface() { v1_dtl::clear_impl<Derived>::call(derived()); }
 
         template<typename D = Derived>
         constexpr auto empty() noexcept(
@@ -224,8 +228,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         template<
             typename D = Derived,
             typename Enable = std::enable_if_t<
-                detail::decrementable_sentinel<D>::value &&
-                detail::common_range<D>::value>>
+                v1_dtl::decrementable_sentinel<D>::value &&
+                v1_dtl::common_range<D>::value>>
         constexpr auto
         back() noexcept(noexcept(*std::prev(std::declval<D &>().end())))
             -> decltype(*std::prev(std::declval<D &>().end()))
@@ -235,8 +239,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         template<
             typename D = Derived,
             typename Enable = std::enable_if_t<
-                detail::decrementable_sentinel<D>::value &&
-                detail::common_range<D>::value>>
+                v1_dtl::decrementable_sentinel<D>::value &&
+                v1_dtl::common_range<D>::value>>
         constexpr auto back() const
             noexcept(noexcept(*std::prev(std::declval<D const &>().end())))
                 -> decltype(*std::prev(std::declval<D const &>().end()))
@@ -346,7 +350,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<detail::common_range<D>::value>>
+            typename Enable = std::enable_if_t<v1_dtl::common_range<D>::value>>
         constexpr auto rbegin() noexcept(noexcept(
             stl_interfaces::make_reverse_iterator(std::declval<D &>().end())))
         {
@@ -354,7 +358,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
         template<
             typename D = Derived,
-            typename Enable = std::enable_if_t<detail::common_range<D>::value>>
+            typename Enable = std::enable_if_t<v1_dtl::common_range<D>::value>>
         constexpr auto rend() noexcept(noexcept(
             stl_interfaces::make_reverse_iterator(std::declval<D &>().begin())))
         {
@@ -460,7 +464,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             typename InputIterator,
             typename D = Derived,
             typename Enable =
-                std::enable_if_t<detail::in_iter<InputIterator>::value>>
+                std::enable_if_t<v1_dtl::in_iter<InputIterator>::value>>
         constexpr auto assign(InputIterator first, InputIterator last) noexcept(
             noexcept(std::declval<D &>().insert(
                 std::declval<D &>().begin(), first, last)))
@@ -532,7 +536,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto swap(
         ContainerInterface & lhs,
         ContainerInterface & rhs) noexcept(noexcept(lhs.swap(rhs)))
-        -> decltype(detail::derived_container(lhs), lhs.swap(rhs))
+        -> decltype(v1_dtl::derived_container(lhs), lhs.swap(rhs))
     {
         return lhs.swap(rhs);
     }
@@ -543,7 +547,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator!=(
         ContainerInterface const & lhs,
         ContainerInterface const & rhs) noexcept(noexcept(lhs == rhs))
-        -> decltype(detail::derived_container(lhs), lhs == rhs)
+        -> decltype(v1_dtl::derived_container(lhs), lhs == rhs)
     {
         return !(lhs == rhs);
     }
@@ -554,7 +558,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator<=(
         ContainerInterface const & lhs,
         ContainerInterface const & rhs) noexcept(noexcept(lhs < rhs))
-        -> decltype(detail::derived_container(lhs), lhs < rhs)
+        -> decltype(v1_dtl::derived_container(lhs), lhs < rhs)
     {
         return !(rhs < lhs);
     }
@@ -565,7 +569,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator>(
         ContainerInterface const & lhs,
         ContainerInterface const & rhs) noexcept(noexcept(lhs < rhs))
-        -> decltype(detail::derived_container(lhs), lhs < rhs)
+        -> decltype(v1_dtl::derived_container(lhs), lhs < rhs)
     {
         return rhs < lhs;
     }
@@ -576,7 +580,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     constexpr auto operator>=(
         ContainerInterface const & lhs,
         ContainerInterface const & rhs) noexcept(noexcept(lhs < rhs))
-        -> decltype(detail::derived_container(lhs), lhs < rhs)
+        -> decltype(v1_dtl::derived_container(lhs), lhs < rhs)
     {
         return !(lhs < rhs);
     }
@@ -774,10 +778,10 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       constexpr auto insert(Derived::const_iterator position, Derived::size_type n,
                             const Derived::value_type& x)
         requires std::forward_range<Derived> && requires {
-          derived().insert(position, v1::detail::make_n_iter(x, n),
-                           v1::detail::make_n_iter_end(x, n)); } {
-            derived().insert(position,  v1::detail::make_n_iter(x, n),
-                             v1::detail::make_n_iter_end(x, n));
+          derived().insert(position, detail::make_n_iter(x, n),
+                           detail::make_n_iter_end(x, n)); } {
+            derived().insert(position,  detail::make_n_iter(x, n),
+                             detail::make_n_iter_end(x, n));
           }
       constexpr auto insert(Derived::const_iterator position,
                             std::initializer_list<Derived::value_type> il)
@@ -804,12 +808,12 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           requires std::forward_range<Derived> && requires {
             derived().clear();
             derived().insert(std::ranges::begin(derived()),
-                             v1::detail::make_n_iter(x, n),
-                             v1::detail::make_n_iter_end(x, n)); } {
+                             detail::make_n_iter(x, n),
+                             detail::make_n_iter_end(x, n)); } {
               derived().clear();
               derived().insert(std::ranges::begin(derived()),
-                               v1::detail::make_n_iter(x, n),
-                               v1::detail::make_n_iter_end(x, n));
+                               detail::make_n_iter(x, n),
+                               detail::make_n_iter_end(x, n));
             }
       constexpr void assign(std::initializer_list<Derived::value_type> il)
           requires std::forward_range<Derived> && requires {

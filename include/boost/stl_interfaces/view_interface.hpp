@@ -27,7 +27,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         >
     struct view_interface;
 
-    namespace detail {
+    namespace v1_dtl {
         template<typename Derived, bool Contiguous>
         void derived_view(view_interface<Derived, Contiguous> const &);
     }
@@ -146,8 +146,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         template<
             typename D = Derived,
             typename Enable = std::enable_if_t<
-                detail::decrementable_sentinel<D>::value &&
-                detail::common_range<D>::value>>
+                v1_dtl::decrementable_sentinel<D>::value &&
+                v1_dtl::common_range<D>::value>>
         constexpr auto
         back() noexcept(noexcept(*std::prev(std::declval<D &>().end())))
             -> decltype(*std::prev(std::declval<D &>().end()))
@@ -157,8 +157,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         template<
             typename D = Derived,
             typename Enable = std::enable_if_t<
-                detail::decrementable_sentinel<D>::value &&
-                detail::common_range<D>::value>>
+                v1_dtl::decrementable_sentinel<D>::value &&
+                v1_dtl::common_range<D>::value>>
         constexpr auto back() const
             noexcept(noexcept(*std::prev(std::declval<D const &>().end())))
                 -> decltype(*std::prev(std::declval<D const &>().end()))
@@ -167,14 +167,14 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
 
         template<typename D = Derived>
-        constexpr auto operator[](detail::range_difference_t<D> n) noexcept(
+        constexpr auto operator[](v1_dtl::range_difference_t<D> n) noexcept(
             noexcept(std::declval<D &>().begin()[n]))
             -> decltype(std::declval<D &>().begin()[n])
         {
             return derived().begin()[n];
         }
         template<typename D = Derived>
-        constexpr auto operator[](detail::range_difference_t<D> n) const
+        constexpr auto operator[](v1_dtl::range_difference_t<D> n) const
             noexcept(noexcept(std::declval<D const &>().begin()[n]))
                 -> decltype(std::declval<D const &>().begin()[n])
         {
@@ -186,7 +186,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         `view_interface`.  */
     template<typename ViewInterface>
     constexpr auto operator!=(ViewInterface lhs, ViewInterface rhs) noexcept(
-        noexcept(lhs == rhs)) -> decltype(detail::derived_view(lhs), lhs == rhs)
+        noexcept(lhs == rhs)) -> decltype(v1_dtl::derived_view(lhs), lhs == rhs)
     {
         return !(lhs == rhs);
     }
