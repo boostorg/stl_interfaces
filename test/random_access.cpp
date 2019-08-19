@@ -143,7 +143,6 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int const *,
     std::ptrdiff_t)
 
-// TODO: Call ranges algorithms with this.
 struct zip_iter : boost::stl_interfaces::proxy_iterator_interface<
                       zip_iter,
                       std::random_access_iterator_tag,

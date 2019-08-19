@@ -127,35 +127,47 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int const *,
     std::ptrdiff_t)
 
-#if 0 // TODO: Call ranges algorithms with this.
-struct basic_proxy_forward_iter : bsi::iterator_interface<
+struct basic_proxy_forward_iter : bsi::proxy_iterator_interface<
                                       basic_proxy_forward_iter,
                                       std::forward_iterator_tag,
-                                      int,
                                       int>
 {
     basic_proxy_forward_iter() : it_(nullptr) {}
     basic_proxy_forward_iter(int * it) : it_(it) {}
 
     int operator*() const { return *it_; }
-    basic_proxy_forward_iter & operator++() { ++it_; }
+    basic_proxy_forward_iter & operator++()
+    {
+        ++it_;
+        return *this;
+    }
     friend bool operator==(
         basic_proxy_forward_iter lhs, basic_proxy_forward_iter rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = bsi::iterator_interface<
+    using base_type = bsi::proxy_iterator_interface<
         basic_proxy_forward_iter,
         std::forward_iterator_tag,
-        int,
         int>;
     using base_type::operator++;
 
 private:
     int * it_;
 };
-#endif
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    basic_proxy_forward_iter, bsi::ranges::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_proxy_forward_iter,
+    std::forward_iterator_tag,
+    std::forward_iterator_tag,
+    int,
+    int,
+    boost::stl_interfaces::proxy_arrow_result<int>,
+    std::ptrdiff_t)
+
 
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 

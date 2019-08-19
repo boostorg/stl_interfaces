@@ -37,8 +37,9 @@ private:
 
 using output = basic_output_iter;
 
-// TODO
-// static_assert(std::output_iterator<output, int>, "");
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts)
+static_assert(std::output_iterator<output, int>, "");
+#endif
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     output,
     std::output_iterator_tag,
@@ -85,8 +86,9 @@ private:
 
 using back_insert = back_insert_iter<std::vector<int>>;
 
-// TODO
-// static_assert(std::output_iterator<back_insert, int>, "");
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts)
+static_assert(std::output_iterator<back_insert, int>, "");
+#endif
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     back_insert,
     std::output_iterator_tag,

@@ -72,9 +72,8 @@ private:
     int * it_;
 };
 
-// TODO: Broken.
-// BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-//     basic_adapted_random_access_iter, bsi::ranges::random_access_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    basic_adapted_random_access_iter, bsi::ranges::random_access_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_adapted_random_access_iter,
     std::random_access_iterator_tag,
@@ -144,7 +143,6 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int const *,
     std::ptrdiff_t)
 
-// TODO: Call ranges algorithms with this.
 struct zip_iter : bsi::proxy_iterator_interface<
                       zip_iter,
                       std::random_access_iterator_tag,
@@ -488,7 +486,6 @@ TEST(random_access, basic_adapted_std_copy)
         EXPECT_EQ(iota_ints, ints);
     }
 
-#if 0 // TODO: Broken.
     {
         std::array<int, 10> iota_ints;
         basic_adapted_random_access_iter first(iota_ints.data());
@@ -501,7 +498,6 @@ TEST(random_access, basic_adapted_std_copy)
         std::sort(first, last);
         EXPECT_EQ(iota_ints, ints);
     }
-#endif
 }
 
 TEST(random_access, mutable_to_const_conversions)

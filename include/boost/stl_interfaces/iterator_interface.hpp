@@ -501,6 +501,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 namespace boost { namespace stl_interfaces { namespace v2 {
 
+    // This is only here to satisfy clag-format.
     namespace v2_dtl {
     }
 
@@ -535,7 +536,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       using pointer = detail::pointer_t<Pointer, iterator_concept>;
       using difference_type = DifferenceType;
 
-      // TODO: Require a return type of reference here?
       constexpr decltype(auto) operator*()
         requires requires { *access::base(derived()); } {
           return *access::base(derived());
@@ -546,26 +546,26 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
 
       constexpr auto operator->()
-        requires requires { detail::make_pointer<pointer>(*derived()); } {
+        requires requires { *derived(); } {
           return detail::make_pointer<pointer>(*derived());
         }
       constexpr auto operator->() const
-        requires requires { detail::make_pointer<pointer>(*derived()); } {
+        requires requires { *derived(); } {
           return detail::make_pointer<pointer>(*derived());
         }
 
       constexpr decltype(auto) operator[](difference_type n) const
         requires requires { derived() += n; } {
         Derived retval = derived();
-        retval += i;
+        retval += n;
         return *retval;
       }
 
-      // TODO: Require a return type of Derived & here (and below)?
       constexpr decltype(auto) operator++()
         requires requires { ++access::base(derived()); } &&
           !requires { derived() += difference_type(1); } {
-            return ++access::base(derived());
+            ++access::base(derived());
+            return derived();
           }
       constexpr decltype(auto) operator++()
         requires requires { derived() += difference_type(1); } {
@@ -578,21 +578,23 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       }
       constexpr decltype(auto) operator+=(difference_type n)
         requires requires { access::base(derived()) += n; } {
-          return access::base(derived()) += n;
+          access::base(derived()) += n;
+          return derived();
         }
       friend constexpr auto operator+(Derived it, difference_type n)
         requires requires { it += n; } {
           return it += n;
         }
       friend constexpr auto operator+(difference_type n, Derived it)
-        requires requires { it + n; } {
-          return it + n;
+        requires requires { it += n; } {
+          return it ++ n;
         }
 
       constexpr decltype(auto) operator--()
         requires requires { --access::base(derived()); } &&
           !requires { derived() += difference_type(1); } {
-          return --access::base(derived());
+          --access::base(derived());
+          return derived();
         }
       constexpr decltype(auto) operator--()
         requires requires { derived() += -difference_type(1); } {
@@ -618,20 +620,25 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
       friend constexpr std::strong_equality operator<=>(Derived lhs, Derived rhs)
         requires requires { access::base(lhs) == access::base(rhs); } &&
+          !requires { access::base(lhs) <=> access::base(rhs); } &&
           !requires { lhs - rhs; } {
-            return access::base(lhs) == access::base(rhs);
+            return access::base(lhs) == access::base(rhs) ?
+                std::strong_equality::equal : std::strong_equality::unequal;
           }
-      friend constexpr auto operator<=>(Derived lhs, Derived rhs)
-        requires requires {
-          access::base(lhs) == access::base(rhs);
-          access::base(lhs) <=> access::base(rhs);
-        } && !requires { lhs - rhs; } {
-          return access::base(lhs) <=> access::base(rhs);
-        }
       friend constexpr std::strong_ordering operator<=>(Derived lhs, Derived rhs)
-          requires requires { lhs - rhs; } {
-          return (lhs - rhs) <=> 0;
-        }
+        requires requires { access::base(lhs) <=> access::base(rhs); } ||
+          requires { lhs - rhs; } {
+            if constexpr (requires { access::base(lhs) <=> access::base(rhs); }) {
+              return access::base(lhs) <=> access::base(rhs);
+            } else {
+              auto delta = lhs - rhs;
+              if (delta < 0)
+                  return std::strong_ordering::less;
+              if (0 < delta)
+                  return std::strong_ordering::greater;
+              return  std::strong_ordering::equal;
+            }
+          }
     };
 
 #elif 201703L <= __cplusplus && __has_include(<stl2/ranges.hpp>) && \
@@ -644,23 +651,21 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         concept bool base_incr =
             requires (Derived & d) { ++access::base(d); };
 
-//       TODO: Needed?
-//       template<typename Derived>
-//       concept bool make_ptr = requires (Derived & d) {
-//           detail::make_pointer<typename Derived::pointer>(*d); };
-
         template<typename Derived>
         concept bool base_deref =
             requires (Derived & d) { *access::base(d); };
 
         template<typename Derived>
+        concept bool deref = requires (Derived & d) { *d; };
+
+        template<typename Derived>
         concept bool plus_eq =
-            requires (Derived & d) { d += typename Derived::difference_type(0); };
+            requires (Derived & d) { d += typename Derived::difference_type(1); };
 
         template<typename Derived>
         concept bool base_plus_eq =
             requires (Derived & d) {
-                access::base(d) += typename Derived::difference_type(0); };
+                access::base(d) += typename Derived::difference_type(1); };
 
         template<typename Derived>
         concept bool incr = requires (Derived & d) { ++d; };
@@ -715,7 +720,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       using pointer = detail::pointer_t<Pointer, iterator_concept>;
       using difference_type = DifferenceType;
 
-      // TODO: Require a return type of reference here?
       constexpr decltype(auto) operator*()
         requires v1_dt2::base_deref<Derived> {
           return *access::base(derived());
@@ -726,11 +730,11 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
 
       constexpr auto operator->()
-        /* TODO: Needed? requires v1_dt2::make_ptr<Derived> */ {
+        requires v1_dt2::deref<Derived> {
           return detail::make_pointer<pointer>(*derived());
         }
       constexpr auto operator->() const
-        /* TODO: Needed? requires v1_dt2::make_ptr<const Derived> */ {
+        requires v1_dt2::deref<Derived> {
           return detail::make_pointer<pointer>(*derived());
         }
 
@@ -741,10 +745,10 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return *retval;
         }
 
-      // TODO: Require a return type of Derived & here (and below)?
       constexpr decltype(auto) operator++()
         requires v1_dt2::base_incr<Derived> && !v1_dt2::plus_eq<Derived> {
-          return ++access::base(derived());
+          ++access::base(derived());
+          return derived();
         }
       constexpr decltype(auto) operator++()
         requires v1_dt2::plus_eq<Derived> {
@@ -757,7 +761,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       }
       constexpr decltype(auto) operator+=(difference_type n)
         requires v1_dt2::base_plus_eq<Derived> {
-          return access::base(derived()) += n;
+          access::base(derived()) += n;
+          return derived();
         }
       friend constexpr auto operator+(Derived it, difference_type n)
         requires v1_dt2::plus_eq<Derived> {
@@ -770,7 +775,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
       constexpr decltype(auto) operator--()
         requires v1_dt2::base_decr<Derived> && !v1_dt2::plus_eq<Derived> {
-          return --access::base(derived());
+          --access::base(derived());
+          return derived();
         }
       constexpr decltype(auto) operator--()
         requires v1_dt2::plus_eq<Derived> {
@@ -797,6 +803,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 #if 201711L <= __cpp_lib_three_way_comparison
       friend constexpr std::strong_equality operator<=>(Derived lhs, Derived rhs)
         requires requires { access::base(lhs) == access::base(rhs); } &&
+          !requires { access::base(lhs) == access::base(rhs); } &&
           !requires { lhs - rhs; } {
             return access::base(lhs) == access::base(rhs) ?
                 std::strong_equality::equal : std::strong_equality::unequal;

@@ -174,9 +174,6 @@ std::array<std::pair<int, int>, 10> pairs = {{
 }};
 
 
-// TODO: Call std::ranges::copy below too.
-
-
 TEST(input, basic_std_copy)
 {
     basic_input_iter first(ints.data());
