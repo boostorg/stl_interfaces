@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+project(stl_interfaces)
+
 ################################################## 
 # C++ standard version selection
 ################################################## 
-set(CXX_STD 14 CACHE INT "Set to X to enable C++X builds.")
+set(CXX_STD 14 CACHE STRING "Set to X to enable C++X builds.")
 message("-- Using -std=c++${CXX_STD}")
 
 
@@ -52,7 +54,6 @@ endif ()
 set(boost_components)
 include(dependencies)
 
-
 ##################################################
 # stl_interfaces library
 ##################################################
@@ -60,9 +61,15 @@ add_library(stl_interfaces INTERFACE)
 
 target_include_directories(stl_interfaces INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(stl_interfaces INTERFACE boost)
-if (link_flags)
+if (link_flags OR HAVE_CMCSTL2)
     target_link_libraries(stl_interfaces INTERFACE ${link_flags})
     target_compile_options(stl_interfaces INTERFACE ${compile_flags})
+    if (HAVE_CMCSTL2)
+        target_link_libraries(stl_interfaces INTERFACE stl2)
+        if (CXX_STD STREQUAL "14")
+            message("It looks like you're trying to use cmcstl2, but CXX_STD=14.  Set CXX_STD=17 for a great good.")
+        endif()
+    endif()
 endif ()
 if (NOT MSVC)
     target_compile_options(stl_interfaces INTERFACE -Wall)
