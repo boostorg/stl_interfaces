@@ -47,7 +47,7 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    basic_forward_iter, std::forward_iterator)
+    basic_forward_iter, bsi::ranges::forward_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_forward_iter,
     std::forward_iterator_tag,
@@ -106,7 +106,7 @@ static_assert(ill_formed<decrementable_t, forward>::value, "");
 static_assert(ill_formed<decrementable_t, const_forward>::value, "");
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    forward, std::forward_iterator)
+    forward, bsi::ranges::forward_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     forward,
     std::forward_iterator_tag,
@@ -117,7 +117,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    const_forward, std::forward_iterator)
+    const_forward, bsi::ranges::forward_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_forward,
     std::forward_iterator_tag,

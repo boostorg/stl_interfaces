@@ -46,8 +46,6 @@ namespace boost { namespace stl_interfaces { namespace detail {
         noexcept(n_iter<T, SizeType>(x, n)))
     {
         using result_type = n_iter<T, SizeType>;
-        BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-            result_type, std::random_access_iterator)
         return result_type(x, SizeType(0));
     }
     template<typename T, typename SizeType>

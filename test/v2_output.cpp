@@ -37,7 +37,7 @@ private:
 
 using output = basic_output_iter;
 
-BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(output, std::output_iterator)
+static_assert(bsi::ranges::output_iterator<output, int>);
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     output,
     std::output_iterator_tag,
@@ -84,7 +84,7 @@ private:
 
 using back_insert = back_insert_iter<std::vector<int>>;
 
-BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(back_insert, std::output_iterator)
+static_assert(bsi::ranges::output_iterator<back_insert, int>);
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     back_insert,
     std::output_iterator_tag,

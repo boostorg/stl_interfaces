@@ -42,7 +42,7 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    basic_input_iter, std::input_iterator)
+    basic_input_iter, bsi::ranges::input_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_input_iter,
     std::input_iterator_tag,
@@ -93,7 +93,7 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    input_iter<int>, std::input_iterator)
+    input_iter<int>, bsi::ranges::input_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     input_iter<int>,
     std::input_iterator_tag,
@@ -150,7 +150,7 @@ private:
 
 using int_pair = std::pair<int, int>;
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    proxy_input_iter<int_pair>, std::input_iterator)
+    proxy_input_iter<int_pair>, bsi::ranges::input_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     proxy_input_iter<int_pair>,
     std::input_iterator_tag,
@@ -280,134 +280,5 @@ TEST(input, const_std_copy)
             *out++ = first->first;
         }
         EXPECT_EQ(firsts_copy, ints);
-    }
-}
-
-
-////////////////////
-// view_interface //
-////////////////////
-#include "view_tests.hpp"
-
-template<typename T>
-using data_t = decltype(std::declval<T>().data());
-
-static_assert(
-    ill_formed<
-        data_t,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        data_t,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-template<typename T>
-using size_t_ = decltype(std::declval<T>().size());
-
-static_assert(
-    ill_formed<
-        size_t_,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        size_t_,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-template<typename T>
-using back_t_ = decltype(std::declval<T>().back());
-
-static_assert(
-    ill_formed<
-        back_t_,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        back_t_,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-template<typename T>
-using index_operator_t = decltype(std::declval<T>()[0]);
-
-static_assert(
-    ill_formed<
-        index_operator_t,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        index_operator_t,
-        subrange<
-            basic_input_iter,
-            basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-TEST(input, basic_subrange)
-{
-    basic_input_iter first(ints.data());
-    basic_input_iter last(ints.data() + ints.size());
-
-    auto r = range<boost::stl_interfaces::v1::discontiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::v1::discontiguous>(first, first);
-
-    // range begin/end
-    {
-        std::array<int, 10> ints_copy;
-        std::copy(r.begin(), r.end(), ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-
-        EXPECT_EQ(empty.begin(), empty.end());
-    }
-
-    // empty/op bool
-    {
-        EXPECT_FALSE(r.empty());
-        EXPECT_TRUE(r);
-
-        EXPECT_TRUE(empty.empty());
-        EXPECT_FALSE(empty);
-
-        auto const cr = r;
-        EXPECT_FALSE(cr.empty());
-        EXPECT_TRUE(cr);
-
-        auto const cempty = empty;
-        EXPECT_TRUE(cempty.empty());
-        EXPECT_FALSE(cempty);
-    }
-
-    // front/back
-    {
-        EXPECT_EQ(r.front(), 0);
-
-        auto const cr = r;
-        EXPECT_EQ(cr.front(), 0);
     }
 }

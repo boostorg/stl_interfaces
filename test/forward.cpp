@@ -3,6 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+#define BOOST_STL_INTERFACES_DISABLE_CMCSTL2
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include "ill_formed.hpp"
@@ -103,8 +104,7 @@ using const_forward = forward_iter<int const>;
 static_assert(ill_formed<decrementable_t, forward>::value, "");
 static_assert(ill_formed<decrementable_t, const_forward>::value, "");
 
-BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    forward, std::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(forward, std::forward_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     forward,
     std::forward_iterator_tag,
@@ -114,8 +114,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
-BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    const_forward, std::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(const_forward, std::forward_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_forward,
     std::forward_iterator_tag,

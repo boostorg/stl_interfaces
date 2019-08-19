@@ -3,6 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+#define BOOST_STL_INTERFACES_DISABLE_CMCSTL2
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <gtest/gtest.h>
@@ -36,7 +37,8 @@ private:
 
 using output = basic_output_iter;
 
-BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(output, std::output_iterator)
+// TODO
+// static_assert(std::output_iterator<output, int>, "");
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     output,
     std::output_iterator_tag,
@@ -83,7 +85,8 @@ private:
 
 using back_insert = back_insert_iter<std::vector<int>>;
 
-BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(back_insert, std::output_iterator)
+// TODO
+// static_assert(std::output_iterator<back_insert, int>, "");
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     back_insert,
     std::output_iterator_tag,
