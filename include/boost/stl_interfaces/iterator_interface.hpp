@@ -542,11 +542,11 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       }
 
       // TODO: Require a return type of Derived & here (and below)?
-      // TODO: Are these two operator++()'s ambiguous (same with op-- below)?
       constexpr decltype(auto) operator++()
-        requires requires { ++v1::access::base(derived()); } {
-          return ++v1::access::base(derived());
-        }
+        requires requires { ++v1::access::base(derived()); } &&
+          !requires { derived() += difference_type(1); } {
+            return ++v1::access::base(derived());
+          }
       constexpr decltype(auto) operator++()
         requires requires { derived() += difference_type(1); } {
           return derived() += difference_type(1);
@@ -570,7 +570,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
 
       constexpr decltype(auto) operator--()
-        requires requires { --v1::access::base(derived()); } {
+        requires requires { --v1::access::base(derived()); } &&
+          !requires { derived() += difference_type(1); } {
           return --v1::access::base(derived());
         }
       constexpr decltype(auto) operator--()
