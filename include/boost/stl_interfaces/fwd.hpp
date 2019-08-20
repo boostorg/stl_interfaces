@@ -21,6 +21,12 @@
 #define BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR constexpr
 #endif
 
+#if defined(__GNUC__) && __GNUC__ < 9
+#define BOOST_STL_INTERFACES_CONCECPT concept bool
+#else
+#define BOOST_STL_INTERFACES_CONCEPT concept
+#endif
+
 #endif
 
 

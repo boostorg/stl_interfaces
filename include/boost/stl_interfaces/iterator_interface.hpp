@@ -648,48 +648,47 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         // These named concepts are used to work around
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82740
         template<typename Derived>
-        concept bool base_incr =
+        BOOST_STL_INTERFACES_CONCECPT base_incr =
             requires (Derived & d) { ++access::base(d); };
 
         template<typename Derived>
-        concept bool base_deref =
+        BOOST_STL_INTERFACES_CONCECPT base_deref =
             requires (Derived & d) { *access::base(d); };
 
         template<typename Derived>
-        concept bool deref = requires (Derived & d) { *d; };
+        BOOST_STL_INTERFACES_CONCECPT deref = requires (Derived & d) { *d; };
 
         template<typename Derived>
-        concept bool plus_eq =
-            requires (Derived & d) { d += typename Derived::difference_type(1); };
+        BOOST_STL_INTERFACES_CONCECPT plus_eq = requires (Derived & d) {
+            d += typename Derived::difference_type(1); };
 
         template<typename Derived>
-        concept bool base_plus_eq =
-            requires (Derived & d) {
-                access::base(d) += typename Derived::difference_type(1); };
+        BOOST_STL_INTERFACES_CONCECPT base_plus_eq = requires (Derived & d) {
+            access::base(d) += typename Derived::difference_type(1); };
 
         template<typename Derived>
-        concept bool incr = requires (Derived & d) { ++d; };
+        BOOST_STL_INTERFACES_CONCECPT incr = requires (Derived & d) { ++d; };
 
         template<typename Derived>
-        concept bool base_decr =
+        BOOST_STL_INTERFACES_CONCECPT base_decr =
             requires (Derived & d) { --access::base(d); };
 
         template<typename Derived>
-        concept bool decr = requires (Derived & d) { --d; };
+        BOOST_STL_INTERFACES_CONCECPT decr = requires (Derived & d) { --d; };
 
         template<typename Derived>
-        concept bool base_sub =
+        BOOST_STL_INTERFACES_CONCECPT base_sub =
             requires (Derived & d) { access::base(d) - access::base(d); };
 
         template<typename Derived>
-        concept bool base_eq =
+        BOOST_STL_INTERFACES_CONCECPT base_eq =
             requires (Derived & d) { access::base(d) == access::base(d); };
 
         template<typename Derived>
-        concept bool sub = requires (Derived & d) { d - d; };
+        BOOST_STL_INTERFACES_CONCECPT sub = requires (Derived & d) { d - d; };
 
         template<typename Derived>
-        concept bool eq = requires (Derived & d) { d == d; };
+        BOOST_STL_INTERFACES_CONCECPT eq = requires (Derived & d) { d == d; };
     }
 
     /** A CRTP template that one may derive from to make defining iterators
