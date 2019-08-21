@@ -1128,12 +1128,14 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       constexpr auto crbegin() const
         requires ranges::bidirectional_range<const Derived> &&
           ranges::common_range<const Derived> {
-            return ranges::rbegin(derived());
+            return stl_interfaces::reverse_iterator(ranges::iterator_t<const Derived>(
+              ranges::end(mutable_derived())));
           }
       constexpr auto crend() const
         requires ranges::bidirectional_range<const Derived> &&
           ranges::common_range<const Derived> {
-            return ranges::rend(derived());
+            return stl_interfaces::reverse_iterator(ranges::iterator_t<const Derived>(
+              ranges::begin(mutable_derived())));
           }
 
       template<ranges::forward_range Container = Derived>

@@ -343,13 +343,10 @@ static_assert(
         writable_iter_t,
         decltype(std::declval<vec_type &>().crbegin())>::value,
     "");
-#if 0 // TODO: Broken.  This somehow picks up the free operator!=() intended
-      // for use with v1::container_interface.
 static_assert(
     ill_formed<writable_iter_t, decltype(std::declval<vec_type &>().crend())>::
         value,
     "");
-#endif
 
 TEST(static_vec, iterators)
 {
@@ -392,9 +389,7 @@ TEST(static_vec, iterators)
         EXPECT_TRUE(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
 
         EXPECT_TRUE(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
-#if 0 // TODO: Broken.
         EXPECT_TRUE(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
-#endif
 
         *v.begin() = 8;
         *v.rbegin() = 9;
@@ -444,9 +439,7 @@ TEST(static_vec, iterators)
         EXPECT_TRUE(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
 
         EXPECT_TRUE(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
-#if 0 // TODO: Broken.
         EXPECT_TRUE(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
-#endif
     }
 }
 
