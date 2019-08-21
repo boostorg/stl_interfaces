@@ -22,7 +22,7 @@
 #endif
 
 #if defined(__GNUC__) && __GNUC__ < 9
-#define BOOST_STL_INTERFACES_CONCECPT concept bool
+#define BOOST_STL_INTERFACES_CONCEPT concept bool
 #else
 #define BOOST_STL_INTERFACES_CONCEPT concept
 #endif

@@ -12,6 +12,20 @@
 #include <cassert>
 
 
+// There's a test that uses this example header; this controls whether the
+// C++14 version (v1::) of container_interface gets used, or the C++20 version
+// (v2::).
+#if defined(USE_V2)
+template<typename Derived, bool Contiguous>
+using container_interface =
+    boost::stl_interfaces::v2::container_interface<Derived>;
+#else
+template<typename Derived, bool Contiguous>
+using container_interface =
+    boost::stl_interfaces::v1::container_interface<Derived, Contiguous>;
+#endif
+
+
 //[ static_vector_defn
 // The sections of member functions below are comemnted as they are in the
 // standard for std::vector.  Each section has two numbers: the number of
@@ -22,7 +36,7 @@
 // We're passing boost::stl_interfaces::contiguous here, so that
 // container_interface knows that it should provide data().
 template<typename T, std::size_t N>
-struct static_vector : boost::stl_interfaces::container_interface<
+struct static_vector : container_interface<
                            static_vector<T, N>,
                            boost::stl_interfaces::contiguous>
 {
@@ -233,7 +247,7 @@ struct static_vector : boost::stl_interfaces::container_interface<
     // since many of those overloads are implemented in terms of a
     // user-defined function of the same name, we need to add quite a few
     // using declarations here.
-    using base_type = boost::stl_interfaces::container_interface<
+    using base_type = container_interface<
         static_vector<T, N>,
         boost::stl_interfaces::contiguous>;
     using base_type::begin;
