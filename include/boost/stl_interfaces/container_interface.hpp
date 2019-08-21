@@ -979,15 +979,15 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         return ranges::begin(derived()) == ranges::end(derived());
       }
 
-#if 0 // TODO: Needs tests (and so does v1::container_interface's data().
+#if 0 // TODO: Needs tests.
       constexpr auto data() requires ranges::contiguous_iterator<ranges::iterator_t<Derived>> {
         return &*ranges::begin(derived());
       }
-      constexpr auto data() const
-        requires ranges::range<const Derived> &&
-          ranges::contiguous_iterator<ranges::iterator_t<const Derived>> {
-            return &*ranges::begin(derived());
-          }
+      template<ranges::range Container = const Derived>
+        constexpr auto data() const
+          requires ranges::contiguous_iterator<ranges::iterator_t<Container>> {
+              return &*ranges::begin(derived());
+            }
 #endif
 
       constexpr auto size() requires v2_dtl::szd_sent_fwd_rng<Derived> {
@@ -1214,6 +1214,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         requires v2_dtl::swap<Derived> {
           return lhs.swap(rhs);
         }
+
+      // TODO: We can always provide op== and op<!
 
 #if 201711L <= __cpp_lib_three_way_comparison
       friend constexpr std::strong_ordering operator<=>(const Derived& lhs,
