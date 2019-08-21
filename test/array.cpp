@@ -55,22 +55,6 @@ struct array
     using base_type::begin;
     using base_type::end;
 
-    friend bool operator==(array const & lhs, array const & rhs)
-    {
-        return lhs.size() == rhs.size() &&
-               std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-    }
-    friend bool operator<(array const & lhs, array const & rhs)
-    {
-        auto const iters =
-            std::mismatch(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-        if (iters.second == rhs.end())
-            return false;
-        if (iters.first == lhs.end())
-            return true;
-        return *iters.first < *iters.second;
-    }
-
     T elements_[N];
 };
 

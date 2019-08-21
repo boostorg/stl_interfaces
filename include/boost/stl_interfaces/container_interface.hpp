@@ -541,6 +541,23 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         return lhs.swap(rhs);
     }
 
+    /** Implementation of `operator==()` for all containers derived from
+        `container_interface`.  */
+    template<typename ContainerInterface>
+    constexpr auto
+    operator==(ContainerInterface const & lhs, ContainerInterface const & rhs) noexcept(
+        noexcept(lhs.size() == rhs.size()) &&
+        noexcept(*lhs.begin() == *rhs.begin()))
+        -> decltype(
+            v1_dtl::derived_container(lhs),
+            lhs.size() == rhs.size(),
+            *lhs.begin() == *rhs.begin(),
+            true)
+    {
+        return lhs.size() == rhs.size() &&
+               std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+
     /** Implementation of `operator!=()` for all containers derived from
         `container_interface`.  */
     template<typename ContainerInterface>
@@ -550,6 +567,29 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         -> decltype(v1_dtl::derived_container(lhs), lhs == rhs)
     {
         return !(lhs == rhs);
+    }
+
+    /** Implementation of `operator<()` for all containers derived from
+        `container_interface`.  */
+    template<typename ContainerInterface>
+    constexpr auto operator<(
+        ContainerInterface const & lhs,
+        ContainerInterface const &
+            rhs) noexcept(noexcept(*lhs.begin() < *rhs.begin()))
+        -> decltype(
+            v1_dtl::derived_container(lhs), *lhs.begin() < *rhs.begin(), true)
+    {
+        auto it1 = lhs.begin();
+        auto const last1 = lhs.end();
+        auto it2 = rhs.begin();
+        auto const last2 = rhs.end();
+        for (; it1 != last1 && it2 != last2; ++it1, ++it2) {
+            if (*it1 < *it2)
+                return true;
+            if (*it2 < *it1)
+                return false;
+        }
+        return it1 == last1 && it2 != last2;
     }
 
     /** Implementation of `operator<=()` for all containers derived from
@@ -917,19 +957,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
                                         typename Derived::size_type>;
 
         template<typename Derived>
-        BOOST_STL_INTERFACES_CONCEPT insert_n_iter =
-            requires (Derived & d,
-                      ranges::iterator_t<const Derived> pos,
-                      /*n_iter_t<Derived>*/ int * it) {
-              d.insert(pos, it, it);
-            };
-
-        template<typename Derived>
         BOOST_STL_INTERFACES_CONCEPT swap =
             requires (Derived & d) { d.swap(d); };
-
-        template<typename Derived>
-        BOOST_STL_INTERFACES_CONCEPT lt_ = requires (Derived & d) { d < d; };
 
         template<typename Derived>
         BOOST_STL_INTERFACES_CONCEPT szd_sent_fwd_rng =
@@ -941,10 +970,24 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         BOOST_STL_INTERFACES_CONCEPT erase_insert =
             v2_dtl::erase_<Derived> && v2_dtl::insert_<Derived, Iter>;
 
-        // This need to become an exposition-only snake-case template alias
+        // This needs to become an exposition-only snake-case template alias
         // when standardized.
         template<typename Derived>
         using container_size_t = typename Derived::size_type;
+
+#if 201711L <= __cpp_lib_three_way_comparison
+        // This *may* need to become an exposition-only snake-case template
+        // when standardized.
+        struct three_way {
+          template<class T, class U>
+            requires three_way_comparable_with<T, U>// || BUILTIN-PTR-CMP(T, <=>, U)
+          constexpr bool operator()(T&& t, U&& u) const {
+            return std::forward<T>(t) <=> std::forward<U>(u);
+          }
+
+          using is_transparent = std::true_type; // = unspecified;
+        };
+#endif
     }
 
     /** A CRTP template that one may derive from to make it easier to define
@@ -970,7 +1013,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
 
     public:
-        ~container_interface() { clear_impl(derived()); }
+      ~container_interface() { clear_impl(derived()); }
 
       constexpr bool empty() requires ranges::forward_range<Derived> {
         return ranges::begin(derived()) == ranges::end(derived());
@@ -1152,22 +1195,22 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       }
 
       template<ranges::forward_range Container = Derived>
-      constexpr auto insert(ranges::iterator_t<const Container> position,
-                            v2_dtl::container_size_t<Container> n,
-                            const ranges::ext::range_value_t<Container>& x)
+        constexpr auto insert(ranges::iterator_t<const Container> position,
+                              v2_dtl::container_size_t<Container> n,
+                              const ranges::ext::range_value_t<Container>& x)
 #if 0 // TODO: This ICEs GCC 8 and 9.
           requires v2_dtl::insert_<Container, v2_dtl::n_iter_t<Container>>
 #endif
-        {
-          return derived().insert(position, detail::make_n_iter(x, n),
-                                  detail::make_n_iter_end(x, n));
-        }
+          {
+            return derived().insert(position, detail::make_n_iter(x, n),
+                                    detail::make_n_iter_end(x, n));
+          }
       template<ranges::forward_range Container = Derived>
-      constexpr auto insert(ranges::iterator_t<const Container> position,
-                            std::initializer_list<ranges::ext::range_value_t<Container>> il)
-        requires v2_dtl::insert_<Container, decltype(il.begin())> {
-          return derived().insert(position, il.begin(), il.end());
-        }
+        constexpr auto insert(ranges::iterator_t<const Container> position,
+                              std::initializer_list<ranges::ext::range_value_t<Container>> il)
+          requires v2_dtl::insert_<Container, decltype(il.begin())> {
+            return derived().insert(position, il.begin(), il.end());
+          }
 
       template<ranges::forward_range Container = Derived>
         requires v2_dtl::erase_<Container>
@@ -1176,11 +1219,11 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       }
 
       template<ranges::input_iterator Iter, ranges::forward_range Container = Derived>
-      constexpr void assign(Iter first, Iter last)
-        requires v2_dtl::erase_insert<Container, Iter> {
-          derived().clear();
-          derived().insert(ranges::begin(derived()), first, last);
-        }
+        constexpr void assign(Iter first, Iter last)
+          requires v2_dtl::erase_insert<Container, Iter> {
+            derived().clear();
+            derived().insert(ranges::begin(derived()), first, last);
+          }
       template<ranges::forward_range Container = Derived>
         requires v2_dtl::erase_insert<Container, v2_dtl::n_iter_t<Container>>
           constexpr void assign(v2_dtl::container_size_t<Container> n,
@@ -1215,29 +1258,54 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return lhs.swap(rhs);
         }
 
-      // TODO: We can always provide op== and op<!
-
 #if 201711L <= __cpp_lib_three_way_comparison
+      friend constexpr bool operator==(const Derived& lhs, const Derived& rhs)
+        requires ranges::sized_range<const Derived> &&
+          ranges::indirect_relation<ranges::equal_to, ranges::iterator_t<const Derived>> {
+            return lhs.size() == rhs.size() && ranges::equal(lhs, rhs);
+          }
       friend constexpr std::strong_ordering operator<=>(const Derived& lhs,
-                                                        const Derived& rhs) {
+                                                        const Derived& rhs)
+        requires ranges::indirect_relation<v2_dtl::three_way, ranges::iterator_t<const Derived>> {
           return std::lexicographical_compare_three_way(lhs.begin(), lhs.end(),
                                                         rhs.begin(), rhs.end());
-      }
+        }
 #else
+      friend constexpr bool operator==(const Derived& lhs, const Derived& rhs)
+        requires ranges::sized_range<const Derived> &&
+          ranges::indirect_relation<ranges::equal_to, ranges::iterator_t<const Derived>> {
+            return lhs.size() == rhs.size() &&
+                   std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+          }
       friend constexpr bool operator!=(const Derived& lhs, const Derived& rhs)
-        requires v2_dtl::eq<const Derived> {
-          return !(lhs == rhs);
+        requires ranges::sized_range<const Derived> &&
+          ranges::indirect_relation<ranges::equal_to, ranges::iterator_t<const Derived>> {
+            return !(lhs == rhs);
+          }
+      friend constexpr bool operator<(const Derived& lhs, const Derived& rhs)
+        requires ranges::indirect_relation<ranges::less, ranges::iterator_t<const Derived>> {
+          auto it1 = lhs.begin();
+          auto const last1 = lhs.end();
+          auto it2 = rhs.begin();
+          auto const last2 = rhs.end();
+          for (; it1 != last1 && it2 != last2; ++it1, ++it2) {
+            if (*it1 < *it2)
+              return true;
+            if (*it2 < *it1)
+              return false;
+          }
+          return it1 == last1 && it2 != last2;
         }
       friend constexpr bool operator<=(const Derived& lhs, const Derived& rhs)
-        requires v2_dtl::lt_<const Derived> {
+        requires ranges::indirect_relation<ranges::less, ranges::iterator_t<const Derived>> {
           return !(rhs < lhs);
         }
       friend constexpr bool operator>(const Derived& lhs, const Derived& rhs)
-        requires v2_dtl::lt_<const Derived> {
+        requires ranges::indirect_relation<ranges::less, ranges::iterator_t<const Derived>> {
           return rhs < lhs;
         }
       friend constexpr bool operator>=(const Derived& lhs, const Derived& rhs)
-        requires v2_dtl::lt_<const Derived> {
+        requires ranges::indirect_relation<ranges::less, ranges::iterator_t<const Derived>> {
           return !(lhs < rhs);
         }
 #endif
