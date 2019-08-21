@@ -961,6 +961,10 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         BOOST_STL_INTERFACES_CONCEPT erase_insert =
             v2_dtl::erase_<Derived> && v2_dtl::insert_<Derived, Iter>;
 
+        template<typename Derived>
+        BOOST_STL_INTERFACES_CONCEPT contig_iter =
+          ranges::contiguous_iterator<ranges::iterator_t<Derived>>;
+
         // This needs to become an exposition-only snake-case template alias
         // when standardized.
         template<typename Derived>
@@ -1010,21 +1014,18 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         return ranges::begin(derived()) == ranges::end(derived());
       }
 
-#if 0 // TODO: Needs tests.
-      constexpr auto data() requires ranges::contiguous_iterator<ranges::iterator_t<Derived>> {
-        return &*ranges::begin(derived());
-      }
-      template<ranges::range Container = const Derived>
-        constexpr auto data() const
-          requires ranges::contiguous_iterator<ranges::iterator_t<Container>> {
-              return &*ranges::begin(derived());
-            }
-#endif
-
       constexpr auto size() const requires v2_dtl::szd_sent_fwd_rng<Derived> {
         return typename Derived::size_type(
           ranges::end(derived()) - ranges::begin(derived()));
       }
+
+      constexpr auto data() requires v2_dtl::contig_iter<Derived> {
+        return &*ranges::begin(derived());
+      }
+      constexpr auto data() const
+        requires ranges::range<const Derived> && v2_dtl::contig_iter<const Derived> {
+          return &*ranges::begin(derived());
+        }
 
       constexpr decltype(auto) front() requires ranges::forward_range<Derived> {
         BOOST_ASSERT(!empty());

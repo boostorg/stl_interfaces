@@ -710,11 +710,10 @@ TEST(static_vec, front_back)
 TEST(static_vec, data_index_at)
 {
     {
-        // TODO: Enable these tests, once v2::container_interface::data() is fixed.
         vec_type v = {3, 2, 1};
-//        EXPECT_EQ(v.data()[0], 3);
-//        EXPECT_EQ(v.data()[1], 2);
-//        EXPECT_EQ(v.data()[2], 1);
+        EXPECT_EQ(v.data()[0], 3);
+        EXPECT_EQ(v.data()[1], 2);
+        EXPECT_EQ(v.data()[2], 1);
         EXPECT_EQ(v[0], 3);
         EXPECT_EQ(v[1], 2);
         EXPECT_EQ(v[2], 1);
@@ -723,7 +722,7 @@ TEST(static_vec, data_index_at)
         EXPECT_NO_THROW(v.at(2));
         EXPECT_THROW(v.at(3), std::out_of_range);
 
-//        static_assert(std::is_same<decltype(v.data()), int *>::value, "");
+        static_assert(std::is_same<decltype(v.data()), int *>::value, "");
         static_assert(std::is_same<decltype(v[0]), int &>::value, "");
         static_assert(std::is_same<decltype(v.at(0)), int &>::value, "");
 
@@ -734,9 +733,9 @@ TEST(static_vec, data_index_at)
 
     {
         vec_type const v = {3, 2, 1};
-//        EXPECT_EQ(v.data()[0], 3);
-//        EXPECT_EQ(v.data()[1], 2);
-//        EXPECT_EQ(v.data()[2], 1);
+        EXPECT_EQ(v.data()[0], 3);
+        EXPECT_EQ(v.data()[1], 2);
+        EXPECT_EQ(v.data()[2], 1);
         EXPECT_EQ(v[0], 3);
         EXPECT_EQ(v[1], 2);
         EXPECT_EQ(v[2], 1);
@@ -745,7 +744,7 @@ TEST(static_vec, data_index_at)
         EXPECT_NO_THROW(v.at(2));
         EXPECT_THROW(v.at(3), std::out_of_range);
 
-//        static_assert(std::is_same<decltype(v.data()), int const *>::value, "");
+        static_assert(std::is_same<decltype(v.data()), int const *>::value, "");
         static_assert(std::is_same<decltype(v[0]), int const &>::value, "");
         static_assert(std::is_same<decltype(v.at(0)), int const &>::value, "");
     }
