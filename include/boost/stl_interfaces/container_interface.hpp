@@ -663,9 +663,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     public:
       ~container_interface() { clear_impl(derived()); }
 
-      constexpr bool empty() requires std::forward_range<Derived> {
-        return std::ranges::begin(derived()) == std::ranges::end(derived());
-      }
       constexpr bool empty() const requires std::forward_range<const Derived> {
         return std::ranges::begin(derived()) == std::ranges::end(derived());
       }
@@ -679,12 +676,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
             return std::to_address(std::ranges::begin(derived()));
           }
 
-      constexpr auto size() requires std::forward_range<Derived> &&
-        std::sized_sentinel_for<std::sentinel_t<Derived>, std::iterator_t<Derived>>
-        -> Derived::size_type {
-          return Derived::size_type(
-            std::ranges::end(derived()) - std::ranges::begin(derived()));
-        }
       constexpr auto size() const requires std::forward_range<const Derived> &&
         std::sized_sentinel_for<std::sentinel_t<const Derived>, std::iterator_t<const Derived>>
         -> Derived::size_type {
@@ -1015,9 +1006,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     public:
       ~container_interface() { clear_impl(derived()); }
 
-      constexpr bool empty() requires ranges::forward_range<Derived> {
-        return ranges::begin(derived()) == ranges::end(derived());
-      }
       constexpr bool empty() const requires ranges::forward_range<const Derived> {
         return ranges::begin(derived()) == ranges::end(derived());
       }
@@ -1033,10 +1021,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
             }
 #endif
 
-      constexpr auto size() requires v2_dtl::szd_sent_fwd_rng<Derived> {
-        return typename Derived::size_type(
-          ranges::end(derived()) - ranges::begin(derived()));
-      }
       constexpr auto size() const requires v2_dtl::szd_sent_fwd_rng<Derived> {
         return typename Derived::size_type(
           ranges::end(derived()) - ranges::begin(derived()));
