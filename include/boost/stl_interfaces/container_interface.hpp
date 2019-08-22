@@ -10,6 +10,7 @@
 
 #include <boost/assert.hpp>
 
+#include <algorithm>
 #include <stdexcept>
 
 
@@ -555,7 +556,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             true)
     {
         return lhs.size() == rhs.size() &&
-               std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+               std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     /** Implementation of `operator!=()` for all containers derived from
