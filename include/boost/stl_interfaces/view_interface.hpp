@@ -14,22 +14,28 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     /** A CRTP template that one may derive from to make it easier to define
         `std::ranges::view`-like types with a container-like interface.  This
         is a pre-C++20 version of C++20's `view_interface` (see
-        [view.interface] in the C++ standard). */
+        [view.interface] in the C++ standard).
+
+        The template parameter `D` for `view_interface` may be an incomplete
+        type.  Before any member of the resulting specialization of
+        `view_interface` other than special member functions is referenced,
+        `D` shall be complete, and model both
+        `std::derived_from<view_interface<D>>` and `std::view`. */
     template<
-        typename Derived,
+        typename D,
         bool Contiguous = discontiguous
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
         typename E = std::enable_if_t<
-            std::is_class<Derived>::value &&
-            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+            std::is_class<D>::value &&
+            std::is_same<D, std::remove_cv_t<D>>::value>
 #endif
         >
     struct view_interface;
 
     namespace v1_dtl {
-        template<typename Derived, bool Contiguous>
-        void derived_view(view_interface<Derived, Contiguous> const &);
+        template<typename D, bool Contiguous>
+        void derived_view(view_interface<D, Contiguous> const &);
     }
 
     template<
@@ -201,8 +207,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     /** A template alias for `std::view_interface`.  This only exists to make
         migration from Boost.STLInterfaces to C++20 easier; switch to the one
         in `std` as soon as you can. */
-    template<typename Derived, bool = v1::discontiguous>
-    using view_interface = std::view_interface<Derived>;
+    template<typename D, bool = v1::discontiguous>
+    using view_interface = std::view_interface<D>;
 
 }}}
 
