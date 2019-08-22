@@ -21,6 +21,12 @@ container requirements in the standard.  _IFaces_ provides another template
 called _cont_iface_ that reduces the implementation and testing burden
 dramatically.
 
+[note C++20 versions of _iter_iface_ and _cont_iface_ are provided (C++20
+provides `std::view_interface`).  These are constrained templates using C++20
+concepts.  These are in the `boost::stl_interfaces::v2` namespace, and are
+considered experimental, because at the time of this writing, no
+C++20-conforming compiler exists.]
+
 [heading A Quick Example]
 
 Here is an example of the iterator portion of the library.  Let's say that we
