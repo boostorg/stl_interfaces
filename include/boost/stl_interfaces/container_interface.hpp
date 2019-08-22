@@ -63,7 +63,22 @@ namespace boost { namespace stl_interfaces { namespace detail {
 namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** A CRTP template that one may derive from to make it easier to define
-        container types. */
+        container types.
+
+        The template parameter `Derived` for `container_interface` may be an
+        incomplete type. Before any member of the resulting specialization of
+        `container_interface` other than special member functions is
+        referenced, `Derived` shall be complete; shall model
+        `std::derived_from<container_interface<Derived>>`, `std::semiregular`,
+        and `std::forward_range`; and shall contain all the nested types
+        required in Table 72: Container requirements and, for those whose
+        iterator nested type models `std::bidirectinal_iterator`, those in
+        Table 73: Reversible container requirements.
+
+        For an object `d` of type `Derived`, a call to `std::ranges::begin(d)`
+        shall not mutate any data members of `d`, and `d`'s destructor shall
+        end the lifetimes of the objects in `[std::ranges::begin(d),
+        std::ranges::end(d))`. */
     template<
         typename Derived,
         bool Contiguous = discontiguous
@@ -640,7 +655,22 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 #if 201703L < __cplusplus && defined(__cpp_lib_concepts) || BOOST_STL_INTERFACES_DOXYGEN
 
     /** A CRTP template that one may derive from to make it easier to define
-        container types. */
+        container types.
+
+        The template parameter `Derived` for `container_interface` may be an
+        incomplete type. Before any member of the resulting specialization of
+        `container_interface` other than special member functions is
+        referenced, `Derived` shall be complete; shall model
+        `std::derived_from<container_interface<Derived>>`, `std::semiregular`,
+        and `std::forward_range`; and shall contain all the nested types
+        required in Table 72: Container requirements and, for those whose
+        iterator nested type models `std::bidirectinal_iterator`, those in
+        Table 73: Reversible container requirements.
+
+        For an object `d` of type `Derived`, a call to `std::ranges::begin(d)`
+        shall not mutate any data members of `d`, and `d`'s destructor shall
+        end the lifetimes of the objects in `[std::ranges::begin(d),
+        std::ranges::end(d))`. */
     template<typename Derived>
       requires std::is_class_v<Derived> &&
                std::same_as<Derived, std::remove_cv_t<Derived>>
@@ -663,52 +693,50 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     public:
       ~container_interface() { clear_impl(derived()); }
 
-      constexpr bool empty() const requires std::ranges::forward_range<const Derived> {
+      constexpr bool empty() const {
         return std::ranges::begin(derived()) == std::ranges::end(derived());
       }
 
       constexpr auto data() requires std::contiguous_iterator<std::ranges::iterator_t<Derived>> {
         return std::to_address(std::ranges::begin(derived()));
       }
-      constexpr auto data() const
-        requires std::range<const Derived> && std::contiguous_iterator<std::ranges::iterator_t<const Derived>> {
+      constexpr auto data() const requires std::contiguous_iterator<std::ranges::iterator_t<const Derived>> {
           return std::to_address(std::ranges::begin(derived()));
         }
 
-      constexpr auto size() const requires std::ranges::forward_range<const Derived> &&
-        std::sized_sentinel_for<std::sentinel_t<const Derived>, std::ranges::iterator_t<const Derived>>
+      constexpr auto size() const
+        requires std::sized_sentinel_for<std::sentinel_t<const Derived>, std::ranges::iterator_t<const Derived>>
         -> v2_dtl::container_size_t<Derived> {
           return v2_dtl::container_size_t<Derived>(
             std::ranges::end(derived()) - std::ranges::begin(derived()));
         }
 
-      constexpr decltype(auto) front() requires std::ranges::forward_range<Derived> {
+      constexpr decltype(auto) front() {
         BOOST_ASSERT(!empty());
         return *std::ranges::begin(derived());
       }
-      constexpr decltype(auto) front() const requires std::ranges::forward_range<const Derived> {
+      constexpr decltype(auto) front() const {
         BOOST_ASSERT(!empty());
         return *std::ranges::begin(derived());
       }
 
-      template<std::ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void push_front(const std::ranges::range_value_t<C>& x)
           requires requires { derived().emplace_front(x); } {
             derived().emplace_front(x);
           }
-      template<ranges::ranges::forward_range C = Derived>
+      template<typenaem C = Derived>
         constexpr void push_front(std::ranges::range_value_t<C>&& x)
           requires requires { derived().emplace_front(std::move(x)); } {
             derived().emplace_front(std::move(x));
           }
       constexpr void pop_front() noexcept
-        requires std::ranges::forward_range<Derived> &&
-          requires requires (const std::ranges::range_value_t<Derived>& x, std::ranges::iterator_t<Derived> position) {
-            derived().emplace_front(x);
-            derived().erase(position);
-          } {
-            return derived().erase(std::ranges::begin(derived()));
-          }
+        requires requires (const std::ranges::range_value_t<Derived>& x, std::ranges::iterator_t<Derived> position) {
+          derived().emplace_front(x);
+          derived().erase(position);
+        } {
+          return derived().erase(std::ranges::begin(derived()));
+        }
 
       constexpr decltype(auto) back()
         requires std::ranges::bidirectional_range<Derived> && std::ranges::common_range<Derived> {
@@ -762,7 +790,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return std::ranges::begin(derived())[n];
         }
 
-      template<std::ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void resize(v2_dtl::container_size_t<C> n)
           requires requires {
             std::ranges::range_value_t<Derived>();
@@ -778,12 +806,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         return typename Derived::const_iterator(std::ranges::end(mutable_derived()));
       }
 
-      constexpr auto cbegin() const requires std::ranges::forward_range<const Derived> {
-        return std::ranges::begin(derived());
-      }
-      constexpr auto cend() const requires std::ranges::forward_range<const Derived> {
-        return std::ranges::end(derived());
-      }
+      constexpr auto cbegin() const { return std::ranges::begin(derived()); }
+      constexpr auto cend() const { return std::ranges::end(derived()); }
 
       constexpr auto rbegin()
         requires std::ranges::bidirectional_range<Derived> && std::cranges::ommon_range<Derived> {
@@ -820,19 +844,19 @@ namespace boost { namespace stl_interfaces { namespace v2 {
               std::ranges::begin(mutable_derived())));
             }
 
-      template<std::ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(std::ranges::iterator_t<const C> position,
                               const std::ranges::range_value_t<C>& x)
           requires requires { derived().emplace(position, x); } {
             derived().emplace(position, x);
           }
-      template<std::ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(std::ranges::iterator_t<const C> position,
                               std::ranges::range_value_t<C>&& x)
           requires requires { derived().emplace(position, std::move(x)); } {
             derived().emplace(position, std::move(x));
           }
-      template<std::ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(std::ranges::iterator_t<const C> position,
                               v2_dtl::container_size_t<C> n,
                               const std::ranges::range_value_t<C>& x)
@@ -840,20 +864,20 @@ namespace boost { namespace stl_interfaces { namespace v2 {
             derived().insert(position, detail::make_n_iter(x, n), detail::make_n_iter_end(x, n)); } {
               derived().insert(position,  detail::make_n_iter(x, n), detail::make_n_iter_end(x, n));
             }
-      template<std::ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(std::ranges::iterator_t<const C> position,
                               std::initializer_list<std::ranges::range_value_t<C>> il)
           requires requires { derived().insert(position, il.begin(), il.end()); } {
             derived().insert(position, il.begin(), il.end());
           }
 
-      template<std::ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void erase(Derived::const_iterator position)
           requires requires { derived().erase(position, std::ranges::next(position)); } {
             derived().erase(position, std::ranges::next(position));
           }
 
-      template<std::ranges::input_iterator Iter, std::ranges::forward_range C = Derived>
+      template<std::ranges::input_iterator Iter, typename C = Derived>
         constexpr void assign(Iter first, Iter last)
           requires requires {
             derived().clear();
@@ -861,7 +885,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
               derived().clear();
               derived().insert(std::ranges::begin(derived()), first, last);
             }
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void assign(v2_dtl::container_size_t<C> n,
                               const std::ranges::range_value_t<C>& x)
           requires requires {
@@ -874,7 +898,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
                                detail::make_n_iter(x, n),
                                detail::make_n_iter_end(x, n));
             }
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void assign(std::initializer_list<std::ranges::range_value_t<C>> il)
           requires requires {
             derived().clear();
@@ -884,12 +908,12 @@ namespace boost { namespace stl_interfaces { namespace v2 {
             }
 
       constexpr void clear() noexcept
-        requires std::ranges::forward_range<Derived> && requires {
+        requires requires {
           derived().erase(std::ranges::begin(derived()), std::ranges::end(derived())); } {
             derived().erase(std::ranges::begin(derived()), std::ranges::end(derived()));
           }
 
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr decltype(auto) operator=(
             std::initializer_list<std::ranges::range_value_t<C>> il)
           requires requires { derived().assign(il.begin(), il.end()); } {
@@ -911,21 +935,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
                                                         rhs.begin(), rhs.end());
         }
     };
-
-    // TODO: Rewrite container_interface assuming that Derived models
-    // derived_from<container_interface<Derived>>, semiregular, and
-    // forward_range.
-    //
-    // Wording for that:
-    //
-    // The template parameter D for container_interface may be an incomplete
-    // type. Before any member of the resulting specialization of
-    // container_interface other than special member functions is referenced,
-    // D shall be complete; shall model derived_from<container_interface<D>>,
-    // semiregular, and forward_range; and shall contain all the nested types
-    // required in Table 72: Container requirements and, for those whose
-    // iterator nested type models bidirectinal_iterator, those in Table 73:
-    // Reversible container requirements.
 
 #elif 201703L <= __cplusplus && __has_include(<stl2/ranges.hpp>) && \
     !defined(BOOST_STL_INTERFACES_DISABLE_CMCSTL2)
@@ -991,7 +1000,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
         template<typename Derived>
         BOOST_STL_INTERFACES_CONCEPT szd_sent_fwd_rng =
-            ranges::forward_range<Derived> &&
             ranges::sized_sentinel_for<ranges::sentinel_t<Derived>,
                                        ranges::iterator_t<Derived>>;
 
@@ -1005,7 +1013,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
         template<typename Derived>
         BOOST_STL_INTERFACES_CONCEPT pop_front_req =
-          ranges::forward_range<Derived> &&
             v2_dtl::empl_frnt<Derived, const ranges::ext::range_value_t<Derived>&> &&
             v2_dtl::erase_<Derived>;
 
@@ -1037,7 +1044,22 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     }
 
     /** A CRTP template that one may derive from to make it easier to define
-        container types. */
+        container types.
+
+        The template parameter `Derived` for `container_interface` may be an
+        incomplete type. Before any member of the resulting specialization of
+        `container_interface` other than special member functions is
+        referenced, `Derived` shall be complete; shall model
+        `std::derived_from<container_interface<Derived>>`, `std::semiregular`,
+        and `std::forward_range`; and shall contain all the nested types
+        required in Table 72: Container requirements and, for those whose
+        iterator nested type models `std::bidirectinal_iterator`, those in
+        Table 73: Reversible container requirements.
+
+        For an object `d` of type `Derived`, a call to `std::ranges::begin(d)`
+        shall not mutate any data members of `d`, and `d`'s destructor shall
+        end the lifetimes of the objects in `[std::ranges::begin(d),
+        std::ranges::end(d))`. */
     template<typename Derived>
       requires std::is_class_v<Derived> &&
                ranges::same_as<Derived, std::remove_cv_t<Derived>>
@@ -1061,39 +1083,37 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     public:
       ~container_interface() { clear_impl(derived()); }
 
-      constexpr bool empty() const requires ranges::forward_range<const Derived> {
+      constexpr bool empty() const {
         return ranges::begin(derived()) == ranges::end(derived());
       }
 
       constexpr auto data() requires v2_dtl::contig_iter<Derived> {
         return &*ranges::begin(derived());
       }
-      constexpr auto data() const
-        requires ranges::range<const Derived> && v2_dtl::contig_iter<const Derived> {
+      constexpr auto data() const requires v2_dtl::contig_iter<const Derived> {
           return &*ranges::begin(derived());
         }
 
-      constexpr auto size() const requires v2_dtl::szd_sent_fwd_rng<Derived> {
+      constexpr auto size() const requires v2_dtl::szd_sent_fwd_rng<const Derived> {
         return typename Derived::size_type(
           ranges::end(derived()) - ranges::begin(derived()));
       }
 
-      constexpr decltype(auto) front() requires ranges::forward_range<Derived> {
+      constexpr decltype(auto) front() {
         BOOST_ASSERT(!empty());
         return *ranges::begin(derived());
       }
-      constexpr decltype(auto) front() const
-        requires ranges::forward_range<const Derived> {
+      constexpr decltype(auto) front() const {
           BOOST_ASSERT(!empty());
           return *ranges::begin(derived());
         }
 
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void push_front(const ranges::ext::range_value_t<C>& x)
           requires v2_dtl::empl_frnt<C, const ranges::ext::range_value_t<C>&> {
               derived().emplace_front(x);
             }
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void push_front(ranges::ext::range_value_t<C>&& x)
           requires v2_dtl::empl_frnt<C, ranges::ext::range_value_t<C>&&> {
               derived().emplace_front(std::move(x));
@@ -1155,7 +1175,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return ranges::begin(derived())[n];
         }
 
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         requires v2_dtl::resz_n_x<C>
         constexpr void resize(v2_dtl::container_size_t<C> n) {
           derived().resize(n, ranges::ext::range_value_t<C>());
@@ -1168,12 +1188,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         return typename Derived::const_iterator(ranges::end(mutable_derived()));
       }
 
-      constexpr auto cbegin() const requires ranges::forward_range<const Derived> {
-        return ranges::begin(derived());
-      }
-      constexpr auto cend() const requires ranges::forward_range<const Derived> {
-        return ranges::end(derived());
-      }
+      constexpr auto cbegin() const { return ranges::begin(derived()); }
+      constexpr auto cend() const { return ranges::end(derived()); }
 
       constexpr auto rbegin()
         requires ranges::bidirectional_range<Derived> &&
@@ -1212,20 +1228,19 @@ namespace boost { namespace stl_interfaces { namespace v2 {
               ranges::begin(mutable_derived())));
           }
 
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(ranges::iterator_t<const C> position,
                               const ranges::ext::range_value_t<C>& x)
           requires v2_dtl::empl<C, const ranges::ext::range_value_t<C>&> {
             return derived().emplace(position, x);
           }
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(ranges::iterator_t<const C> position,
                               ranges::ext::range_value_t<C>&& x)
           requires v2_dtl::empl<C, ranges::ext::range_value_t<C>&&> {
             return derived().emplace(position, std::move(x));
           }
-
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(ranges::iterator_t<const C> position,
                               v2_dtl::container_size_t<C> n,
                               const ranges::ext::range_value_t<C>& x)
@@ -1236,26 +1251,26 @@ namespace boost { namespace stl_interfaces { namespace v2 {
             return derived().insert(position, detail::make_n_iter(x, n),
                                     detail::make_n_iter_end(x, n));
           }
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto insert(ranges::iterator_t<const C> position,
                               std::initializer_list<ranges::ext::range_value_t<C>> il)
           requires v2_dtl::insert_<C, decltype(il.begin())> {
             return derived().insert(position, il.begin(), il.end());
           }
 
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr auto erase(ranges::iterator_t<const C> position)
           requires v2_dtl::erase_<C> {
             return derived().erase(position, ranges::next(position));
           }
 
-      template<ranges::input_iterator Iter, ranges::forward_range C = Derived>
+      template<ranges::input_iterator Iter, typename C = Derived>
         constexpr void assign(Iter first, Iter last)
           requires v2_dtl::erase_insert<C, Iter> {
             derived().clear();
             derived().insert(ranges::begin(derived()), first, last);
           }
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void assign(v2_dtl::container_size_t<C> n,
                               const ranges::ext::range_value_t<C>& x)
           requires v2_dtl::erase_insert<C, v2_dtl::n_iter_t<C>> {
@@ -1264,7 +1279,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
                              detail::make_n_iter(x, n),
                              detail::make_n_iter_end(x, n));
           }
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
         constexpr void assign(std::initializer_list<ranges::ext::range_value_t<C>> il)
           requires v2_dtl::erase_insert<C, decltype(il.begin())> {
             derived().clear();
@@ -1272,11 +1287,11 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           }
 
       constexpr void clear() noexcept
-        requires ranges::forward_range<Derived> && v2_dtl::erase_<Derived> {
+        requires v2_dtl::erase_<Derived> {
           derived().erase(ranges::begin(derived()), ranges::end(derived()));
         }
 
-      template<ranges::forward_range C = Derived>
+      template<typename C = Derived>
       constexpr decltype(auto) operator=(
         std::initializer_list<ranges::ext::range_value_t<C>> il)
           requires v2_dtl::erase_<C> &&
