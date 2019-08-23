@@ -80,13 +80,13 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         lifetimes of the objects in `[std::ranges::begin(d),
         std::ranges::end(d))`. */
     template<
-        typename D,
+        typename Derived,
         bool Contiguous = discontiguous
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
         typename E = std::enable_if_t<
-            std::is_class<D>::value &&
-            std::is_same<D, std::remove_cv_t<D>>::value>
+            std::is_class<Derived>::value &&
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
 #endif
         >
     struct container_interface;
@@ -776,7 +776,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       template<std::ranges::random_access_range C = D>
         constexpr decltype(auto) at(v2_dtl::container_size_t<C> n) {
           if (derived().size() < n)
-            throw std::out_of_range("Bounds check failed in container_interface::at()");
+            throw std::out_of_range("Bounds check failed in container_interface::at()es
+");
           return std::ranges::begin(derived())[n];
         }
       template<std::ranges::random_access_range C = const D>
