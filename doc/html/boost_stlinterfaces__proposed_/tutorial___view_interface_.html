@@ -100,7 +100,7 @@
     <span class="identifier">Sentinel</span> <span class="identifier">last_</span><span class="special">;</span>
 <span class="special">};</span>
 
-<span class="comment">// std::view::all() returns one of several types, depending onwhat you pass</span>
+<span class="comment">// std::view::all() returns one of several types, depending on what you pass</span>
 <span class="comment">// it.  Here, we're keeping it simple; all() always returns a subrange.</span>
 <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Range</span><span class="special">&gt;</span>
 <span class="keyword">auto</span> <span class="identifier">all</span><span class="special">(</span><span class="identifier">Range</span> <span class="special">&amp;&amp;</span> <span class="identifier">range</span><span class="special">)</span>
@@ -149,7 +149,7 @@
     <span class="keyword">constexpr</span> <span class="identifier">Pred</span> <span class="keyword">const</span> <span class="special">&amp;</span> <span class="identifier">pred</span><span class="special">()</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> <span class="special">{</span> <span class="keyword">return</span> <span class="identifier">pred_</span><span class="special">;</span> <span class="special">}</span>
 
     <span class="comment">// A more robust implementation should probably cache the value computed</span>
-    <span class="comment">// by this function, so that aubsequent calls can just return the cached</span>
+    <span class="comment">// by this function, so that subsequent calls can just return the cached</span>
     <span class="comment">// iterator.</span>
     <span class="keyword">constexpr</span> <span class="keyword">auto</span> <span class="identifier">begin</span><span class="special">()</span>
     <span class="special">{</span>

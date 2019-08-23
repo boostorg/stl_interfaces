@@ -18,13 +18,13 @@
 <a name="boost_stlinterfaces__proposed_.introduction"></a><a class="link" href="introduction.html" title="Introduction">Introduction</a>
 </h2></div></div></div>
 <p>
-      Writing STL iterators, views, and containers is suprisingly hard. There are
+      Writing STL iterators, views, and containers is surprisingly hard. There are
       a lot of things that can subtly go wrong. It is also very tedious, which of
       course makes it error-prone.
     </p>
 <p>
       Iterators have numerous typedefs and operations, even though all the operations
-      of a givenn iterator can be implemented in terms of at most four operations
+      of a given iterator can be implemented in terms of at most four operations
       (and usually only three). Writing all the other operations yields very similar-looking
       code that is hard to review, and all but requires that you write full-coverage
       tests for each iterator.
@@ -175,7 +175,7 @@
     <span class="keyword">friend</span> <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;=(</span>
         <span class="identifier">repeated_chars_iterator</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">repeated_chars_iterator</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">noexcept</span>
     <span class="special">{</span>
-        <span class="keyword">return</span> <span class="identifier">lhs</span> <span class="special">&lt;=</span> <span class="identifier">rhs</span><span class="special">;</span>
+        <span class="keyword">return</span> <span class="identifier">rhs</span> <span class="special">&lt;=</span> <span class="identifier">lhs</span><span class="special">;</span>
     <span class="special">}</span>
 
     <span class="keyword">friend</span> <span class="keyword">constexpr</span> <span class="identifier">repeated_chars_iterator</span>
@@ -192,11 +192,6 @@
     <span class="keyword">operator</span><span class="special">-(</span><span class="identifier">repeated_chars_iterator</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">difference_type</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">noexcept</span>
     <span class="special">{</span>
         <span class="keyword">return</span> <span class="identifier">lhs</span> <span class="special">-=</span> <span class="identifier">rhs</span><span class="special">;</span>
-    <span class="special">}</span>
-    <span class="keyword">friend</span> <span class="keyword">constexpr</span> <span class="identifier">repeated_chars_iterator</span>
-    <span class="keyword">operator</span><span class="special">-(</span><span class="identifier">difference_type</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">repeated_chars_iterator</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">noexcept</span>
-    <span class="special">{</span>
-        <span class="keyword">return</span> <span class="identifier">rhs</span> <span class="special">-=</span> <span class="identifier">lhs</span><span class="special">;</span>
     <span class="special">}</span>
     <span class="keyword">friend</span> <span class="keyword">constexpr</span> <span class="identifier">difference_type</span> <span class="keyword">operator</span><span class="special">-(</span>
         <span class="identifier">repeated_chars_iterator</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">repeated_chars_iterator</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">noexcept</span>

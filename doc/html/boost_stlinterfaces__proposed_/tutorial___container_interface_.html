@@ -97,9 +97,9 @@
       that's fine -- you can just implement the operations that your type can do,
       and whatever operations can be provided by <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> in terms
       of the user-defined operations, will be provided. For example, the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like
-      container decribed above would have <code class="computeroutput"><span class="identifier">front</span><span class="special">()</span></code> &#8212; which comes from the optional sequence
+      container described above would have <code class="computeroutput"><span class="identifier">front</span><span class="special">()</span></code> &#8212; which comes from the optional sequence
       container requirements &#8212; even if you did not write any user-defined
-      inertion or erasure member functions into your container. It if has bidirectional
+      insertion or erasure member functions into your container. It if has bidirectional
       iterators, the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like container would have <code class="computeroutput"><span class="identifier">back</span><span class="special">()</span></code> too.
     </p>
 <p>
@@ -1369,7 +1369,7 @@
                 and non-<code class="computeroutput"><span class="keyword">const</span></code> overloads.
                 <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 can only provide <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">back</span><span class="special">()</span></code> if <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">iterator</span></code>
-                and <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">const_iterator</span></code> are bidirectinal
+                and <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">const_iterator</span></code> are bidirectional
                 iterators.
               </p>
             </td>
@@ -1536,7 +1536,7 @@
     </p>
 <p>
 </p>
-<pre class="programlisting"><span class="comment">// The sections of member functions below are comemnted as they are in the</span>
+<pre class="programlisting"><span class="comment">// The sections of member functions below are commented as they are in the</span>
 <span class="comment">// standard for std::vector.  Each section has two numbers: the number of</span>
 <span class="comment">// member functions in that section, and the number that are missing, because</span>
 <span class="comment">// they are provided by container_interface.  The purely allocator-specific</span>

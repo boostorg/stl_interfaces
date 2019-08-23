@@ -7,11 +7,11 @@
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
 <link rel="up" href="../../header/boost/stl_interfaces/iterator_interface_hpp.html" title="Header &lt;boost/stl_interfaces/iterator_interface.hpp&gt;">
 <link rel="prev" href="access.html" title="Struct access">
-<link rel="next" href="../../BOOST_STL_INTERFAC_idm9034.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT">
+<link rel="next" href="../../BOOST_STL_INTERFAC_idm9015.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <div class="spirit-nav">
-<a accesskey="p" href="access.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../header/boost/stl_interfaces/iterator_interface_hpp.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_STL_INTERFAC_idm9034.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="access.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../header/boost/stl_interfaces/iterator_interface_hpp.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_STL_INTERFAC_idm9015.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.stl_interfaces.proxy_arrow_result"></a><div class="titlepage"></div>
@@ -25,33 +25,33 @@
 </span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> 
 <span class="keyword">struct</span> <a class="link" href="proxy_arrow_result.html" title="Struct template proxy_arrow_result">proxy_arrow_result</a> <span class="special">{</span>
   <span class="comment">// <a class="link" href="proxy_arrow_result.html#boost.stl_interfaces.proxy_arrow_resultconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <a class="link" href="proxy_arrow_result.html#idm8637-bb"><span class="identifier">proxy_arrow_result</span></a><span class="special">(</span><span class="identifier">T</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="proxy_arrow_result.html#idm8640-bb"><span class="identifier">proxy_arrow_result</span></a><span class="special">(</span><span class="identifier">T</span> <span class="special">&amp;&amp;</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="proxy_arrow_result.html#idm8618-bb"><span class="identifier">proxy_arrow_result</span></a><span class="special">(</span><span class="identifier">T</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="proxy_arrow_result.html#idm8621-bb"><span class="identifier">proxy_arrow_result</span></a><span class="special">(</span><span class="identifier">T</span> <span class="special">&amp;&amp;</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="proxy_arrow_result.html#idm8632-bb">public member functions</a></span>
-  <span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="keyword">const</span>  <span class="special">*</span> <a class="link" href="proxy_arrow_result.html#idm8633-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
-  <span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="special">*</span> <a class="link" href="proxy_arrow_result.html#idm8635-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="proxy_arrow_result.html#idm8613-bb">public member functions</a></span>
+  <span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="keyword">const</span>  <span class="special">*</span> <a class="link" href="proxy_arrow_result.html#idm8614-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="special">*</span> <a class="link" href="proxy_arrow_result.html#idm8616-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm16976"></a><h2>Description</h2>
+<a name="idm16957"></a><h2>Description</h2>
 <p>The return type of <code class="computeroutput">operator-&gt;()</code> in a proxy iterator.</p>
 <p>This template is used as the default <code class="computeroutput">Pointer</code> template parameter in the <code class="computeroutput">proxy_iterator_interface</code> template alias. Note that the use of this template implies a copy or move of the underlying object of type <code class="computeroutput">T</code>. </p>
 <div class="refsect2">
-<a name="idm16984"></a><h3>
+<a name="idm16965"></a><h3>
 <a name="boost.stl_interfaces.proxy_arrow_resultconstruct-copy-destruct"></a><code class="computeroutput">proxy_arrow_result</code> 
         public
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
-<li class="listitem"><pre class="literallayout"><a name="idm8637-bb"></a><span class="identifier">proxy_arrow_result</span><span class="special">(</span><span class="identifier">T</span> <span class="keyword">const</span> <span class="special">&amp;</span> value<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
-<li class="listitem"><pre class="literallayout"><a name="idm8640-bb"></a><span class="identifier">proxy_arrow_result</span><span class="special">(</span><span class="identifier">T</span> <span class="special">&amp;&amp;</span> value<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><a name="idm8618-bb"></a><span class="identifier">proxy_arrow_result</span><span class="special">(</span><span class="identifier">T</span> <span class="keyword">const</span> <span class="special">&amp;</span> value<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><a name="idm8621-bb"></a><span class="identifier">proxy_arrow_result</span><span class="special">(</span><span class="identifier">T</span> <span class="special">&amp;&amp;</span> value<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">T</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">value</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
 </ol></div>
 </div>
 <div class="refsect2">
-<a name="idm17037"></a><h3>
-<a name="idm8632-bb"></a><code class="computeroutput">proxy_arrow_result</code> public member functions</h3>
+<a name="idm17018"></a><h3>
+<a name="idm8613-bb"></a><code class="computeroutput">proxy_arrow_result</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
-<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="keyword">const</span>  <span class="special">*</span> <a name="idm8633-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li>
-<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="special">*</span> <a name="idm8635-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="keyword">const</span>  <span class="special">*</span> <a name="idm8614-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">T</span> <span class="special">*</span> <a name="idm8616-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li>
 </ol></div>
 </div>
 </div>
@@ -66,7 +66,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="access.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../header/boost/stl_interfaces/iterator_interface_hpp.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_STL_INTERFAC_idm9034.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="access.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../header/boost/stl_interfaces/iterator_interface_hpp.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_STL_INTERFAC_idm9015.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
