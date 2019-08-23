@@ -103,7 +103,7 @@ For the iterator portion -- if you need to write an iterator, iterator_iterface 
         friend constexpr bool operator>=(
             repeated_chars_iterator lhs, repeated_chars_iterator rhs) noexcept
         {
-            return lhs <= rhs;
+            return rhs <= lhs;
         }
 
         friend constexpr repeated_chars_iterator
@@ -120,11 +120,6 @@ For the iterator portion -- if you need to write an iterator, iterator_iterface 
         operator-(repeated_chars_iterator lhs, difference_type rhs) noexcept
         {
             return lhs -= rhs;
-        }
-        friend constexpr repeated_chars_iterator
-        operator-(difference_type lhs, repeated_chars_iterator rhs) noexcept
-        {
-            return rhs -= lhs;
         }
         friend constexpr difference_type operator-(
             repeated_chars_iterator lhs, repeated_chars_iterator rhs) noexcept

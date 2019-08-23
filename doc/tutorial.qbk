@@ -225,10 +225,10 @@ visible in derived types without user intervention.
 
 Next, we define the user-defined operations that _iter_iface_ requires to do
 its work.  As you might expect, the three required operations are very
-straightfoward.
+straightforward.
 
 [note Here, I implement `operator==()` as a hidden friend function.  it would
-have worked just as well if I had instead implemanted it as a member function,
+have worked just as well if I had instead implemented it as a member function,
 like this:
 
 ``constexpr bool operator==(node_iterator rhs) const noexcept
@@ -240,7 +240,7 @@ Either of these forms works, since _iter_iface_ is concept-based _emdash_ the
 appropriate expressions need to be well-formed for the _iter_iface_ tempalte
 to do its work. ]
 
-Finally, we need a using declataion to make
+Finally, we need a using declaration to make
 `iterator_interface::operator++(int)` visible:
 
 [node_iterator_using_declaration]
@@ -298,7 +298,7 @@ eventually find yourself looking at an error message with a very long template
 instantiation stack.
 
 There's also a macro that can help you check that `std::iterator_traits` is
-well-formed and provides the corect types.  See _traits_m_.
+well-formed and provides the correct types.  See _traits_m_.
 
 [endsect]
 
@@ -420,10 +420,10 @@ If you have a type that does not have all the operations in one of the tables,
 that's fine -- you can just implement the operations that your type can do,
 and whatever operations can be provided by _cont_iface_ in terms of the
 user-defined operations, will be provided.  For example, the `std::array`-like
-container decribed above would have `front()` _emdash_ which comes from the
+container described above would have `front()` _emdash_ which comes from the
 optional sequence container requirements _emdash_ even if you did not write
-any user-defined inertion or erasure member functions into your container.  It
-if has bidirectional iterators, the `std::array`-like container would have
+any user-defined insertion or erasure member functions into your container.
+It if has bidirectional iterators, the `std::array`-like container would have
 `back()` too.
 
 After each requirements table, there's a table indicating how _cont_iface_
@@ -783,7 +783,7 @@ a.at(n)
     [
         [ `a.end()` ]
         [ `a.back()` ]
-        [ `back()` is provided in `const` and non-`const` overloads.  _cont_iface_ can only provide `a.back()` if `X::iterator` and `X::const_iterator` are bidirectinal iterators. ]
+        [ `back()` is provided in `const` and non-`const` overloads.  _cont_iface_ can only provide `a.back()` if `X::iterator` and `X::const_iterator` are bidirectional iterators. ]
     ]
     [
         [ `a.emplace_front(args)` ]
@@ -878,7 +878,7 @@ container requirements.]
 [section Tutorial: `reverse_iterator`]
 
 There is a `std::reverse_iterator` template that has been around since C++98.
-In C++20 it is compatible with proxy iterators, and is `constexpr`- and and
+In C++20 it is compatible with proxy iterators, and is `constexpr`- and
 `noexcept`-friendly.  If you are using C++20 or later, just use
 `std::reverse_iterator`.  For code built against earlier versions of C++, you
 can use _rev_iter_.
@@ -891,7 +891,7 @@ There's nothing much to document about it; it works just like
 [section The `v2` Namespace]
 
 _IFaces_ contains an `inline v1` namespace.  All the C++14-compatible
-*`_interface` templates are implemnted there.  Since `v1` is an `inline`
+*`_interface` templates are implemented there.  Since `v1` is an `inline`
 namespace, you can just access these templates without referring to `v1` at
 all.
 
@@ -954,7 +954,7 @@ Differences you are less likely to notice:
   constraints on member functions in `v2` are all concept-based.
 
 The subtle differences between SFINAE and concepts and between templates and
-non-templates in overload resolution may mean that these less-noticable
+non-templates in overload resolution may mean that these less-noticeable
 differences do affect your code, but this will be rare in practice.
 
 [endsect]

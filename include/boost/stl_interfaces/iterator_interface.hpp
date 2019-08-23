@@ -903,12 +903,12 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
 /** `static_asserts` that type `type` models concept `concept_name`.  This is
     useful for checking that an iterator, view, etc. that you write using one
-    ofthe *`_interface` templates models the right C++ concept.
+    of the *`_interface` templates models the right C++ concept.
 
     For example: `BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(my_iter,
     std::input_iterator)`.
 
-    \note This macro exapnds to nothing when `__cpp_lib_concepts` is not
+    \note This macro expands to nothing when `__cpp_lib_concepts` is not
     defined. */
 #define BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(type, concept_name)
 

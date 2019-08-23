@@ -69,7 +69,7 @@ struct reverse_iterator
     }
 
     // No need for a using declaration to make
-    // iterator_interface::operator++(int) visible, becasue we're not defining
+    // iterator_interface::operator++(int) visible, because we're not defining
     // operator++() in this template.
 
 private:
