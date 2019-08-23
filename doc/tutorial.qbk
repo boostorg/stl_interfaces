@@ -944,7 +944,7 @@ Differences you will probably notice:
   n, value)` overload.  The `v2` version is constrained with the identical
   constraint, in concept form, and the constraint works as expected.
 
-Differnces you are less likely to notice:
+Differences you are less likely to notice:
 
 - In order to constrain all the member functions of the `v1` implementations
   individually, it was necessary to make them templates.  Most (though not
