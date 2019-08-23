@@ -138,7 +138,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         referenced, `D` shall be complete, and model
         `std::derived_from<iterator_interface<D>>`. */
     template<
-        typename D,
+        typename Derived,
         typename IteratorConcept,
         typename ValueType,
         typename Reference = ValueType &,
@@ -147,8 +147,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
         typename E = std::enable_if_t<
-            std::is_class<D>::value &&
-            std::is_same<D, std::remove_cv_t<D>>::value>
+            std::is_class<Derived>::value &&
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
 #endif
         >
     struct iterator_interface;

@@ -22,13 +22,13 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         `D` shall be complete, and model both
         `std::derived_from<view_interface<D>>` and `std::view`. */
     template<
-        typename D,
+        typename Derived,
         bool Contiguous = discontiguous
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
         typename E = std::enable_if_t<
-            std::is_class<D>::value &&
-            std::is_same<D, std::remove_cv_t<D>>::value>
+            std::is_class<Derived>::value &&
+            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
 #endif
         >
     struct view_interface;
