@@ -133,7 +133,7 @@ we have to write it.  This library seeks to turn what we write from this:
         friend constexpr bool operator>=(
             repeated_chars_iterator lhs, repeated_chars_iterator rhs) noexcept
         {
-            return lhs <= rhs;
+            return rhs <= lhs;
         }
 
         friend constexpr repeated_chars_iterator
@@ -150,11 +150,6 @@ we have to write it.  This library seeks to turn what we write from this:
         operator-(repeated_chars_iterator lhs, difference_type rhs) noexcept
         {
             return lhs -= rhs;
-        }
-        friend constexpr repeated_chars_iterator
-        operator-(difference_type lhs, repeated_chars_iterator rhs) noexcept
-        {
-            return rhs -= lhs;
         }
         friend constexpr difference_type operator-(
             repeated_chars_iterator lhs, repeated_chars_iterator rhs) noexcept
