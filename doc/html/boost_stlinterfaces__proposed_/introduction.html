@@ -40,9 +40,21 @@
 <p>
       Most daunting of all is the task of writing a type or template that meets the
       container requirements in the standard. Boost.STLInterfaces provides another
-      template called <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/container_interface.html" title="Struct template container_interface">container_interface</a></code> that reduces
+      template called <code class="computeroutput">container_interface</code> that reduces
       the implementation and testing burden dramatically.
     </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        C++20 versions of <code class="computeroutput">iterator_interface</code> and <code class="computeroutput">container_interface</code>
+        are provided (C++20 provides <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">view_interface</span></code>).
+        These are constrained templates using C++20 concepts. These are in the <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">stl_interfaces</span><span class="special">::</span><span class="identifier">v2</span></code> namespace, and are considered experimental,
+        because at the time of this writing, no C++20-conforming compiler exists.
+      </p></td></tr>
+</table></div>
 <h4>
 <a name="boost_stlinterfaces__proposed_.introduction.h0"></a>
       <span class="phrase"><a name="boost_stlinterfaces__proposed_.introduction.a_quick_example"></a></span><a class="link" href="introduction.html#boost_stlinterfaces__proposed_.introduction.a_quick_example">A Quick

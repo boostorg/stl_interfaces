@@ -6,20 +6,26 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
 <link rel="up" href="../../../reference.html" title="Reference">
-<link rel="prev" href="../../../BOOST_STL_INTERFAC_idm8498.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">
-<link rel="next" href="../../../boost/stl_interfaces/reverse_iterator.html" title="Struct template reverse_iterator">
+<link rel="prev" href="../../../BOOST_STL_INTERFAC_idm9049.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">
+<link rel="next" href="../../../boost/stl_interfaces/v1/reverse_iterator.html" title="Struct template reverse_iterator">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <div class="spirit-nav">
-<a accesskey="p" href="../../../BOOST_STL_INTERFAC_idm8498.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../reference.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../../boost/stl_interfaces/reverse_iterator.html"><img src="../../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="../../../BOOST_STL_INTERFAC_idm9049.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../reference.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../../boost/stl_interfaces/v1/reverse_iterator.html"><img src="../../../images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
 <a name="header.boost.stl_interfaces.reverse_iterator_hpp"></a>Header &lt;<a href="../../../../../boost/stl_interfaces/reverse_iterator.hpp" target="_top">boost/stl_interfaces/reverse_iterator.hpp</a>&gt;</h3></div></div></div>
 <pre class="synopsis"><span class="keyword">namespace</span> <span class="identifier">boost</span> <span class="special">{</span>
   <span class="keyword">namespace</span> <span class="identifier">stl_interfaces</span> <span class="special">{</span>
-    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter<span class="special">&gt;</span> <span class="keyword">struct</span> <a class="link" href="../../../boost/stl_interfaces/reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a><span class="special">;</span>
-    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter<span class="special">&gt;</span> <span class="keyword">auto</span> <a class="link" href="../../../boost/stl_interfaces/make_reverse_iterator.html" title="Function template make_reverse_iterator"><span class="identifier">make_reverse_iterator</span></a><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">)</span><span class="special">;</span>
+    <span class="keyword">namespace</span> <span class="identifier">v1</span> <span class="special">{</span>
+      <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter<span class="special">&gt;</span> <span class="keyword">struct</span> <a class="link" href="../../../boost/stl_interfaces/v1/reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a><span class="special">;</span>
+      <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter<span class="special">&gt;</span> <span class="keyword">auto</span> <a class="link" href="../../../boost/stl_interfaces/v1/make_reverse_iterator.html" title="Function template make_reverse_iterator"><span class="identifier">make_reverse_iterator</span></a><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">)</span><span class="special">;</span>
+    <span class="special">}</span>
+    <span class="keyword">namespace</span> <span class="identifier">v2</span> <span class="special">{</span>
+      <span class="keyword">typedef</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">reverse_iterator</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&gt;</span> <a class="link" href="../../../boost/stl_interfaces/v2/reverse_iterator.html" title="Type definition reverse_iterator"><span class="identifier">reverse_iterator</span></a><span class="special">;</span>
+      <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter<span class="special">&gt;</span> <span class="keyword">auto</span> <a class="link" href="../../../boost/stl_interfaces/v2/make_reverse_iterator.html" title="Function template make_reverse_iterator"><span class="identifier">make_reverse_iterator</span></a><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">)</span><span class="special">;</span>
+    <span class="special">}</span>
   <span class="special">}</span>
 <span class="special">}</span></pre>
 </div>
@@ -33,7 +39,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../../../BOOST_STL_INTERFAC_idm8498.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../reference.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../../boost/stl_interfaces/reverse_iterator.html"><img src="../../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="../../../BOOST_STL_INTERFAC_idm9049.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../reference.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../../boost/stl_interfaces/v1/reverse_iterator.html"><img src="../../../images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

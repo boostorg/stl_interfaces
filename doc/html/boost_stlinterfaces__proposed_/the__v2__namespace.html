@@ -1,0 +1,135 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>The v2 Namespace</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
+<link rel="prev" href="tutorial___reverse_iterator_.html" title="Tutorial: reverse_iterator">
+<link rel="next" href="examples.html" title="Examples">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="tutorial___reverse_iterator_.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="examples.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_stlinterfaces__proposed_.the__v2__namespace"></a><a class="link" href="the__v2__namespace.html" title="The v2 Namespace">The
+    <code class="computeroutput"><span class="identifier">v2</span></code> Namespace</a>
+</h2></div></div></div>
+<p>
+      Boost.STLInterfaces contains an <code class="computeroutput"><span class="keyword">inline</span>
+      <span class="identifier">v1</span></code> namespace. All the C++14-compatible
+      *<code class="computeroutput"><span class="identifier">_interface</span></code> templates are implemnted
+      there. Since <code class="computeroutput"><span class="identifier">v1</span></code> is an <code class="computeroutput"><span class="keyword">inline</span></code> namespace, you can just access these
+      templates without referring to <code class="computeroutput"><span class="identifier">v1</span></code>
+      at all.
+    </p>
+<p>
+      In the <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">stl_interfaces</span><span class="special">::</span><span class="identifier">v2</span></code> namespace, you will find C++20 versions
+      of <code class="computeroutput">iterator_interface</code> and <code class="computeroutput">container_interface</code>;
+      the C++20 standard library provides <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">view_interface</span></code>.
+    </p>
+<p>
+      These are constrained templates using C++20 concepts, and are considered experimental,
+      because at the time of this writing, no C++20-conforming compiler exists.
+    </p>
+<p>
+      For each template, you will find two versions: one that uses concepts and templates
+      defined in the C++20 standard library, and one that uses concepts and templates
+      defined in the <a href="https://github.com/CaseyCarter/cmcstl2" target="_top">cmcstl2</a>
+      library.
+    </p>
+<p>
+      The first is the final version of the <code class="computeroutput"><span class="identifier">v2</span></code>
+      templates, for use with a conforming C++20 compiler and standard library.
+    </p>
+<p>
+      The second is a temporary implementation for those who wish to experiment with
+      a concept-constrained version before C++20 is widely implemented. <a href="https://github.com/CaseyCarter/cmcstl2" target="_top">cmcstl2</a>
+      is an implementation of the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ranges</span></code>
+      portion of the C++20 standard library. To use it:
+    </p>
+<p>
+      - put its headers in your include path, so that they can be included with
+      <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">stl2</span><span class="special">/</span><span class="identifier">foo</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>,
+      and
+    </p>
+<p>
+      - build with GCC 8 or 9, including the <code class="computeroutput"><span class="special">-</span><span class="identifier">fconcepts</span></code> and <code class="computeroutput"><span class="special">-</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">c</span><span class="special">++</span><span class="number">2</span><span class="identifier">a</span></code>
+      flags.
+    </p>
+<p>
+      GCC 8 and 9 are the only compilers with an adequate concepts implementation
+      at the time of this writing.
+    </p>
+<h4>
+<a name="boost_stlinterfaces__proposed_.the__v2__namespace.h0"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.the__v2__namespace.differences_between__code__phrase_role__identifier__v1__phrase___code__and__code__phrase_role__identifier__v2__phrase___code_"></a></span><a class="link" href="the__v2__namespace.html#boost_stlinterfaces__proposed_.the__v2__namespace.differences_between__code__phrase_role__identifier__v1__phrase___code__and__code__phrase_role__identifier__v2__phrase___code_">Differences
+      between <code class="computeroutput"><span class="identifier">v1</span></code> and <code class="computeroutput"><span class="identifier">v2</span></code></a>
+    </h4>
+<p>
+      There are some differences between the <code class="computeroutput"><span class="identifier">v1</span></code>
+      and <code class="computeroutput"><span class="identifier">v2</span></code> implementations, mostly
+      due to the differences between SFINAE and concepts. Most of these changes are
+      subtle, and will not be noticeable.
+    </p>
+<p>
+      Differences you will probably notice:
+    </p>
+<p>
+      - <code class="computeroutput">view_interface</code>
+      and <code class="computeroutput">container_interface</code> each have
+      a <code class="computeroutput"><span class="keyword">bool</span></code> non-type template parameter
+      <code class="computeroutput"><span class="identifier">Contiguous</span></code> that indicates whether
+      they have a <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
+      operation that yields a contiguous iterator. Before C++20, there was no way
+      of determining that. The <code class="computeroutput"><span class="identifier">v2</span></code>
+      versions do not need this template parameter.
+    </p>
+<p>
+      - The <code class="computeroutput"><span class="identifier">insert</span><span class="special">(</span><span class="identifier">position</span><span class="special">,</span> <span class="identifier">n</span><span class="special">,</span> <span class="identifier">value</span><span class="special">)</span></code> overload of <code class="computeroutput">container_interface</code> &#8212;
+      the one that inserts <code class="computeroutput"><span class="identifier">n</span></code> copies
+      of <code class="computeroutput"><span class="identifier">value</span></code> before <code class="computeroutput"><span class="identifier">position</span></code> &#8212; is unconstrained. That
+      is because the proper constraint causes an infinite recursion on every compiler
+      I tried. This means that containers that you should not be able to <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code>
+      into will still have the <code class="computeroutput"><span class="identifier">insert</span><span class="special">(</span><span class="identifier">position</span><span class="special">,</span> <span class="identifier">n</span><span class="special">,</span>
+      <span class="identifier">value</span><span class="special">)</span></code>
+      overload. The <code class="computeroutput"><span class="identifier">v2</span></code> version is
+      constrained with the identical constraint, in concept form, and the constraint
+      works as expected.
+    </p>
+<p>
+      Differnces you are less likely to notice:
+    </p>
+<p>
+      - In order to constrain all the member functions of the <code class="computeroutput"><span class="identifier">v1</span></code>
+      implementations individually, it was necessary to make them templates. Most
+      (though not all) of the <code class="computeroutput"><span class="identifier">v2</span></code>
+      member functions are not templates.
+    </p>
+<p>
+      - The constraints on member functions in <code class="computeroutput"><span class="identifier">v1</span></code>
+      are all SFINAE-based. The constraints on member functions in <code class="computeroutput"><span class="identifier">v2</span></code> are all concept-based.
+    </p>
+<p>
+      The subtle differences between SFINAE and concepts and between templates and
+      non-templates in overload resolution may mean that these less-noticable differences
+      do affect your code, but this will be rare in practice.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2019 T. Zachary Laine<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="tutorial___reverse_iterator_.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="examples.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

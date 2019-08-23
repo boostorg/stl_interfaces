@@ -1,0 +1,105 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Struct template reverse_iterator</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces (Proposed)">
+<link rel="up" href="../../../header/boost/stl_interfaces/reverse_iterator_hpp.html" title="Header &lt;boost/stl_interfaces/reverse_iterator.hpp&gt;">
+<link rel="prev" href="../../../header/boost/stl_interfaces/reverse_iterator_hpp.html" title="Header &lt;boost/stl_interfaces/reverse_iterator.hpp&gt;">
+<link rel="next" href="make_reverse_iterator.html" title="Function template make_reverse_iterator">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../../../header/boost/stl_interfaces/reverse_iterator_hpp.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../header/boost/stl_interfaces/reverse_iterator_hpp.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="make_reverse_iterator.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="boost.stl_interfaces.v1.reverse_iterator"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Struct template reverse_iterator</span></h2>
+<p>boost::stl_interfaces::v1::reverse_iterator</p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../../header/boost/stl_interfaces/reverse_iterator_hpp.html" title="Header &lt;boost/stl_interfaces/reverse_iterator.hpp&gt;">boost/stl_interfaces/reverse_iterator.hpp</a>&gt;
+
+</span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter<span class="special">&gt;</span> 
+<span class="keyword">struct</span> <a class="link" href="reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a> <span class="special">:</span> <span class="keyword">public</span> boost::stl_interfaces::v1::iterator_interface&lt; reverse_iterator&lt; BidiIter &gt;, std::iterator_traits&lt; BidiIter &gt;::iterator_category, std::iterator_traits&lt; BidiIter &gt;::value_type, std::iterator_traits&lt; BidiIter &gt;::reference, std::iterator_traits&lt; BidiIter &gt;::pointer, std::iterator_traits&lt; BidiIter &gt;::difference_type &gt;
+<span class="special">{</span>
+  <span class="comment">// <a class="link" href="reverse_iterator.html#boost.stl_interfaces.v1.reverse_iteratorconstruct-copy-destruct">construct/copy/destruct</a></span>
+  <a class="link" href="reverse_iterator.html#idm9099-bb"><span class="identifier">reverse_iterator</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="reverse_iterator.html#idm9100-bb"><span class="identifier">reverse_iterator</span></a><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">(</span><span class="identifier">it</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter2<span class="special">,</span> 
+           <span class="keyword">typename</span> E <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_if_t</span><span class="special">&lt;</span>                <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">BidiIter2</span><span class="special">,</span> <span class="identifier">BidiIter</span><span class="special">&gt;</span><span class="special">::</span><span class="identifier">value</span><span class="special">&gt;</span> <span class="special">&gt;</span> 
+    <a class="link" href="reverse_iterator.html#idm9103-bb"><span class="identifier">reverse_iterator</span></a><span class="special">(</span><a class="link" href="reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a><span class="special">&lt;</span> <span class="identifier">BidiIter2</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// <a class="link" href="reverse_iterator.html#idm9082-bb">friend functions</a></span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter2<span class="special">&gt;</span> <span class="keyword">friend</span> <span class="keyword">struct</span> <a class="link" href="reverse_iterator.html#idm9083-bb"><span class="identifier">reverse_iterator</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// <a class="link" href="reverse_iterator.html#idm9091-bb">public member functions</a></span>
+  <span class="keyword">constexpr</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">reference</span> 
+  <a class="link" href="reverse_iterator.html#idm9092-bb"><span class="keyword">operator</span><span class="special">*</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">prev</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">declval</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&amp;</span><span class="special">&gt;</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <a class="link" href="reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a> <span class="special">&amp;</span> 
+  <a class="link" href="reverse_iterator.html#idm9094-bb"><span class="keyword">operator</span><span class="special">+=</span></a><span class="special">(</span><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">difference_type</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">advance</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">declval</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&amp;</span><span class="special">&gt;</span><span class="special">(</span><span class="special">)</span><span class="special">,</span> <span class="special">-</span><span class="identifier">n</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// <a class="link" href="reverse_iterator.html#idm9111-bb">private member functions</a></span>
+  <span class="keyword">constexpr</span> <span class="identifier">BidiIter</span> <span class="special">&amp;</span> <a class="link" href="reverse_iterator.html#idm9112-bb"><span class="identifier">base_reference</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="identifier">BidiIter</span> <span class="keyword">const</span>  <span class="special">&amp;</span> <a class="link" href="reverse_iterator.html#idm9114-bb"><span class="identifier">base_reference</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
+<span class="special">}</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idm17293"></a><h2>Description</h2>
+<p>This type is very similar to the C++20 version of <code class="computeroutput">std::reverse_iterator</code>; it is <code class="computeroutput">constexpr</code>-, <code class="computeroutput">noexcept</code>-, and proxy-friendly. </p>
+<div class="refsect2">
+<a name="idm17299"></a><h3>
+<a name="boost.stl_interfaces.v1.reverse_iteratorconstruct-copy-destruct"></a><code class="computeroutput">reverse_iterator</code> 
+        public
+       construct/copy/destruct</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem"><pre class="literallayout"><a name="idm9099-bb"></a><span class="identifier">reverse_iterator</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><a name="idm9100-bb"></a><span class="identifier">reverse_iterator</span><span class="special">(</span><span class="identifier">BidiIter</span> it<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">BidiIter</span><span class="special">(</span><span class="identifier">it</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter2<span class="special">,</span> 
+         <span class="keyword">typename</span> E <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_if_t</span><span class="special">&lt;</span>                <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">BidiIter2</span><span class="special">,</span> <span class="identifier">BidiIter</span><span class="special">&gt;</span><span class="special">::</span><span class="identifier">value</span><span class="special">&gt;</span> <span class="special">&gt;</span> 
+  <a name="idm9103-bb"></a><span class="identifier">reverse_iterator</span><span class="special">(</span><a class="link" href="reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a><span class="special">&lt;</span> <span class="identifier">BidiIter2</span> <span class="special">&gt;</span> it<span class="special">)</span><span class="special">;</span></pre></li>
+</ol></div>
+</div>
+<div class="refsect2">
+<a name="idm17376"></a><h3>
+<a name="idm9082-bb"></a><code class="computeroutput">reverse_iterator</code> friend functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> BidiIter2<span class="special">&gt;</span> <span class="keyword">friend</span> <span class="keyword">struct</span> <a name="idm9083-bb"></a><span class="identifier">reverse_iterator</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p>A template alias for <code class="computeroutput">std::reverse_iterator</code>. This only exists to make migration from Boost.STLInterfaces to C++20 easier; switch to the one in <code class="computeroutput">std</code> as soon as you can. </p>
+</li></ol></div>
+</div>
+<div class="refsect2">
+<a name="idm17398"></a><h3>
+<a name="idm9091-bb"></a><code class="computeroutput">reverse_iterator</code> public member functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">reference</span> 
+<a name="idm9092-bb"></a><span class="keyword">operator</span><span class="special">*</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">prev</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">declval</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&amp;</span><span class="special">&gt;</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <a class="link" href="reverse_iterator.html" title="Struct template reverse_iterator">reverse_iterator</a> <span class="special">&amp;</span> 
+<a name="idm9094-bb"></a><span class="keyword">operator</span><span class="special">+=</span><span class="special">(</span><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">difference_type</span> n<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="keyword">noexcept</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">advance</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">declval</span><span class="special">&lt;</span> <span class="identifier">BidiIter</span> <span class="special">&amp;</span><span class="special">&gt;</span><span class="special">(</span><span class="special">)</span><span class="special">,</span> <span class="special">-</span><span class="identifier">n</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre></li>
+</ol></div>
+</div>
+<div class="refsect2">
+<a name="idm17488"></a><h3>
+<a name="idm9111-bb"></a><code class="computeroutput">reverse_iterator</code> private member functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">BidiIter</span> <span class="special">&amp;</span> <a name="idm9112-bb"></a><span class="identifier">base_reference</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">BidiIter</span> <span class="keyword">const</span>  <span class="special">&amp;</span> <a name="idm9114-bb"></a><span class="identifier">base_reference</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li>
+</ol></div>
+</div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2019 T. Zachary Laine<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../../../header/boost/stl_interfaces/reverse_iterator_hpp.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../../header/boost/stl_interfaces/reverse_iterator_hpp.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="make_reverse_iterator.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
