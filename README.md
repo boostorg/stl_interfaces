@@ -184,6 +184,19 @@ containers, this is not for you.
 
 Online docs: https://tzlaine.github.io/stl_interfaces.
 
+This library includes a temporary implementation for those who wish to experiment with
+a concept-constrained version before C++20 is widely implemented.  Casey Carter's cmcstl2
+is an implementation of the `std::ranges` portion of the C++20 standard library.  To use it:
+
+- put its headers in your include path, so that they can be included with
+  `#include <stl2/foo.hpp>`, and
+
+- build with GCC 8 or 9, including the `-fconcepts` and `-std=c++2a` flags.
+
+GCC 8 and 9 are the only compilers with an adequate concepts implementation at
+the time of this writing.
+
+
 [![Build Status](https://travis-ci.org/tzlaine/stl_interfaces.svg?branch=master)](https://travis-ci.org/tzlaine/stl_interfaces)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/stl_interfaces?branch=master&svg=true)](https://ci.appveyor.com/project/tzlaine/stl_interfaces)
 [![License](https://img.shields.io/badge/license-boost-brightgreen.svg)](LICENSE_1_0.txt)
