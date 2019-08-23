@@ -66,11 +66,11 @@
    <span class="identifier">requires</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm16472"></a><h2>Description</h2>
+<a name="idm16559"></a><h2>Description</h2>
 <p>A CRTP template that one may derive from to make defining iterators easier.</p>
 <p>The template parameter <code class="computeroutput">D</code> for <code class="computeroutput"><a class="link" href="iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code> may be an incomplete type. Before any member of the resulting specialization of <code class="computeroutput"><a class="link" href="iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code> other than special member functions is referenced, <code class="computeroutput">D</code> shall be complete, and model <code class="computeroutput">std::derived_from&lt;<a class="link" href="iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a>&lt;D&gt;&gt;</code>. </p>
 <div class="refsect2">
-<a name="idm16484"></a><h3>
+<a name="idm16571"></a><h3>
 <a name="idm8970-bb"></a><code class="computeroutput">iterator_interface</code> private member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem"><pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">D</span> <span class="special">&amp;</span> <a name="idm8971-bb"></a><span class="identifier">derived</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li>
@@ -78,7 +78,7 @@
 </ol></div>
 </div>
 <div class="refsect2">
-<a name="idm16515"></a><h3>
+<a name="idm16602"></a><h3>
 <a name="idm8975-bb"></a><code class="computeroutput">iterator_interface</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem"><pre class="literallayout"><span class="keyword">decltype</span><span class="special">(</span><span class="keyword">auto</span><span class="special">)</span> <span class="keyword">constexpr</span> <a name="idm8976-bb"></a><span class="keyword">operator</span><span class="special">*</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre></li>

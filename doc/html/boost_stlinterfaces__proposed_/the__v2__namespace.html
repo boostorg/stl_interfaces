@@ -28,7 +28,7 @@
     </p>
 <p>
       In the <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">stl_interfaces</span><span class="special">::</span><span class="identifier">v2</span></code> namespace, you will find C++20 versions
-      of <code class="computeroutput">iterator_interface</code> and <code class="computeroutput">container_interface</code>;
+      of <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code> and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>;
       the C++20 standard library provides <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">view_interface</span></code>.
     </p>
 <p>
@@ -79,17 +79,16 @@
       Differences you will probably notice:
     </p>
 <p>
-      - <code class="computeroutput">view_interface</code>
-      and <code class="computeroutput">container_interface</code> each have
-      a <code class="computeroutput"><span class="keyword">bool</span></code> non-type template parameter
-      <code class="computeroutput"><span class="identifier">Contiguous</span></code> that indicates whether
-      they have a <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
+      - <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
+      each have a <code class="computeroutput"><span class="keyword">bool</span></code> non-type template
+      parameter <code class="computeroutput"><span class="identifier">Contiguous</span></code> that indicates
+      whether they have a <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
       operation that yields a contiguous iterator. Before C++20, there was no way
       of determining that. The <code class="computeroutput"><span class="identifier">v2</span></code>
       versions do not need this template parameter.
     </p>
 <p>
-      - The <code class="computeroutput"><span class="identifier">insert</span><span class="special">(</span><span class="identifier">position</span><span class="special">,</span> <span class="identifier">n</span><span class="special">,</span> <span class="identifier">value</span><span class="special">)</span></code> overload of <code class="computeroutput">container_interface</code> &#8212;
+      - The <code class="computeroutput"><span class="identifier">insert</span><span class="special">(</span><span class="identifier">position</span><span class="special">,</span> <span class="identifier">n</span><span class="special">,</span> <span class="identifier">value</span><span class="special">)</span></code> overload of <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> &#8212;
       the one that inserts <code class="computeroutput"><span class="identifier">n</span></code> copies
       of <code class="computeroutput"><span class="identifier">value</span></code> before <code class="computeroutput"><span class="identifier">position</span></code> &#8212; is unconstrained. That
       is because the proper constraint causes an infinite recursion on every compiler

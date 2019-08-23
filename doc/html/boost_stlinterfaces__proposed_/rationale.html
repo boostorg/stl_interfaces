@@ -23,8 +23,8 @@
     </h4>
 <p>
       This is the constraint on the <code class="computeroutput"><span class="identifier">Derived</span></code>
-      template parameter to <code class="computeroutput">iterator_interface</code>, <code class="computeroutput">view_interface</code>
-      and <code class="computeroutput">container_interface</code>:
+      template parameter to <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code>, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>
+      and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>:
     </p>
 <pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_if_t</span><span class="special">&lt;</span>
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_class</span><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&amp;&amp;</span>
@@ -36,7 +36,7 @@
       etc.
     </p>
 <p>
-      There are not more constraints (for instance, that <code class="computeroutput">view_interface</code> is given a <code class="computeroutput"><span class="identifier">Derived</span></code> template parameter for a type that
+      There are not more constraints (for instance, that <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> is given a <code class="computeroutput"><span class="identifier">Derived</span></code> template parameter for a type that
       has a <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
       and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code>),
       because <code class="computeroutput"><span class="identifier">Derived</span></code> is an incomplete
@@ -49,7 +49,7 @@
       a Special Access-Granting <code class="computeroutput"><span class="keyword">struct</span></code></a>
     </h4>
 <p>
-      The interface templates rely mostly on public members provided by their <code class="computeroutput"><span class="identifier">Derived</span></code> template parameter. However, <code class="computeroutput">iterator_interface</code>
+      The interface templates rely mostly on public members provided by their <code class="computeroutput"><span class="identifier">Derived</span></code> template parameter. However, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code>
       requires you to supply <code class="computeroutput"><span class="identifier">base_reference</span><span class="special">()</span></code> functions if you want it to act like an adaptor.
       Since at least the non-<code class="computeroutput"><span class="keyword">const</span></code> overload
       provides a non-<code class="computeroutput"><span class="keyword">const</span></code> lvalue reference
@@ -59,47 +59,46 @@
     </p>
 <h4>
 <a name="boost_stlinterfaces__proposed_.rationale.h2"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__can_act_like_an_adaptor__and_the_other_interface_templates_can_t"></a></span><a class="link" href="rationale.html#boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__can_act_like_an_adaptor__and_the_other_interface_templates_can_t"><code class="computeroutput">iterator_interface</code>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__can_act_like_an_adaptor__and_the_other_interface_templates_can_t"></a></span><a class="link" href="rationale.html#boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__can_act_like_an_adaptor__and_the_other_interface_templates_can_t">iterator_interface
       Can Act Like an Adaptor, And the Other Interface Templates Can't</a>
     </h4>
 <p>
-      There wouldn't be much point in adding this functionality to <code class="computeroutput">view_interface</code>, because it only
+      There wouldn't be much point in adding this functionality to <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>, because it only
       uses the <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
       and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code>
       of the <code class="computeroutput"><span class="identifier">Derived</span></code> type anyway.
     </p>
 <p>
-      For <code class="computeroutput">container_interface</code> it also does
+      For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> it also does
       not make much sense. Consider how many container adaptors you've written. That's
       a use case that does not come up often.
     </p>
 <h4>
 <a name="boost_stlinterfaces__proposed_.rationale.h3"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__takes_a_lot_of_template_parameters__and_the_other_interface_templates_don_t"></a></span><a class="link" href="rationale.html#boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__takes_a_lot_of_template_parameters__and_the_other_interface_templates_don_t"><code class="computeroutput">iterator_interface</code>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__takes_a_lot_of_template_parameters__and_the_other_interface_templates_don_t"></a></span><a class="link" href="rationale.html#boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__iterator_interface___code__phrase_role__identifier__iterator_interface__phrase___code___classname__takes_a_lot_of_template_parameters__and_the_other_interface_templates_don_t">iterator_interface
       Takes a Lot of Template Parameters, And the Other Interface Templates Don't</a>
     </h4>
 <p>
-      <code class="computeroutput">iterator_interface</code>
-      does in fact take a lot of template parameters. However, it usually only takes
-      3: the <code class="computeroutput"><span class="identifier">Derived</span></code> type, the iterator
-      category, and the iterator's <code class="computeroutput"><span class="identifier">value_type</span></code>.
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code> does in fact
+      take a lot of template parameters. However, it usually only takes 3: the <code class="computeroutput"><span class="identifier">Derived</span></code> type, the iterator category, and
+      the iterator's <code class="computeroutput"><span class="identifier">value_type</span></code>.
     </p>
 <p>
-      When you make a proxy iterator, you typically use the <code class="computeroutput">proxy_iterator_interface</code> alias,
+      When you make a proxy iterator, you typically use the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/proxy_iterator_interface.html" title="Type definition proxy_iterator_interface">proxy_iterator_interface</a></code> alias,
       and you again only need the same template parameters. Though you can opt into
       more template parameters, the rest are seldom necessary.
     </p>
 <p>
-      By contrast, the <code class="computeroutput">view_interface</code> and <code class="computeroutput">container_interface</code>
-      templates have very few template parameters. For <code class="computeroutput">view_interface</code>, this is because
+      By contrast, the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
+      templates have very few template parameters. For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>, this is because
       there are no member typedefs in the <code class="computeroutput"><span class="identifier">view</span></code>
-      concept. For <code class="computeroutput">container_interface</code>, it was deemed
+      concept. For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>, it was deemed
       ridiculous to create a template whose purpose is to reduce code size, which
       takes 14 template parameters.]
     </p>
 <h4>
 <a name="boost_stlinterfaces__proposed_.rationale.h4"></a>
-      <span class="phrase"><a name="boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__container_interface___code__phrase_role__identifier__container_interface__phrase___code___classname__does_not_support_associative_or_unordered_associative_containers"></a></span><a class="link" href="rationale.html#boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__container_interface___code__phrase_role__identifier__container_interface__phrase___code___classname__does_not_support_associative_or_unordered_associative_containers"><code class="computeroutput">container_interface</code>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__container_interface___code__phrase_role__identifier__container_interface__phrase___code___classname__does_not_support_associative_or_unordered_associative_containers"></a></span><a class="link" href="rationale.html#boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__container_interface___code__phrase_role__identifier__container_interface__phrase___code___classname__does_not_support_associative_or_unordered_associative_containers">container_interface
       Does not Support Associative or Unordered Associative Containers</a>
     </h4>
 <p>

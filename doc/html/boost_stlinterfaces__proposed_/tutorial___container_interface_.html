@@ -24,10 +24,10 @@
 <th align="left">Note</th>
 </tr>
 <tr><td align="left" valign="top"><p>
-        All the member functions provided by <code class="computeroutput">container_interface</code> are in
-        your container's base class &#8212; <code class="computeroutput">container_interface</code> &#8212;
+        All the member functions provided by <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> are in
+        your container's base class &#8212; <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> &#8212;
         and can therefore be hidden if you define a member function with the same
-        name in your derived container. If you don't like the semantics of any <code class="computeroutput">container_interface</code>-provided
+        name in your derived container. If you don't like the semantics of any <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-provided
         member function, feel free to replace it.
       </p></td></tr>
 </table></div>
@@ -44,7 +44,7 @@
     </p>
 <p>
       There is a large development cost associated with implementing a standard-compliant
-      container. As a result very few people do so. <code class="computeroutput">container_interface</code> exists to
+      container. As a result very few people do so. <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> exists to
       make bring that large development time way, way down.
     </p>
 <p>
@@ -54,7 +54,7 @@
 <span class="keyword">struct</span> <span class="identifier">container_interface</span><span class="special">;</span>
 </pre>
 <p>
-      Just as with <code class="computeroutput">view_interface</code>, <code class="computeroutput">container_interface</code> takes the
+      Just as with <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> takes the
       derived type and an optional <code class="computeroutput"><span class="keyword">bool</span></code>
       non-type template parameter that indicates whether <code class="computeroutput"><span class="identifier">Derived</span></code>'s
       iterators are contiguous. The <code class="computeroutput"><span class="keyword">bool</span></code>
@@ -62,15 +62,14 @@
     </p>
 <p>
       The tables below represent a subset of the operations needed for each of the
-      container requirements tables in the standard. <code class="computeroutput">container_interface</code> covers the
+      container requirements tables in the standard. <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> covers the
       definition of containers (including the optional container requirements); reversible
       containers; and sequence containers (including the optional sequence container
       requirements). Each table lists all the user-defined types and operations required
-      to make standard-conforming containers with <code class="computeroutput">container_interface</code>. Note that
-      <code class="computeroutput">container_interface</code>
-      does not interact at all with the allocator-aware container requirements, the
-      associative container requirements, or the unordered associative container
-      requirements.
+      to make standard-conforming containers with <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>. Note that
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> does not
+      interact at all with the allocator-aware container requirements, the associative
+      container requirements, or the unordered associative container requirements.
     </p>
 <p>
       For instance, to make a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like
@@ -96,7 +95,7 @@
 <p>
       If you have a type that does not have all the operations in one of the tables,
       that's fine -- you can just implement the operations that your type can do,
-      and whatever operations can be provided by <code class="computeroutput">container_interface</code> in terms
+      and whatever operations can be provided by <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> in terms
       of the user-defined operations, will be provided. For example, the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like
       container decribed above would have <code class="computeroutput"><span class="identifier">front</span><span class="special">()</span></code> &#8212; which comes from the optional sequence
       container requirements &#8212; even if you did not write any user-defined
@@ -104,14 +103,14 @@
       iterators, the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like container would have <code class="computeroutput"><span class="identifier">back</span><span class="special">()</span></code> too.
     </p>
 <p>
-      After each requirements table, there's a table indicating how <code class="computeroutput">container_interface</code> maps the
+      After each requirements table, there's a table indicating how <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> maps the
       user-defined operations to the operations it provides. These mapping tables
       can be handy if you have a container that meets only some of the requirements
       of one of the requirements tables.
     </p>
 <p>
       In the tables, <code class="computeroutput"><span class="identifier">X</span></code> is a user-defined
-      type derived from <code class="computeroutput">container_interface</code> containing
+      type derived from <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> containing
       objects of type <code class="computeroutput"><span class="identifier">T</span></code>; <code class="computeroutput"><span class="identifier">a</span></code> and <code class="computeroutput"><span class="identifier">b</span></code>
       are objects of type <code class="computeroutput"><span class="identifier">X</span></code>; <code class="computeroutput"><span class="identifier">i</span></code> and <code class="computeroutput"><span class="identifier">j</span></code>
       are objects of type (possibly const) <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">iterator</span></code>;
@@ -406,7 +405,7 @@
               <p>
                 Containers that also meet the sequence container requirements do
                 not need to define a destructor, as long as a call to <code class="computeroutput"><span class="identifier">clear</span><span class="special">()</span></code>
-                is sufficient &#8212; for sequence containers, <code class="computeroutput">container_interface</code>
+                is sufficient &#8212; for sequence containers, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 calls <code class="computeroutput"><span class="identifier">clear</span><span class="special">()</span></code>
                 in its destructor.
               </p>
@@ -558,11 +557,11 @@
         from the requirements above. In particular, you may want to have non-reference
         and non-pointer types for <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">reference</span></code>
         and <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">pointer</span></code>, respectively &#8212; and that
-        certainly will not break <code class="computeroutput">container_interface</code>.
+        certainly will not break <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>.
       </p></td></tr>
 </table></div>
 <p>
-      If you provide the types and operations above, <code class="computeroutput">container_interface</code> will provide
+      If you provide the types and operations above, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> will provide
       the rest of the container requirements, using this mapping:
     </p>
 <div class="table">
@@ -581,7 +580,7 @@
             </th>
 <th>
               <p>
-                <code class="computeroutput">container_interface</code>-Provided
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-Provided
               </p>
             </th>
 <th>
@@ -615,8 +614,8 @@
 <td>
               <p>
                 The user-defined <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code> are non-<code class="computeroutput"><span class="keyword">const</span></code>,
-                and the <code class="computeroutput">container_interface</code>-provided
-                ones are <code class="computeroutput"><span class="keyword">const</span></code>. <code class="computeroutput">container_interface</code>
+                and the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-provided
+                ones are <code class="computeroutput"><span class="keyword">const</span></code>. <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 can only provide <code class="computeroutput"><span class="identifier">size</span><span class="special">()</span></code> if <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">const_iterator</span></code>
                 is a random access iterator; otherwise, it must be user-defined.
               </p>
@@ -733,7 +732,7 @@
 </table></div>
 </div>
 <br class="table-break"><p>
-      If you provide the types and operations above, <code class="computeroutput">container_interface</code> will provide
+      If you provide the types and operations above, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> will provide
       the rest of the reversible container requirements, using this mapping:
     </p>
 <div class="table">
@@ -752,7 +751,7 @@
             </th>
 <th>
               <p>
-                <code class="computeroutput">container_interface</code>-Provided
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-Provided
               </p>
             </th>
 <th>
@@ -783,12 +782,12 @@
 <td>
               <p>
                 The user-defined <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code> are non-<code class="computeroutput"><span class="keyword">const</span></code>,
-                and <code class="computeroutput">container_interface</code>
+                and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 provides both <code class="computeroutput"><span class="keyword">const</span></code>
                 and non-<code class="computeroutput"><span class="keyword">const</span></code> overloads
                 of <code class="computeroutput"><span class="identifier">rbegin</span><span class="special">()</span></code>
                 and <code class="computeroutput"><span class="identifier">rend</span><span class="special">()</span></code>.
-                <code class="computeroutput">container_interface</code>
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 can only provide these operations if <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">iterator</span></code>
                 and <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">const_iterator</span></code> are bidirectional
                 iterators.
@@ -864,7 +863,7 @@
 </table></div>
 </div>
 <br class="table-break"><p>
-      If you provide the types and operations above, <code class="computeroutput">container_interface</code> will provide
+      If you provide the types and operations above, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> will provide
       the rest of the optional container requirements, using this mapping:
     </p>
 <div class="table">
@@ -883,7 +882,7 @@
             </th>
 <th>
               <p>
-                <code class="computeroutput">container_interface</code>-Provided
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-Provided
               </p>
             </th>
 <th>
@@ -1086,7 +1085,7 @@
       </p></td></tr>
 </table></div>
 <p>
-      If you provide the types and operations above, <code class="computeroutput">container_interface</code> will provide
+      If you provide the types and operations above, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> will provide
       the rest of the sequence container requirements, using this mapping:
     </p>
 <div class="table">
@@ -1105,7 +1104,7 @@
             </th>
 <th>
               <p>
-                <code class="computeroutput">container_interface</code>-Provided
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-Provided
               </p>
             </th>
 <th>
@@ -1181,7 +1180,7 @@
             </td>
 <td>
               <p>
-                The <code class="computeroutput">container_interface</code>
+                The <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 destructor behavior is equivalent to <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">clear</span><span class="special">()</span></code>.
               </p>
             </td>
@@ -1208,7 +1207,7 @@
               <p>
                 <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">q1</span><span class="special">,</span> <span class="identifier">q2</span><span class="special">)</span></code>
                 and <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">p</span><span class="special">,</span> <span class="identifier">i</span><span class="special">,</span> <span class="identifier">j</span><span class="special">)</span></code>
-                must both be user-defined for <code class="computeroutput">container_interface</code>
+                must both be user-defined for <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 to provide these operations.
               </p>
             </td>
@@ -1296,7 +1295,7 @@
 </table></div>
 </div>
 <br class="table-break"><p>
-      If you provide the types and operations above, <code class="computeroutput">container_interface</code> will provide
+      If you provide the types and operations above, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> will provide
       the rest of the optional sequence container requirements, using this mapping:
     </p>
 <div class="table">
@@ -1315,7 +1314,7 @@
             </th>
 <th>
               <p>
-                <code class="computeroutput">container_interface</code>-Provided
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-Provided
               </p>
             </th>
 <th>
@@ -1345,7 +1344,7 @@
               <p>
                 These operations are provided in <code class="computeroutput"><span class="keyword">const</span></code>
                 and non-<code class="computeroutput"><span class="keyword">const</span></code> overloads.
-                <code class="computeroutput">container_interface</code>
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 can only provide <code class="computeroutput"><span class="identifier">a</span><span class="special">[</span><span class="identifier">n</span><span class="special">]</span></code> and <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">at</span><span class="special">(</span><span class="identifier">n</span><span class="special">)</span></code> if <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">iterator</span></code>
                 and <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">const_iterator</span></code> are random access
                 iterators.
@@ -1368,7 +1367,7 @@
                 <code class="computeroutput"><span class="identifier">back</span><span class="special">()</span></code>
                 is provided in <code class="computeroutput"><span class="keyword">const</span></code>
                 and non-<code class="computeroutput"><span class="keyword">const</span></code> overloads.
-                <code class="computeroutput">container_interface</code>
+                <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 can only provide <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">back</span><span class="special">()</span></code> if <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">iterator</span></code>
                 and <code class="computeroutput"><span class="identifier">X</span><span class="special">::</span><span class="identifier">const_iterator</span></code> are bidirectinal
                 iterators.
@@ -1429,7 +1428,7 @@
               <p>
                 <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">emplace_front</span><span class="special">(</span><span class="identifier">args</span><span class="special">)</span></code>
                 and <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">q1</span><span class="special">,</span> <span class="identifier">q2</span><span class="special">)</span></code>
-                must both be user-defined for <code class="computeroutput">container_interface</code>
+                must both be user-defined for <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 to provide this operation.
               </p>
             </td>
@@ -1452,7 +1451,7 @@
               <p>
                 <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">emplace_front</span><span class="special">(</span><span class="identifier">args</span><span class="special">)</span></code>
                 and <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">q1</span><span class="special">,</span> <span class="identifier">q2</span><span class="special">)</span></code>
-                must both be user-defined for <code class="computeroutput">container_interface</code>
+                must both be user-defined for <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
                 to provide this operation.
               </p>
             </td>
@@ -1468,17 +1467,17 @@
 <tr><td align="left" valign="top"><p>
         <code class="computeroutput"><span class="identifier">emplace_front</span><span class="special">()</span></code>
         and <code class="computeroutput"><span class="identifier">emplace_back</span><span class="special">()</span></code>
-        are not needed for some of the <code class="computeroutput">container_interface</code>-provided
+        are not needed for some of the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>-provided
         operations above (e.g. <code class="computeroutput"><span class="identifier">pop_front</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">pop_back</span><span class="special">()</span></code>, respectively). However, they are each
         used as the user-defined operation that indicates that the container being
         defined is front- or back-mutation-friendly.
       </p></td></tr>
 </table></div>
 <p>
-      <code class="computeroutput">container_interface</code>
-      will provide one more operation that is not part of the C++ container requirements
-      tables, but that is pretty commonly found on sequence containers. If you define
-      <code class="computeroutput"><span class="identifier">resize</span><span class="special">(</span><span class="identifier">n</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>, <code class="computeroutput">container_interface</code> will provide
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> will provide
+      one more operation that is not part of the C++ container requirements tables,
+      but that is pretty commonly found on sequence containers. If you define <code class="computeroutput"><span class="identifier">resize</span><span class="special">(</span><span class="identifier">n</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>,
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> will provide
       a <code class="computeroutput"><span class="identifier">resize</span><span class="special">(</span><span class="identifier">n</span><span class="special">)</span></code> overload.
     </p>
 <p>
@@ -1524,7 +1523,7 @@
       contains a template called <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">container</span><span class="special">::</span><span class="identifier">static_vector</span></code>,
       which is a fixed-capacity vector that does not allocate from the heap. We have
       a similar template in this example, <code class="computeroutput"><span class="identifier">static_vector</span></code>.
-      It is implemented by deriving from <code class="computeroutput">container_interface</code>, which provides
+      It is implemented by deriving from <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>, which provides
       much of the API specified in the STL, based on a subset of the API that the
       user must provide.
     </p>
@@ -1776,11 +1775,11 @@
 <p>
     </p>
 <p>
-      That's quite a bit of code. However, by using <code class="computeroutput">container_interface</code>, we were
-      able to write only 21 functions, and let <code class="computeroutput">container_interface</code> provide the
+      That's quite a bit of code. However, by using <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>, we were
+      able to write only 21 functions, and let <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> provide the
       other 40. 9 of the 21 function that we did have to write were constructors
       and special member functions, and those always have to be written in the derived
-      class; <code class="computeroutput">container_interface</code> never could
+      class; <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> never could
       have helped with those.
     </p>
 <div class="note"><table border="0" summary="Note">
@@ -1789,7 +1788,7 @@
 <th align="left">Note</th>
 </tr>
 <tr><td align="left" valign="top"><p>
-        <code class="computeroutput">container_interface</code> does not
+        <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> does not
         support all the sets of container requirements in the standard. In particular,
         it does not support the allocator-aware requirements, and it does not support
         the associative or unordered associative container requirements.

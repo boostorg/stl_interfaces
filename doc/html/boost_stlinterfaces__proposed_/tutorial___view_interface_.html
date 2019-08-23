@@ -24,10 +24,10 @@
 <th align="left">Note</th>
 </tr>
 <tr><td align="left" valign="top"><p>
-        All the member functions provided by <code class="computeroutput">view_interface</code> are in your
-        view's base class &#8212; <code class="computeroutput">view_interface</code> &#8212; and
+        All the member functions provided by <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> are in your
+        view's base class &#8212; <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> &#8212; and
         can therefore be hidden if you define a member function with the same name
-        in your derived view. If you don't like the semantics of any <code class="computeroutput">view_interface</code>-provided member
+        in your derived view. If you don't like the semantics of any <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>-provided member
         function, feel free to replace it.
       </p></td></tr>
 </table></div>
@@ -45,21 +45,21 @@
       This is a C++14-compatible version of that template.
     </p>
 <p>
-      As with <code class="computeroutput">iterator_interface</code>, <code class="computeroutput">view_interface</code>
+      As with <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code>, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>
       makes it possible to write very few operations &#8212; only <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> and
       <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code>
-      are actually used by <code class="computeroutput">view_interface</code> &#8212; and get
+      are actually used by <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> &#8212; and get
       all the other operations that go with view types. The operations added depend
       on what kinds of iterator and/or sentinel types your derived view type define.
     </p>
 <p>
-      Here is the declaration of <code class="computeroutput">view_interface</code>:
+      Here is the declaration of <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>:
     </p>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Derived</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">Contiguous</span> <span class="special">=</span> <span class="identifier">discontiguous</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">view_interface</span><span class="special">;</span>
 </pre>
 <p>
-      <code class="computeroutput">view_interface</code>
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>
       only requires the derived type and an optional <code class="computeroutput"><span class="keyword">bool</span></code>
       non-type template parameter that indicates whether <code class="computeroutput"><span class="identifier">Derived</span></code>'s
       iterators are contiguous. The <code class="computeroutput"><span class="keyword">bool</span></code>
@@ -117,9 +117,9 @@
     </p>
 <p>
       Note that <code class="computeroutput"><span class="identifier">subrange</span></code> is derived
-      from <code class="computeroutput">view_interface</code>,
-      so it will have all the view-like operations that are appropriate to its <code class="computeroutput"><span class="identifier">Iterator</span></code> and <code class="computeroutput"><span class="identifier">Sentinel</span></code>
-      types.
+      from <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>, so it will have
+      all the view-like operations that are appropriate to its <code class="computeroutput"><span class="identifier">Iterator</span></code>
+      and <code class="computeroutput"><span class="identifier">Sentinel</span></code> types.
     </p>
 <p>
       With the helpers available, we can define <code class="computeroutput"><span class="identifier">drop_while_view</span></code>:
@@ -183,7 +183,7 @@
     </p>
 <p>
       Now, let's look at code using these types, including operations defined by
-      <code class="computeroutput">view_interface</code>
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>
       that we did not have to write:
     </p>
 <p>
@@ -221,7 +221,7 @@
 <p>
     </p>
 <p>
-      If you want more details on <code class="computeroutput">view_interface</code>, you can find
+      If you want more details on <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>, you can find
       it wherever you usually find reference documentation on the standard library.
       We won't cover it in too much detail here, for that reason.
     </p>

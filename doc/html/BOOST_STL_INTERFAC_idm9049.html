@@ -24,7 +24,7 @@
 
 </span>BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(iter, category, concept, value_type, reference, pointer, difference_type)</pre></div>
 <div class="refsect1">
-<a name="idm17018"></a><h2>Description</h2>
+<a name="idm17105"></a><h2>Description</h2>
 <p><code class="computeroutput">static_asserts</code> that the types of all typedefs in <code class="computeroutput">std::iterator_traits&lt;iter&gt;</code> match the remaining macro parameters. This is useful for checking that an iterator you write using <code class="computeroutput">iterator_interface</code> has the correct iterator traits.</p>
 <p>For example: <code class="computeroutput">BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(my_iter, std::input_iterator_tag, std::input_iterator_tag, int, int &amp;, int *, std::ptrdiff_t)</code>.</p>
 <div class="note"><table border="0" summary="Note">
