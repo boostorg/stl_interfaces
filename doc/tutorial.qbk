@@ -890,14 +890,14 @@ There's nothing much to document about it; it works just like
 
 [section The `v2` Namespace]
 
-_IFace_ contains an `inline v1` namespace.  All the C++14-compatible
+_IFaces_ contains an `inline v1` namespace.  All the C++14-compatible
 *`_interface` templates are implemnted there.  Since `v1` is an `inline`
 namespace, you can just access these templates without referring to `v1` at
 all.
 
 In the `boost::stl_interfaces::v2` namespace, you will find C++20 versions of
-_iter_iface_ and _cont_iface_ are provided; the C++20 standard library
-provides `std::view_interface`.
+_iter_iface_ and _cont_iface_; the C++20 standard library provides
+`std::view_interface`.
 
 These are constrained templates using C++20 concepts, and are considered
 experimental, because at the time of this writing, no C++20-conforming
