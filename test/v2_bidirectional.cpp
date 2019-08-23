@@ -3,7 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#define BOOST_STL_INTERFACES_DISABLE_CMCSTL2
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include "ill_formed.hpp"
@@ -16,7 +15,9 @@
 #include <type_traits>
 
 
-struct basic_bidirectional_iter : boost::stl_interfaces::iterator_interface<
+namespace bsi = boost::stl_interfaces::v2;
+
+struct basic_bidirectional_iter : bsi::iterator_interface<
                                       basic_bidirectional_iter,
                                       std::bidirectional_iterator_tag,
                                       int>
@@ -41,7 +42,7 @@ struct basic_bidirectional_iter : boost::stl_interfaces::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
+    using base_type = bsi::iterator_interface<
         basic_bidirectional_iter,
         std::bidirectional_iterator_tag,
         int>;
@@ -53,7 +54,7 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    basic_bidirectional_iter, std::bidirectional_iterator)
+    basic_bidirectional_iter, bsi::ranges::bidirectional_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_bidirectional_iter,
     std::bidirectional_iterator_tag,
@@ -69,7 +70,7 @@ static_assert(
     "");
 
 struct basic_adapted_bidirectional_ptr_iter
-    : boost::stl_interfaces::iterator_interface<
+    : bsi::iterator_interface<
           basic_adapted_bidirectional_ptr_iter,
           std::bidirectional_iterator_tag,
           int>
@@ -86,7 +87,7 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    basic_adapted_bidirectional_ptr_iter, std::bidirectional_iterator)
+    basic_adapted_bidirectional_ptr_iter, bsi::ranges::bidirectional_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_adapted_bidirectional_ptr_iter,
     std::bidirectional_iterator_tag,
@@ -97,7 +98,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 struct basic_adapted_bidirectional_list_iter
-    : boost::stl_interfaces::iterator_interface<
+    : bsi::iterator_interface<
           basic_adapted_bidirectional_list_iter,
           std::bidirectional_iterator_tag,
           int>
@@ -114,7 +115,7 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    basic_adapted_bidirectional_list_iter, std::bidirectional_iterator)
+    basic_adapted_bidirectional_list_iter, bsi::ranges::bidirectional_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_adapted_bidirectional_list_iter,
     std::bidirectional_iterator_tag,
@@ -125,7 +126,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
+struct bidirectional_iter : bsi::iterator_interface<
                                 bidirectional_iter<ValueType>,
                                 std::bidirectional_iterator_tag,
                                 ValueType>
@@ -157,7 +158,7 @@ struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
+    using base_type = bsi::iterator_interface<
         bidirectional_iter<ValueType>,
         std::bidirectional_iterator_tag,
         ValueType>;
@@ -175,7 +176,7 @@ using bidirectional = bidirectional_iter<int>;
 using const_bidirectional = bidirectional_iter<int const>;
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    bidirectional, std::bidirectional_iterator)
+    bidirectional, bsi::ranges::bidirectional_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     bidirectional,
     std::bidirectional_iterator_tag,
@@ -186,7 +187,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
-    const_bidirectional, std::bidirectional_iterator)
+    const_bidirectional, bsi::ranges::bidirectional_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_bidirectional,
     std::bidirectional_iterator_tag,
@@ -196,6 +197,53 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int const *,
     std::ptrdiff_t)
 
+struct basic_proxy_bidirectional_iter : bsi::proxy_iterator_interface<
+                                            basic_proxy_bidirectional_iter,
+                                            std::bidirectional_iterator_tag,
+                                            int>
+{
+    basic_proxy_bidirectional_iter() : it_(nullptr) {}
+    basic_proxy_bidirectional_iter(int * it) : it_(it) {}
+
+    int operator*() const { return *it_; }
+    basic_proxy_bidirectional_iter & operator++()
+    {
+        ++it_;
+        return *this;
+    }
+    basic_proxy_bidirectional_iter & operator--()
+    {
+        --it_;
+        return *this;
+    }
+    friend bool operator==(
+        basic_proxy_bidirectional_iter lhs,
+        basic_proxy_bidirectional_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
+
+    using base_type = bsi::proxy_iterator_interface<
+        basic_proxy_bidirectional_iter,
+        std::bidirectional_iterator_tag,
+        int>;
+    using base_type::operator++;
+    using base_type::operator--;
+
+private:
+    int * it_;
+};
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    basic_proxy_bidirectional_iter, bsi::ranges::bidirectional_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_proxy_bidirectional_iter,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int,
+    int,
+    boost::stl_interfaces::proxy_arrow_result<int>,
+    std::ptrdiff_t)
 
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
@@ -440,116 +488,5 @@ TEST(bidirectional, const_std_copy)
             std::make_reverse_iterator(first),
             3,
             std::greater<>{}));
-    }
-}
-
-
-////////////////////
-// view_interface //
-////////////////////
-#include "view_tests.hpp"
-
-template<typename T>
-using data_t = decltype(std::declval<T>().data());
-
-static_assert(
-    ill_formed<
-        data_t,
-        subrange<
-            basic_bidirectional_iter,
-            basic_bidirectional_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        data_t,
-        subrange<
-            basic_bidirectional_iter,
-            basic_bidirectional_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-template<typename T>
-using size_t_ = decltype(std::declval<T>().size());
-
-static_assert(
-    ill_formed<
-        size_t_,
-        subrange<
-            basic_bidirectional_iter,
-            basic_bidirectional_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        size_t_,
-        subrange<
-            basic_bidirectional_iter,
-            basic_bidirectional_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-template<typename T>
-using index_operator_t = decltype(std::declval<T>()[0]);
-
-static_assert(
-    ill_formed<
-        index_operator_t,
-        subrange<
-            basic_bidirectional_iter,
-            basic_bidirectional_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        index_operator_t,
-        subrange<
-            basic_bidirectional_iter,
-            basic_bidirectional_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-TEST(bidirectional, basic_subrange)
-{
-    basic_bidirectional_iter first(ints.data());
-    basic_bidirectional_iter last(ints.data() + ints.size());
-
-    auto r = range<boost::stl_interfaces::v1::discontiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::v1::discontiguous>(first, first);
-
-    // range begin/end
-    {
-        std::array<int, 10> ints_copy;
-        std::copy(r.begin(), r.end(), ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-
-        EXPECT_EQ(empty.begin(), empty.end());
-    }
-
-    // empty/op bool
-    {
-        EXPECT_FALSE(r.empty());
-        EXPECT_TRUE(r);
-
-        EXPECT_TRUE(empty.empty());
-        EXPECT_FALSE(empty);
-
-        auto const cr = r;
-        EXPECT_FALSE(cr.empty());
-        EXPECT_TRUE(cr);
-
-        auto const cempty = empty;
-        EXPECT_TRUE(cempty.empty());
-        EXPECT_FALSE(cempty);
-    }
-
-    // front/back
-    {
-        EXPECT_EQ(r.front(), 0);
-        EXPECT_EQ(r.back(), 9);
-
-        auto const cr = r;
-        EXPECT_EQ(cr.front(), 0);
-        EXPECT_EQ(cr.back(), 9);
     }
 }

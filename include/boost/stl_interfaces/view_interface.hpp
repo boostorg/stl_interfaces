@@ -9,20 +9,41 @@
 #include <boost/stl_interfaces/fwd.hpp>
 
 
-namespace boost { namespace stl_interfaces {
+namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** A CRTP template that one may derive from to make it easier to define
         `std::ranges::view`-like types with a container-like interface.  This
         is a pre-C++20 version of C++20's `view_interface` (see
-        [view.interface] in the C++ standard). */
+        [view.interface] in the C++ standard).
+
+        The template parameter `D` for `view_interface` may be an incomplete
+        type.  Before any member of the resulting specialization of
+        `view_interface` other than special member functions is referenced,
+        `D` shall be complete, and model both
+        `std::derived_from<view_interface<D>>` and `std::view`. */
     template<
-        typename Derived,
+        typename D,
         bool Contiguous = discontiguous
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
         typename E = std::enable_if_t<
-            std::is_class<Derived>::value &&
-            std::is_same<Derived, std::remove_cv_t<Derived>>::value>
+            std::is_class<D>::value &&
+            std::is_same<D, std::remove_cv_t<D>>::value>
+#endif
+        >
+    struct view_interface;
+
+    namespace v1_dtl {
+        template<typename D, bool Contiguous>
+        void derived_view(view_interface<D, Contiguous> const &);
+    }
+
+    template<
+        typename Derived,
+        bool Contiguous
+#ifndef BOOST_STL_INTERFACES_DOXYGEN
+        ,
+        typename E
 #endif
         >
     struct view_interface
@@ -40,8 +61,6 @@ namespace boost { namespace stl_interfaces {
 #endif
 
     public:
-        using derived_view_type = Derived;
-
         template<typename D = Derived>
         constexpr auto empty() noexcept(
             noexcept(std::declval<D &>().begin() == std::declval<D &>().end()))
@@ -65,7 +84,7 @@ namespace boost { namespace stl_interfaces {
             typename D = Derived,
             typename R = decltype(std::declval<D &>().empty())>
         constexpr explicit
-        operator R() noexcept(noexcept(std::declval<D &>().empty()))
+        operator bool() noexcept(noexcept(std::declval<D &>().empty()))
         {
             return !derived().empty();
         }
@@ -133,8 +152,8 @@ namespace boost { namespace stl_interfaces {
         template<
             typename D = Derived,
             typename Enable = std::enable_if_t<
-                detail::decrementable_sentinel<D>::value &&
-                detail::common_range<D>::value>>
+                v1_dtl::decrementable_sentinel<D>::value &&
+                v1_dtl::common_range<D>::value>>
         constexpr auto
         back() noexcept(noexcept(*std::prev(std::declval<D &>().end())))
             -> decltype(*std::prev(std::declval<D &>().end()))
@@ -144,8 +163,8 @@ namespace boost { namespace stl_interfaces {
         template<
             typename D = Derived,
             typename Enable = std::enable_if_t<
-                detail::decrementable_sentinel<D>::value &&
-                detail::common_range<D>::value>>
+                v1_dtl::decrementable_sentinel<D>::value &&
+                v1_dtl::common_range<D>::value>>
         constexpr auto back() const
             noexcept(noexcept(*std::prev(std::declval<D const &>().end())))
                 -> decltype(*std::prev(std::declval<D const &>().end()))
@@ -154,14 +173,14 @@ namespace boost { namespace stl_interfaces {
         }
 
         template<typename D = Derived>
-        constexpr auto operator[](detail::range_difference_t<D> n) noexcept(
+        constexpr auto operator[](v1_dtl::range_difference_t<D> n) noexcept(
             noexcept(std::declval<D &>().begin()[n]))
             -> decltype(std::declval<D &>().begin()[n])
         {
             return derived().begin()[n];
         }
         template<typename D = Derived>
-        constexpr auto operator[](detail::range_difference_t<D> n) const
+        constexpr auto operator[](v1_dtl::range_difference_t<D> n) const
             noexcept(noexcept(std::declval<D const &>().begin()[n]))
                 -> decltype(std::declval<D const &>().begin()[n])
         {
@@ -173,14 +192,26 @@ namespace boost { namespace stl_interfaces {
         `view_interface`.  */
     template<typename ViewInterface>
     constexpr auto operator!=(ViewInterface lhs, ViewInterface rhs) noexcept(
-        noexcept(lhs == rhs))
-        -> decltype(
-            detail::dummy<typename ViewInterface::derived_view_type>(),
-            lhs == rhs)
+        noexcept(lhs == rhs)) -> decltype(v1_dtl::derived_view(lhs), lhs == rhs)
     {
         return !(lhs == rhs);
     }
 
-}}
+}}}
+
+
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts) || BOOST_STL_INTERFACES_DOXYGEN
+
+namespace boost { namespace stl_interfaces { namespace v2 {
+
+    /** A template alias for `std::view_interface`.  This only exists to make
+        migration from Boost.STLInterfaces to C++20 easier; switch to the one
+        in `std` as soon as you can. */
+    template<typename D, bool = v1::discontiguous>
+    using view_interface = std::view_interface<D>;
+
+}}}
+
+#endif
 
 #endif

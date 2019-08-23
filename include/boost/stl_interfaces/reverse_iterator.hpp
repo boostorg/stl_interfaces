@@ -9,7 +9,7 @@
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 
-namespace boost { namespace stl_interfaces {
+namespace boost { namespace stl_interfaces { inline namespace v1 {
 
     /** This type is very similar to the C++20 version of
         `std::reverse_iterator`; it is `constexpr`-, `noexcept`-, and
@@ -93,6 +93,32 @@ namespace boost { namespace stl_interfaces {
         return reverse_iterator<BidiIter>(it);
     }
 
-}}
+}}}
+
+
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts) || BOOST_STL_INTERFACES_DOXYGEN
+
+namespace boost { namespace stl_interfaces { namespace v2 {
+
+    /** A template alias for `std::reverse_iterator`.  This only exists to
+        make migration from Boost.STLInterfaces to C++20 easier; switch to the
+        one in `std` as soon as you can. */
+    template<typename BidiIter>
+    using reverse_iterator = std::reverse_iterator<BidiIter>;
+
+
+    /** Makes a `reverse_iterator<BidiIter>` from an iterator of type
+        `Bidiiter`.  This only exists to make migration from
+        Boost.STLInterfaces to C++20 easier; switch to the one in `std` as
+        soon as you can. */
+    template<typename BidiIter>
+    auto make_reverse_iterator(BidiIter it)
+    {
+        return reverse_iterator<BidiIter>(it);
+    }
+
+}}}
+
+#endif
 
 #endif

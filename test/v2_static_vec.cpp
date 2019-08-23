@@ -3,6 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+#define USE_V2
 #include "../example/static_vector.hpp"
 
 #include "ill_formed.hpp"
@@ -10,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include <array>
+
 
 // Instantiate all the members we can.
 template struct static_vector<int, 1024>;
@@ -31,6 +33,19 @@ TEST(static_vec, default_ctor)
     EXPECT_GE(v, v);
 
     EXPECT_THROW(v.at(0), std::out_of_range);
+
+    vec_type const & cv = v;
+    EXPECT_TRUE(cv.empty());
+    EXPECT_EQ(cv.size(), 0u);
+
+    EXPECT_EQ(cv.max_size(), 10u);
+    EXPECT_EQ(cv.capacity(), 10u);
+
+    EXPECT_EQ(cv, cv);
+    EXPECT_LE(cv, cv);
+    EXPECT_GE(cv, cv);
+
+    EXPECT_THROW(cv.at(0), std::out_of_range);
 }
 
 TEST(static_vec, other_ctors_assign)

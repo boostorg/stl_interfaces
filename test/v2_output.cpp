@@ -3,7 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#define BOOST_STL_INTERFACES_DISABLE_CMCSTL2
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <gtest/gtest.h>
@@ -13,9 +12,10 @@
 #include <type_traits>
 
 
+namespace bsi = boost::stl_interfaces::v2;
+
 struct basic_output_iter
-    : boost::stl_interfaces::
-          iterator_interface<basic_output_iter, std::output_iterator_tag, int>
+    : bsi::iterator_interface<basic_output_iter, std::output_iterator_tag, int>
 {
     basic_output_iter() : it_(nullptr) {}
     basic_output_iter(int * it) : it_(it) {}
@@ -27,7 +27,7 @@ struct basic_output_iter
         return *this;
     }
 
-    using base_type = boost::stl_interfaces::
+    using base_type = bsi::
         iterator_interface<basic_output_iter, std::output_iterator_tag, int>;
     using base_type::operator++;
 
@@ -37,9 +37,7 @@ private:
 
 using output = basic_output_iter;
 
-#if 201703L < __cplusplus && defined(__cpp_lib_concepts)
-static_assert(std::output_iterator<output, int>, "");
-#endif
+static_assert(bsi::ranges::output_iterator<output, int>);
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     output,
     std::output_iterator_tag,
@@ -50,7 +48,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename Container>
-struct back_insert_iter : boost::stl_interfaces::iterator_interface<
+struct back_insert_iter : bsi::iterator_interface<
                               back_insert_iter<Container>,
                               std::output_iterator_tag,
                               typename Container::value_type,
@@ -73,7 +71,7 @@ struct back_insert_iter : boost::stl_interfaces::iterator_interface<
         return *this;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
+    using base_type = bsi::iterator_interface<
         back_insert_iter<Container>,
         std::output_iterator_tag,
         typename Container::value_type,
@@ -86,9 +84,7 @@ private:
 
 using back_insert = back_insert_iter<std::vector<int>>;
 
-#if 201703L < __cplusplus && defined(__cpp_lib_concepts)
-static_assert(std::output_iterator<back_insert, int>, "");
-#endif
+static_assert(bsi::ranges::output_iterator<back_insert, int>);
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     back_insert,
     std::output_iterator_tag,
