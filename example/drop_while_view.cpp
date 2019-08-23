@@ -30,7 +30,7 @@ private:
     Sentinel last_;
 };
 
-// std::view::all() returns one of several types, depending onwhat you pass
+// std::view::all() returns one of several types, depending on what you pass
 // it.  Here, we're keeping it simple; all() always returns a subrange.
 template<typename Range>
 auto all(Range && range)
@@ -69,7 +69,7 @@ struct drop_while_view
     constexpr Pred const & pred() const noexcept { return pred_; }
 
     // A more robust implementation should probably cache the value computed
-    // by this function, so that aubsequent calls can just return the cached
+    // by this function, so that subsequent calls can just return the cached
     // iterator.
     constexpr auto begin()
     {

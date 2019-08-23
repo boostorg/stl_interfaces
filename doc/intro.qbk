@@ -1,11 +1,11 @@
 [section Introduction]
 
-Writing STL iterators, views, and containers is suprisingly hard.  There are a
+Writing STL iterators, views, and containers is surprisingly hard.  There are a
 lot of things that can subtly go wrong.  It is also very tedious, which of
 course makes it error-prone.
 
 Iterators have numerous typedefs and operations, even though all the
-operations of a givenn iterator can be implemented in terms of at most four
+operations of a given iterator can be implemented in terms of at most four
 operations (and usually only three).  Writing all the other operations yields
 very similar-looking code that is hard to review, and all but requires that
 you write full-coverage tests for each iterator.

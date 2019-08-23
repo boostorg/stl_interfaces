@@ -27,7 +27,7 @@ using container_interface =
 
 
 //[ static_vector_defn
-// The sections of member functions below are comemnted as they are in the
+// The sections of member functions below are commented as they are in the
 // standard for std::vector.  Each section has two numbers: the number of
 // member functions in that section, and the number that are missing, because
 // they are provided by container_interface.  The purely allocator-specific
