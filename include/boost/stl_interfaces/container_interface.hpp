@@ -482,12 +482,20 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             noexcept(std::declval<D &>().insert(
                 std::declval<D &>().begin(), first, last)))
             -> decltype(
-                std::declval<D &>().clear(),
+                std::declval<D &>().erase(
+                    std::declval<D &>().begin(), std::declval<D &>().end()),
                 (void)std::declval<D &>().insert(
                     std::declval<D &>().begin(), first, last))
         {
-            derived().clear();
-            derived().insert(derived().begin(), first, last);
+            auto out = derived().begin();
+            auto const out_last = derived().end();
+            for (; out != out_last && first != last; ++first, ++out) {
+                *out = *first;
+            }
+            if (out != out_last)
+                derived().erase(out, out_last);
+            if (first != last)
+                derived().insert(derived().end(), first, last);
         }
 
         template<typename D = Derived>
@@ -500,17 +508,24 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
                                              detail::make_n_iter(x, n),
                                              detail::make_n_iter_end(x, n))))
             -> decltype(
-                std::declval<D &>().clear(),
+                std::declval<D &>().erase(
+                    std::declval<D &>().begin(), std::declval<D &>().end()),
                 (void)std::declval<D &>().insert(
                     std::declval<D &>().begin(),
                     detail::make_n_iter(x, n),
                     detail::make_n_iter_end(x, n)))
         {
-            derived().clear();
-            derived().insert(
-                derived().begin(),
-                detail::make_n_iter(x, n),
-                detail::make_n_iter_end(x, n));
+            auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
+            auto const fill_end = std::fill_n(derived().begin(), min_size, x);
+            if (min_size < (std::ptrdiff_t)derived().size()) {
+                derived().erase(fill_end, derived().end());
+            } else {
+                n -= min_size;
+                derived().insert(
+                    derived().begin(),
+                    detail::make_n_iter(x, n),
+                    detail::make_n_iter_end(x, n));
+            }
         }
 
         template<typename D = Derived>
@@ -776,8 +791,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       template<std::ranges::random_access_range C = D>
         constexpr decltype(auto) at(v2_dtl::container_size_t<C> n) {
           if (derived().size() < n)
-            throw std::out_of_range("Bounds check failed in container_interface::at()es
-");
+            throw std::out_of_range("Bounds check failed in container_interface::at()");
           return std::ranges::begin(derived())[n];
         }
       template<std::ranges::random_access_range C = const D>
@@ -877,31 +891,43 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       template<std::ranges::input_iterator Iter, typename C = D>
         constexpr void assign(Iter first, Iter last)
           requires requires {
-            derived().clear();
+            derived().erase(std::ranges::begin(derived()), std::ranges::end(derived()));
             derived().insert(std::ranges::begin(derived()), first, last); } {
-              derived().clear();
-              derived().insert(std::ranges::begin(derived()), first, last);
+              auto out = derived().begin();
+              auto const out_last = derived().end();
+              for (; out != out_last && first != last; ++first, ++out) {
+                *out = *first;
+              }
+              if (out != out_last)
+                derived().erase(out, out_last);
+              if (first != last)
+                derived().insert(derived().end(), first, last);
             }
       template<typename C = D>
         constexpr void assign(v2_dtl::container_size_t<C> n,
                               const std::ranges::range_value_t<C>& x)
           requires requires {
-            derived().clear();
+            derived().erase(std::ranges::begin(derived()), std::ranges::end(derived()));
             derived().insert(std::ranges::begin(derived()),
                              detail::make_n_iter(x, n),
                              detail::make_n_iter_end(x, n)); } {
-              derived().clear();
-              derived().insert(std::ranges::begin(derived()),
-                               detail::make_n_iter(x, n),
-                               detail::make_n_iter_end(x, n));
+              auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
+              auto const fill_end = std::fill_n(derived().begin(), min_size, x);
+              if (min_size < (std::ptrdiff_t)derived().size()) {
+                derived().erase(fill_end, derived().end());
+              } else {
+                n -= min_size;
+                derived().insert(
+                  derived().begin(),
+                  detail::make_n_iter(x, n),
+                  detail::make_n_iter_end(x, n));
+              }
             }
       template<typename C = D>
         constexpr void assign(std::initializer_list<std::ranges::range_value_t<C>> il)
           requires requires {
-            derived().clear();
-            derived().insert(std::ranges::begin(derived()), il.begin(), il.end()); } {
-              derived().clear();
-              derived().insert(std::ranges::begin(derived()), il.begin(), il.end());
+            derived().assign(il.begin(), il.end()); } {
+              derived().assign(il.begin(), il.end());
             }
 
       constexpr void clear() noexcept
@@ -1263,17 +1289,31 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       template<ranges::input_iterator Iter, typename C = D>
         constexpr void assign(Iter first, Iter last)
           requires v2_dtl::erase_insert<C, Iter> {
-            derived().clear();
-            derived().insert(ranges::begin(derived()), first, last);
+            auto out = derived().begin();
+            auto const out_last = derived().end();
+            for (; out != out_last && first != last; ++first, ++out) {
+                *out = *first;
+            }
+            if (out != out_last)
+                derived().erase(out, out_last);
+            if (first != last)
+                derived().insert(derived().end(), first, last);
           }
       template<typename C = D>
         constexpr void assign(v2_dtl::container_size_t<C> n,
                               const ranges::ext::range_value_t<C>& x)
           requires v2_dtl::erase_insert<C, v2_dtl::n_iter_t<C>> {
-            derived().clear();
-            derived().insert(ranges::begin(derived()),
-                             detail::make_n_iter(x, n),
-                             detail::make_n_iter_end(x, n));
+            auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
+            auto const fill_end = std::fill_n(derived().begin(), min_size, x);
+            if (min_size < (std::ptrdiff_t)derived().size()) {
+                derived().erase(fill_end, derived().end());
+            } else {
+                n -= min_size;
+                derived().insert(
+                    derived().begin(),
+                    detail::make_n_iter(x, n),
+                    detail::make_n_iter_end(x, n));
+            }
           }
       template<typename C = D>
         constexpr void assign(std::initializer_list<ranges::ext::range_value_t<C>> il)
