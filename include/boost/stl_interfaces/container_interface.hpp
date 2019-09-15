@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <cstddef>
 
 
 namespace boost { namespace stl_interfaces { namespace detail {
@@ -56,6 +57,20 @@ namespace boost { namespace stl_interfaces { namespace detail {
         noexcept(n_iter<T, SizeType>(x, n)))
     {
         return n_iter<T, SizeType>(x, n);
+    }
+
+    template<typename Container>
+    std::size_t fake_capacity(Container const & c)
+    {
+        return SIZE_MAX;
+    }
+    template<
+        typename Container,
+        typename Enable = decltype(
+            std::size_t() = std::declval<Container const &>().capacity())>
+    std::size_t fake_capacity(Container const & c)
+    {
+        return c.capacity();
     }
 
 }}}
@@ -508,6 +523,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
                                              detail::make_n_iter(x, n),
                                              detail::make_n_iter_end(x, n))))
             -> decltype(
+                std::declval<D &>().size(),
                 std::declval<D &>().erase(
                     std::declval<D &>().begin(), std::declval<D &>().end()),
                 (void)std::declval<D &>().insert(
@@ -515,16 +531,23 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
                     detail::make_n_iter(x, n),
                     detail::make_n_iter_end(x, n)))
         {
-            auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
-            auto const fill_end = std::fill_n(derived().begin(), min_size, x);
-            if (min_size < (std::ptrdiff_t)derived().size()) {
-                derived().erase(fill_end, derived().end());
+            if (detail::fake_capacity(derived()) < n) {
+                Derived temp(n, x);
+                derived().swap(temp);
             } else {
-                n -= min_size;
-                derived().insert(
-                    derived().begin(),
-                    detail::make_n_iter(x, n),
-                    detail::make_n_iter_end(x, n));
+                auto const min_size =
+                    std::min<std::ptrdiff_t>(n, derived().size());
+                auto const fill_end =
+                    std::fill_n(derived().begin(), min_size, x);
+                if (min_size < (std::ptrdiff_t)derived().size()) {
+                    derived().erase(fill_end, derived().end());
+                } else {
+                    n -= min_size;
+                    derived().insert(
+                        derived().begin(),
+                        detail::make_n_iter(x, n),
+                        detail::make_n_iter_end(x, n));
+                }
             }
         }
 
@@ -907,28 +930,33 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         constexpr void assign(v2_dtl::container_size_t<C> n,
                               const std::ranges::range_value_t<C>& x)
           requires requires {
+            { derived().size() } -> std::convertible_to<std::size_t>;
             derived().erase(std::ranges::begin(derived()), std::ranges::end(derived()));
             derived().insert(std::ranges::begin(derived()),
                              detail::make_n_iter(x, n),
                              detail::make_n_iter_end(x, n)); } {
-              auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
-              auto const fill_end = std::fill_n(derived().begin(), min_size, x);
-              if (min_size < (std::ptrdiff_t)derived().size()) {
-                derived().erase(fill_end, derived().end());
+              if (detail::fake_capacity(derived()) < n) {
+                C temp(n, x);
+                derived().swap(temp);
               } else {
-                n -= min_size;
-                derived().insert(
-                  derived().begin(),
-                  detail::make_n_iter(x, n),
-                  detail::make_n_iter_end(x, n));
+                auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
+                auto const fill_end = std::fill_n(derived().begin(), min_size, x);
+                if (min_size < (std::ptrdiff_t)derived().size()) {
+                  derived().erase(fill_end, derived().end());
+                } else {
+                  n -= min_size;
+                  derived().insert(
+                    derived().begin(),
+                    detail::make_n_iter(x, n),
+                    detail::make_n_iter_end(x, n));
+                }
               }
             }
       template<typename C = D>
         constexpr void assign(std::initializer_list<std::ranges::range_value_t<C>> il)
-          requires requires {
-            derived().assign(il.begin(), il.end()); } {
-              derived().assign(il.begin(), il.end());
-            }
+          requires requires { derived().assign(il.begin(), il.end()); } {
+            derived().assign(il.begin(), il.end());
+          }
 
       constexpr void clear() noexcept
         requires requires {
@@ -1303,23 +1331,27 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         constexpr void assign(v2_dtl::container_size_t<C> n,
                               const ranges::ext::range_value_t<C>& x)
           requires v2_dtl::erase_insert<C, v2_dtl::n_iter_t<C>> {
-            auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
-            auto const fill_end = std::fill_n(derived().begin(), min_size, x);
-            if (min_size < (std::ptrdiff_t)derived().size()) {
-                derived().erase(fill_end, derived().end());
+            if (detail::fake_capacity(derived()) < n) {
+              C temp(n, x);
+              derived().swap(temp);
             } else {
-                n -= min_size;
-                derived().insert(
-                    derived().begin(),
-                    detail::make_n_iter(x, n),
-                    detail::make_n_iter_end(x, n));
+              auto const min_size = std::min<std::ptrdiff_t>(n, derived().size());
+              auto const fill_end = std::fill_n(derived().begin(), min_size, x);
+              if (min_size < (std::ptrdiff_t)derived().size()) {
+                  derived().erase(fill_end, derived().end());
+              } else {
+                  n -= min_size;
+                  derived().insert(
+                      derived().begin(),
+                      detail::make_n_iter(x, n),
+                      detail::make_n_iter_end(x, n));
+              }
             }
           }
       template<typename C = D>
         constexpr void assign(std::initializer_list<ranges::ext::range_value_t<C>> il)
           requires v2_dtl::erase_insert<C, decltype(il.begin())> {
-            derived().clear();
-            derived().insert(ranges::begin(derived()), il.begin(), il.end());
+            derived().assign(il.begin(), il.end());
           }
 
       constexpr void clear() noexcept
