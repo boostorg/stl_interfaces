@@ -400,7 +400,7 @@ allocator-aware container requirements, the associative container
 requirements, or the unordered associative container requirements.
 
 For instance, to make a `std::array`-like container (but not a sequence
-container, because if has no `insert()`, `erase()`, etc.), you need to define
+container, because it has no `insert()`, `erase()`, etc.), you need to define
 the types and operations in the "User-Defined Types and Operations for
 Containers" table, and optionally the ones in the "Optional User-Defined Types
 and Operations for Containers".
@@ -423,7 +423,7 @@ user-defined operations, will be provided.  For example, the `std::array`-like
 container described above would have `front()` _emdash_ which comes from the
 optional sequence container requirements _emdash_ even if you did not write
 any user-defined insertion or erasure member functions into your container.
-It if has bidirectional iterators, the `std::array`-like container would have
+If it has bidirectional iterators, the `std::array`-like container will have
 `back()` too.
 
 After each requirements table, there's a table indicating how _cont_iface_
