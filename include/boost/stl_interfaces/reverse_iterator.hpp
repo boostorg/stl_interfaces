@@ -71,6 +71,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             return *this;
         }
 
+        constexpr BidiIter base() const noexcept { return it_; }
+
     private:
         friend access;
         constexpr BidiIter & base_reference() noexcept { return it_; }
