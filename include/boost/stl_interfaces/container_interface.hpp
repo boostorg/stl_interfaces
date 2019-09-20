@@ -9,6 +9,7 @@
 #include <boost/stl_interfaces/reverse_iterator.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/config.hpp>
 
 #include <algorithm>
 #include <stdexcept>
@@ -196,8 +197,11 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
 
         template<typename D = Derived>
-        constexpr auto size() noexcept(
-            noexcept(std::declval<D &>().end() - std::declval<D &>().begin()))
+        constexpr auto size()
+#if !BOOST_CLANG
+            noexcept(noexcept(
+                std::declval<D &>().end() - std::declval<D &>().begin()))
+#endif
             -> decltype(typename D::size_type(
                 std::declval<D &>().end() - std::declval<D &>().begin()))
         {
@@ -208,8 +212,11 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             std::declval<D const &>().end() -
             std::declval<D const &>().begin()))
             -> decltype(typename D::size_type(
+#if !BOOST_CLANG
                 std::declval<D const &>().end() -
-                std::declval<D const &>().begin()))
+                std::declval<D const &>().begin()
+#endif
+                ))
         {
             return derived().end() - derived().begin();
         }
