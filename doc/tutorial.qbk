@@ -398,6 +398,8 @@ and operations required to make standard-conforming containers with
 _cont_iface_.  Note that _cont_iface_ does not interact at all with the
 allocator-aware container requirements, the associative container
 requirements, or the unordered associative container requirements.
+Specifically, nothing precludes you from satisfying any of those sets or
+requirements _emdash_ it's just that _cont_iface_ does not.
 
 For instance, to make a `std::array`-like container (but not a sequence
 container, because it has no `insert()`, `erase()`, etc.), you need to define
