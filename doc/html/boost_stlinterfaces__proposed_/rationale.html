@@ -36,7 +36,7 @@
       etc.
     </p>
 <p>
-      There are not more constraints (for instance, that <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> is given a <code class="computeroutput"><span class="identifier">Derived</span></code> template parameter for a type that
+      Further constraints are not possible (for instance, that <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> is given a <code class="computeroutput"><span class="identifier">Derived</span></code> template parameter for a type that
       has a <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
       and <code class="computeroutput"><span class="identifier">end</span><span class="special">()</span></code>),
       because <code class="computeroutput"><span class="identifier">Derived</span></code> is an incomplete
@@ -80,13 +80,14 @@
     </h4>
 <p>
       <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code> does in fact
-      take a lot of template parameters. However, it usually only takes 3: the <code class="computeroutput"><span class="identifier">Derived</span></code> type, the iterator category, and
-      the iterator's <code class="computeroutput"><span class="identifier">value_type</span></code>.
+      take a lot of template parameters. However, it usually only takes three: the
+      <code class="computeroutput"><span class="identifier">Derived</span></code> type, the iterator
+      category, and the iterator's <code class="computeroutput"><span class="identifier">value_type</span></code>.
     </p>
 <p>
       When you make a proxy iterator, you typically use the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/proxy_iterator_interface.html" title="Type definition proxy_iterator_interface">proxy_iterator_interface</a></code> alias,
-      and you again only need the same template parameters. Though you can opt into
-      more template parameters, the rest are seldom necessary.
+      and you again only need the same three template parameters. Though you can
+      opt into more template parameters, the rest are seldom necessary.
     </p>
 <p>
       By contrast, the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>
@@ -94,7 +95,7 @@
       there are no member typedefs in the <code class="computeroutput"><span class="identifier">view</span></code>
       concept. For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code>, it was deemed
       ridiculous to create a template whose purpose is to reduce code size, which
-      takes 14 template parameters.]
+      takes 14 template parameters.
     </p>
 <h4>
 <a name="boost_stlinterfaces__proposed_.rationale.h4"></a>
@@ -107,6 +108,27 @@
       very efficient, and I don't want to encourage people to write more of them.
       Unordered associative containers have an interface that precludes open addressing.
       I don't want to encourage more of that either.
+    </p>
+<h4>
+<a name="boost_stlinterfaces__proposed_.rationale.h5"></a>
+      <span class="phrase"><a name="boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__container_interface___code__phrase_role__identifier__container_interface__phrase___code___classname__does_not_satisfy_the_allocator_aware_container_requirements"></a></span><a class="link" href="rationale.html#boost_stlinterfaces__proposed_.rationale._classname_alt__boost__stl_interfaces__v1__container_interface___code__phrase_role__identifier__container_interface__phrase___code___classname__does_not_satisfy_the_allocator_aware_container_requirements">container_interface
+      Does not Satisfy the Allocator-Aware Container Requirements</a>
+    </h4>
+<p>
+      It may not be immediately obvious, but <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> simply cannot
+      help with the allocator-aware requirements. All of the allocator-aware requirements
+      but 3 are special members and constructors. A <a href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern" target="_top">CRTP</a>
+      base template is unable to provide those, based on the language rules. That
+      leaves the <code class="computeroutput"><span class="identifier">allocator_type</span></code> typedef,
+      which the user must provide; member <code class="computeroutput"><span class="identifier">swap</span><span class="special">()</span></code>, which is already a container requirement
+      (the allocator-aware table entry just specifies that member <code class="computeroutput"><span class="identifier">swap</span><span class="special">()</span></code> must be constant-time); and <code class="computeroutput"><span class="identifier">get_allocator</span><span class="special">()</span></code>,
+      which again is something the user must provide.
+    </p>
+<p>
+      Most of the difficulty of dealing with allocators has to do with the implementation
+      details of their use within your container. <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> provides
+      missing elements of a sequence container's interface, by calling user-provided
+      members of that same interface. It cannot help you with your container's implementation.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

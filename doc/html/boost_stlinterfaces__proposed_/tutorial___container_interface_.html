@@ -70,10 +70,12 @@
       <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> does not
       interact at all with the allocator-aware container requirements, the associative
       container requirements, or the unordered associative container requirements.
+      Specifically, nothing precludes you from satisfying any of those sets or requirements
+      &#8212; it's just that <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> does not.
     </p>
 <p>
       For instance, to make a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like
-      container (but not a sequence container, because if has no <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">erase</span><span class="special">()</span></code>, etc.), you need to define the types and
+      container (but not a sequence container, because it has no <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">erase</span><span class="special">()</span></code>, etc.), you need to define the types and
       operations in the "User-Defined Types and Operations for Containers"
       table, and optionally the ones in the "Optional User-Defined Types and
       Operations for Containers".
@@ -99,8 +101,8 @@
       of the user-defined operations, will be provided. For example, the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like
       container described above would have <code class="computeroutput"><span class="identifier">front</span><span class="special">()</span></code> &#8212; which comes from the optional sequence
       container requirements &#8212; even if you did not write any user-defined
-      insertion or erasure member functions into your container. It if has bidirectional
-      iterators, the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like container would have <code class="computeroutput"><span class="identifier">back</span><span class="special">()</span></code> too.
+      insertion or erasure member functions into your container. If it has bidirectional
+      iterators, the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span></code>-like container will have <code class="computeroutput"><span class="identifier">back</span><span class="special">()</span></code> too.
     </p>
 <p>
       After each requirements table, there's a table indicating how <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/container_interface.html" title="Struct template container_interface">container_interface</a></code> maps the

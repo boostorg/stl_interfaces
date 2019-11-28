@@ -425,7 +425,23 @@
 </tbody>
 </table></div>
 </div>
-<br class="table-break"><h4>
+<br class="table-break"><div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        For <code class="computeroutput"><span class="identifier">random_access_iterator</span></code>s,
+        the operation <code class="computeroutput"><span class="identifier">i</span> <span class="special">-</span>
+        <span class="identifier">i2</span></code> is used to provide all the relational
+        operators, including <code class="computeroutput"><span class="keyword">operator</span><span class="special">==()</span></code> and <code class="computeroutput"><span class="keyword">operator</span><span class="special">!=()</span></code>. If you are defining an iterator over
+        a discontiguous sequence (e.g. <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">deque</span></code>),
+        this implementation of <code class="computeroutput"><span class="keyword">operator</span><span class="special">==()</span></code> may not be optimal. In this case, provide
+        your own <code class="computeroutput"><span class="keyword">operator</span><span class="special">==()</span></code>
+        and <code class="computeroutput"><span class="keyword">operator</span><span class="special">!=()</span></code>.
+      </p></td></tr>
+</table></div>
+<h4>
 <a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.h2"></a>
       <span class="phrase"><a name="boost_stlinterfaces__proposed_.tutorial___iterator_interface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces__proposed_.tutorial___iterator_interface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_">An
       Important Note About <code class="computeroutput"><span class="keyword">operator</span><span class="special">++()</span></code> and <code class="computeroutput"><span class="keyword">operator</span><span class="special">--()</span></code></a>
@@ -776,7 +792,7 @@
     </p>
 <p>
       There's also a macro that can help you check that <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span></code>
-      is well-formed and provides the correct types. See <code class="computeroutput"><a class="link" href="../BOOST_STL_INTERFAC_idm9030.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
+      is well-formed and provides the correct types. See <code class="computeroutput"><a class="link" href="../BOOST_STL_INTERFAC_idm9088.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
