@@ -125,6 +125,63 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
+struct adapted_bidirectional_ptr_iter
+    : boost::stl_interfaces::iterator_interface<
+          adapted_bidirectional_ptr_iter<ValueType>,
+          std::bidirectional_iterator_tag,
+          ValueType>
+{
+    adapted_bidirectional_ptr_iter() : it_(nullptr) {}
+    adapted_bidirectional_ptr_iter(ValueType * it) : it_(it) {}
+
+    template<typename ValueType2>
+    adapted_bidirectional_ptr_iter(
+        adapted_bidirectional_ptr_iter<ValueType2> other) :
+        it_(other.it_)
+    {}
+
+    template<typename ValueType2>
+    friend struct adapted_bidirectional_ptr_iter;
+
+private:
+    friend boost::stl_interfaces::access;
+    ValueType *& base_reference() noexcept { return it_; }
+    ValueType * base_reference() const noexcept { return it_; }
+
+    ValueType * it_;
+};
+
+static_assert(
+    !boost::stl_interfaces::v1_dtl::ra_iter<
+        adapted_bidirectional_ptr_iter<int>>::value,
+    "");
+static_assert(
+    !boost::stl_interfaces::v1_dtl::ra_iter<
+        adapted_bidirectional_ptr_iter<int const>>::value,
+    "");
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    adapted_bidirectional_ptr_iter<int>, std::bidirectional_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    adapted_bidirectional_ptr_iter<int>,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    adapted_bidirectional_ptr_iter<int const>, std::bidirectional_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    adapted_bidirectional_ptr_iter<int const>,
+    std::bidirectional_iterator_tag,
+    std::bidirectional_iterator_tag,
+    int const,
+    int const &,
+    int const *,
+    std::ptrdiff_t)
+
+template<typename ValueType>
 struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
                                 bidirectional_iter<ValueType>,
                                 std::bidirectional_iterator_tag,
@@ -312,11 +369,57 @@ TEST(bidirectional, basic_adapted_list_std_copy)
 
 TEST(bidirectional, mutable_to_const_conversions)
 {
-    bidirectional first(ints.data());
-    bidirectional last(ints.data() + ints.size());
-    const_bidirectional first_copy(first);
-    const_bidirectional last_copy(last);
-    std::equal(first, last, first_copy, last_copy);
+    {
+        bidirectional first(ints.data());
+        bidirectional last(ints.data() + ints.size());
+        const_bidirectional first_copy(first);
+        const_bidirectional last_copy(last);
+        std::equal(first, last, first_copy, last_copy);
+    }
+
+    {
+        adapted_bidirectional_ptr_iter<int> first(ints.data());
+        adapted_bidirectional_ptr_iter<int> last(ints.data() + ints.size());
+        adapted_bidirectional_ptr_iter<int const> first_copy(
+            (int const *)ints.data());
+        adapted_bidirectional_ptr_iter<int const> last_copy(
+            (int const *)ints.data() + ints.size());
+        std::equal(first, last, first_copy, last_copy);
+    }
+}
+
+TEST(bidirectional, mutable_to_const_comparisons)
+{
+    {
+        bidirectional first(ints.data());
+        bidirectional last(ints.data() + ints.size());
+        const_bidirectional first_const(first);
+        const_bidirectional last_const(last);
+
+        EXPECT_EQ(first, first_const);
+        EXPECT_EQ(first_const, first);
+        EXPECT_NE(first, last_const);
+        EXPECT_NE(last_const, first);
+    }
+
+    {
+        adapted_bidirectional_ptr_iter<int> first(ints.data());
+        adapted_bidirectional_ptr_iter<int> last(ints.data() + ints.size());
+        adapted_bidirectional_ptr_iter<int const> first_const(
+            (int const *)ints.data());
+        adapted_bidirectional_ptr_iter<int const> last_const(
+            (int const *)ints.data() + ints.size());
+
+        static_assert(
+            !boost::stl_interfaces::v1_dtl::ra_iter<
+                adapted_bidirectional_ptr_iter<int>>::value,
+            "");
+
+        EXPECT_EQ(first, first_const);
+        EXPECT_EQ(first_const, first);
+        EXPECT_NE(first, last_const);
+        EXPECT_NE(last_const, first);
+    }
 }
 
 TEST(bidirectional, postincrement_preincrement)
@@ -324,42 +427,42 @@ TEST(bidirectional, postincrement_preincrement)
     {
         bidirectional first(ints.data());
         bidirectional last(ints.data() + ints.size());
-        while (first != last)
+        while (first != last && !(first == last))
             first++;
     }
 
     {
         bidirectional first(ints.data());
         bidirectional last(ints.data() + ints.size());
-        while (first != last)
+        while (first != last && !(first == last))
             last--;
     }
 
     {
         basic_bidirectional_iter first(ints.data());
         basic_bidirectional_iter last(ints.data() + ints.size());
-        while (first != last)
+        while (first != last && !(first == last))
             first++;
     }
 
     {
         basic_bidirectional_iter first(ints.data());
         basic_bidirectional_iter last(ints.data() + ints.size());
-        while (first != last)
+        while (first != last && !(first == last))
             last--;
     }
 
     {
         basic_adapted_bidirectional_ptr_iter first(ints.data());
         basic_adapted_bidirectional_ptr_iter last(ints.data() + ints.size());
-        while (first != last)
+        while (first != last && !(first == last))
             first++;
     }
 
     {
         basic_adapted_bidirectional_ptr_iter first(ints.data());
         basic_adapted_bidirectional_ptr_iter last(ints.data() + ints.size());
-        while (first != last)
+        while (first != last && !(first == last))
             last--;
     }
 
@@ -367,7 +470,7 @@ TEST(bidirectional, postincrement_preincrement)
         std::list<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         basic_adapted_bidirectional_list_iter first(ints.begin());
         basic_adapted_bidirectional_list_iter last(ints.end());
-        while (first != last)
+        while (first != last && !(first == last))
             first++;
     }
 
@@ -375,7 +478,7 @@ TEST(bidirectional, postincrement_preincrement)
         std::list<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         basic_adapted_bidirectional_list_iter first(ints.begin());
         basic_adapted_bidirectional_list_iter last(ints.end());
-        while (first != last)
+        while (first != last && !(first == last))
             last--;
     }
 }

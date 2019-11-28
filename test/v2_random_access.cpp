@@ -40,6 +40,7 @@ private:
     int * it_;
 };
 
+
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_random_access_iter, bsi::ranges::random_access_iterator)
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
@@ -81,6 +82,55 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int,
     int &,
     int *,
+    std::ptrdiff_t)
+
+template<typename ValueType>
+struct adapted_random_access_iter : bsi::iterator_interface<
+                                        adapted_random_access_iter<ValueType>,
+                                        std::random_access_iterator_tag,
+                                        ValueType>
+{
+    adapted_random_access_iter() {}
+    adapted_random_access_iter(ValueType * it) : it_(it) {}
+
+    template<
+        typename ValueType2,
+        typename Enable = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    adapted_random_access_iter(adapted_random_access_iter<ValueType2> other) :
+        it_(other.it_)
+    {}
+
+    template<typename ValueType2>
+    friend struct adapted_random_access_iter;
+
+private:
+    friend boost::stl_interfaces::access;
+    ValueType *& base_reference() noexcept { return it_; }
+    ValueType * base_reference() const noexcept { return it_; }
+
+    ValueType * it_;
+};
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    adapted_random_access_iter<int>, bsi::ranges::random_access_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    adapted_random_access_iter<int>,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    adapted_random_access_iter<int const>, bsi::ranges::random_access_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    adapted_random_access_iter<int const>,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int const,
+    int const &,
+    int const *,
     std::ptrdiff_t)
 
 template<typename ValueType>
@@ -502,11 +552,66 @@ TEST(random_access, basic_adapted_std_copy)
 
 TEST(random_access, mutable_to_const_conversions)
 {
-    random_access first(ints.data());
-    random_access last(ints.data() + ints.size());
-    const_random_access first_copy(first);
-    const_random_access last_copy(last);
-    std::equal(first, last, first_copy, last_copy);
+    {
+        random_access first(ints.data());
+        random_access last(ints.data() + ints.size());
+        const_random_access first_copy(first);
+        const_random_access last_copy(last);
+        std::equal(first, last, first_copy, last_copy);
+    }
+
+    {
+        adapted_random_access_iter<int> first(ints.data());
+        adapted_random_access_iter<int> last(ints.data() + ints.size());
+        adapted_random_access_iter<int const> first_copy(
+            (int const *)ints.data());
+        adapted_random_access_iter<int const> last_copy(
+            (int const *)ints.data() + ints.size());
+        std::equal(first, last, first_copy, last_copy);
+    }
+}
+
+TEST(random_access, mutable_to_const_comparisons)
+{
+    {
+        random_access first(ints.data());
+        random_access last(ints.data() + ints.size());
+        const_random_access first_const(first);
+        const_random_access last_const(last);
+
+        EXPECT_EQ(first, first_const);
+        EXPECT_EQ(first_const, first);
+        EXPECT_NE(first, last_const);
+        EXPECT_NE(last_const, first);
+        EXPECT_LE(first, first_const);
+        EXPECT_LE(first_const, first);
+        EXPECT_GE(first, first_const);
+        EXPECT_GE(first_const, first);
+        EXPECT_GT(last_const, first);
+        EXPECT_GT(last, first_const);
+        EXPECT_LT(first_const, last);
+        EXPECT_LT(first, last_const);
+    }
+
+    {
+        adapted_random_access_iter<int> first(ints.data());
+        adapted_random_access_iter<int> last(ints.data() + ints.size());
+        adapted_random_access_iter<int const> first_const(first);
+        adapted_random_access_iter<int const> last_const(last);
+
+        EXPECT_EQ(first, first_const);
+        EXPECT_EQ(first_const, first);
+        EXPECT_NE(first, last_const);
+        EXPECT_NE(last_const, first);
+        EXPECT_LE(first, first_const);
+        EXPECT_LE(first_const, first);
+        EXPECT_GE(first, first_const);
+        EXPECT_GE(first_const, first);
+        EXPECT_GT(last_const, first);
+        EXPECT_GT(last, first_const);
+        EXPECT_LT(first_const, last);
+        EXPECT_LT(first, last_const);
+    }
 }
 
 TEST(random_access, postincrement_preincrement)
