@@ -162,6 +162,12 @@ i += n`` ]
     ]
 ]
 
+[note For `random_access_iterator`s, the operation `i - i2` is used to provide
+all the relational operators, including `operator==()` and `operator!=()`.  If
+you are defining an iterator over a discontiguous sequence
+(e.g. `std::deque`), this implementation of `operator==()` may not be optimal.
+In this case, provide your own `operator==()` and `operator!=()`. ]
+
 [heading An Important Note About `operator++()` and `operator--()`]
 
 There's a wrinkle in this way of doing things.  When you define `operator++()`
