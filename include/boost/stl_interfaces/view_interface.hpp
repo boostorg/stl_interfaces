@@ -90,7 +90,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
         template<
             typename D = Derived,
-            typename R = decltype(std::declval<D &>().empty())>
+            typename R = decltype(std::declval<D const &>().empty())>
         constexpr explicit operator bool() const
             noexcept(noexcept(std::declval<D const &>().empty()))
         {
@@ -189,10 +189,11 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     };
 
     /** Implementation of `operator!=()` for all views derived from
-        `view_interface`.  */
+        `view_interface`. */
     template<typename ViewInterface>
     constexpr auto operator!=(ViewInterface lhs, ViewInterface rhs) noexcept(
-        noexcept(lhs == rhs)) -> decltype(v1_dtl::derived_view(lhs), lhs == rhs)
+        noexcept(lhs == rhs))
+        -> decltype(v1_dtl::derived_view(lhs), !(lhs == rhs))
     {
         return !(lhs == rhs);
     }
