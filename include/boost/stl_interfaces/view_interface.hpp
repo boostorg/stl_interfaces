@@ -90,7 +90,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
         template<
             typename D = Derived,
-            typename R = decltype(std::declval<D &>().empty())>
+            typename R = decltype(std::declval<D const &>().empty())>
         constexpr explicit operator bool() const
             noexcept(noexcept(std::declval<D const &>().empty()))
         {
