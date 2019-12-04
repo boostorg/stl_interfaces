@@ -166,7 +166,8 @@ i += n`` ]
 all the relational operators, including `operator==()` and `operator!=()`.  If
 you are defining an iterator over a discontiguous sequence
 (e.g. `std::deque`), this implementation of `operator==()` may not be optimal.
-In this case, provide your own `operator==()` and `operator!=()`. ]
+In this case, provide your own `operator==()`.  `operator!=()` will be
+provided if `operator==` is available. ]
 
 [heading An Important Note About `operator++()` and `operator--()`]
 

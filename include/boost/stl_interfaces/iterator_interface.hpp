@@ -434,24 +434,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
     };
 
-    /** Implementation of `operator!=()` for all iterators derived from
-        `iterator_interface`, except those with an iterator category derived
-        from `std::random_access_iterator_tag`.  */
-    template<
-        typename IteratorInterface1,
-        typename IteratorInterface2,
-        typename Enable = std::enable_if_t<
-            !v1_dtl::ra_iter<IteratorInterface1>::value &&
-            detail::interoperable<IteratorInterface1, IteratorInterface2>::
-                value>>
-    constexpr auto
-    operator!=(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept
-        -> decltype(v1_dtl::derived_iterator(lhs), true)
-    {
-        return !detail::common_eq<IteratorInterface1, IteratorInterface2>::call(
-            lhs, rhs);
-    }
-
     /** Implementation of `operator==()`, implemented in terms of the iterator
         underlying IteratorInterface, for all iterators derived from
         `iterator_interface`, except those with an iterator category derived
@@ -488,20 +470,14 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     }
 
     /** Implementation of `operator!=()` for all iterators derived from
-        `iterator_interface` that have an iterator category derived from
-        `std::random_access_iterator_tag`.  */
-    template<
-        typename IteratorInterface1,
-        typename IteratorInterface2,
-        typename Enable =
-            std::enable_if_t<v1_dtl::ra_iter<IteratorInterface1>::value>>
-    constexpr auto
-    operator!=(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
-        noexcept(detail::common_diff(lhs, rhs)))
-        -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+        `iterator_interface`.  */
+    template<typename IteratorInterface1, typename IteratorInterface2>
+    constexpr auto operator!=(
+        IteratorInterface1 lhs,
+        IteratorInterface2 rhs) noexcept(noexcept(!(lhs == rhs)))
+        -> decltype(v1_dtl::derived_iterator(lhs), !(lhs == rhs))
     {
-        return detail::common_diff(lhs, rhs) != 0;
+        return !(lhs == rhs);
     }
 
     /** Implementation of `operator<()` for all iterators derived from
@@ -966,15 +942,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     template<typename D1, typename D2>
     constexpr bool operator!=(D1 lhs, D2 rhs)
       requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> &&
-               detail::interoperable<D1, D2>::value &&
-               (v2_dtl::base_eq<D1, D2> || v2_dtl::eq<D1, D2> || v2_dtl::sub<D1>) {
-        if constexpr (v2_dtl::base_eq<D1, D2>) {
-          return !(access::base(lhs) == access::base(rhs));
-        } else if constexpr (v2_dtl::eq<D1, D2>) {
-          return !(lhs == rhs);
-        } else if constexpr (v2_dtl::sub<D1>) {
-          return (lhs - rhs) != typename D1::difference_type(0);
-        }
+               v2_dtl::eq<D1, D2> {
+        return !(lhs == rhs);
       }
 #endif
 

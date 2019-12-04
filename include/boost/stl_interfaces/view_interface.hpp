@@ -189,10 +189,11 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     };
 
     /** Implementation of `operator!=()` for all views derived from
-        `view_interface`.  */
+        `view_interface`. */
     template<typename ViewInterface>
     constexpr auto operator!=(ViewInterface lhs, ViewInterface rhs) noexcept(
-        noexcept(lhs == rhs)) -> decltype(v1_dtl::derived_view(lhs), lhs == rhs)
+        noexcept(lhs == rhs))
+        -> decltype(v1_dtl::derived_view(lhs), !(lhs == rhs))
     {
         return !(lhs == rhs);
     }
