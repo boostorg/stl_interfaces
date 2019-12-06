@@ -622,7 +622,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
       constexpr decltype(auto) operator++()
         requires requires { ++access::base(derived()); } &&
-          !requires { derived() += difference_type(1); } {
+          (!requires { derived() += difference_type(1); }) {
             ++access::base(derived());
             return derived();
           }
@@ -651,7 +651,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
       constexpr decltype(auto) operator--()
         requires requires { --access::base(derived()); } &&
-          !requires { derived() += difference_type(1); } {
+          (!requires { derived() += difference_type(1); }) {
           --access::base(derived());
           return derived();
         }
@@ -867,8 +867,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 #if 201711L <= __cpp_lib_three_way_comparison
       friend constexpr std::strong_equality operator<=>(D lhs, D rhs)
         requires requires { access::base(lhs) == access::base(rhs); } &&
-          !requires { access::base(lhs) == access::base(rhs); } &&
-          !requires { lhs - rhs; } {
+          (!requires { access::base(lhs) == access::base(rhs); }) &&
+          (!requires { lhs - rhs; }) {
             return access::base(lhs) == access::base(rhs) ?
                 std::strong_equality::equal : std::strong_equality::unequal;
           }
