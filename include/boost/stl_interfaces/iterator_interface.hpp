@@ -646,7 +646,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
       friend constexpr auto operator+(difference_type n, D it)
         requires requires { it += n; } {
-          return it ++ n;
+          return it += n;
         }
 
       constexpr decltype(auto) operator--()
