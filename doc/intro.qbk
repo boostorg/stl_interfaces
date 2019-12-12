@@ -12,7 +12,7 @@ you write full-coverage tests for each iterator.
 
 Writing view types like those found in `std::ranges` is also laborious,
 considering that most of each view type's API can be derived from `begin()`
-and `end()`.  C++20 has a template that doe exactly this,
+and `end()`.  C++20 has a template that does exactly this,
 `std::ranges::view_interface`; _IFaces_ provides a pre-C++20-friendly
 implementation.
 
