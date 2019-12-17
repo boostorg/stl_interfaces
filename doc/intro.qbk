@@ -204,7 +204,7 @@ for use in C++11 and later.  Specifically:
 - _Iterator_ contains two templates, `iterator_facade` and `iterator_adaptor`,
   that represent two ways of writing a new iterator while writing as little
   code as possible.  It would be nice to have the functionality for both
-  available in on template, but it is difficult to unify those two templates
+  available in one template, but it is difficult to unify those two templates
   as written.
 
 For these reasons, it seems more appropriate to introduce a new Boost library
