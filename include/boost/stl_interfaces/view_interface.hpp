@@ -210,7 +210,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         migration from Boost.STLInterfaces to C++20 easier; switch to the one
         in `std` as soon as you can. */
     template<typename D, bool = v1::discontiguous>
-    using view_interface = std::view_interface<D>;
+    using view_interface = std::ranges::view_interface<D>;
 
 }}}
 
