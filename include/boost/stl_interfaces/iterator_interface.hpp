@@ -560,7 +560,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
     // clang-format off
 
-#if 201703L < __cplusplus && defined(__cpp_lib_concepts) || BOOST_STL_INTERFACES_DOXYGEN
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts) ||                    \
+    defined(BOOST_STL_INTERFACES_DOXYGEN)
 
     /** A CRTP template that one may derive from to make defining iterators
         easier.

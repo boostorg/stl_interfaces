@@ -694,7 +694,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
     // clang-format off
 
-#if 201703L < __cplusplus && defined(__cpp_lib_concepts) || BOOST_STL_INTERFACES_DOXYGEN
+#if 201703L < __cplusplus && defined(__cpp_lib_concepts) ||                    \
+    defined(BOOST_STL_INTERFACES_DOXYGEN)
 
     /** A CRTP template that one may derive from to make it easier to define
         container types.
@@ -994,7 +995,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
     };
 
-#elif 201703L <= __cplusplus && __has_include(<stl2/ranges.hpp>) && \
+#elif 201703L <= __cplusplus && __has_include(<stl2/ranges.hpp>) &&            \
     !defined(BOOST_STL_INTERFACES_DISABLE_CMCSTL2)
 
     namespace v2_dtl {
