@@ -51,6 +51,18 @@ typedefs in the `view` concept.  For _cont_iface_, it was deemed ridiculous to
 create a template whose purpose is to reduce code size, which takes 14
 template parameters.
 
+[heading _cont_iface_ Does not Deduce Nested Types Like `iterator`]
+
+_cont_iface_ could deduce some of the nested types required for a standard
+sequence container.  For instance, `iterator` can be deduced as
+`decltype(*begin())`.  However, a type `D` derived from _cont_iface_ may need
+to use some of these nested types _emdash_ like `iterator` _emdash_ in its
+interface or implementation.  If this is the case, those nested types are not
+available early enough in the parse to be used in `D`, if they come from
+deductions in _cont_iface_.  This leaves the user in the awkward position of
+defining the same nested type with a different name that can be used within
+`D`.  It seems better to leave these types for the user to define.
+
 [heading _cont_iface_ Does not Support Associative or Unordered Associative Containers]
 
 That's right.  Associative containers have an interface that assumes that they
