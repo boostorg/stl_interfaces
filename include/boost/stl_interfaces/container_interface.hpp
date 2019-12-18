@@ -1087,7 +1087,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         template<typename D>
         using container_size_t = typename D::size_type;
 
-#if 201711L <= __cpp_lib_three_way_comparison
+#if defined(__cpp_lib_three_way_comparison)
         // This *may* need to become an exposition-only snake-case template
         // when standardized.
         struct three_way {
@@ -1380,7 +1380,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return lhs.swap(rhs);
         }
 
-#if 201711L <= __cpp_lib_three_way_comparison
+#if defined(__cpp_lib_three_way_comparison)
       friend constexpr bool operator==(const D& lhs, const D& rhs)
         requires ranges::sized_range<const D> &&
           ranges::indirect_relation<ranges::equal_to, ranges::iterator_t<const D>> {

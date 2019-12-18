@@ -10,7 +10,7 @@
 
 #include <utility>
 #include <type_traits>
-#if 201711L <= __cpp_lib_three_way_comparison
+#if defined(__cpp_lib_three_way_comparison)
 #include <compare>
 #endif
 
@@ -865,7 +865,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return it += -n;
         }
 
-#if 201711L <= __cpp_lib_three_way_comparison
+#if defined(__cpp_lib_three_way_comparison)
       friend constexpr std::strong_equality operator<=>(D lhs, D rhs)
         requires requires { access::base(lhs) == access::base(rhs); } &&
           !requires { access::base(lhs) == access::base(rhs); } &&
