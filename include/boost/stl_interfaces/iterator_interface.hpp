@@ -93,7 +93,8 @@ namespace boost { namespace stl_interfaces {
         {
             using type = std::random_access_iterator_tag;
         };
-#elif 201703L <= __cplusplus && __has_include(<stl2/ranges.hpp>) && \
+#elif 201703L <= __cplusplus && defined(__has_include) &&                      \
+    __has_include(<stl2/ranges.hpp>) &&                                        \
     !defined(BOOST_STL_INTERFACES_DISABLE_CMCSTL2)
         template<>
         struct concept_category<v2::ranges::contiguous_iterator_tag>
@@ -701,7 +702,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           }
     };
 
-#elif 201703L <= __cplusplus && __has_include(<stl2/ranges.hpp>) && \
+#elif 201703L <= __cplusplus && defined(__has_include) &&                      \
+    __has_include(<stl2/ranges.hpp>) &&                                        \
     !defined(BOOST_STL_INTERFACES_DISABLE_CMCSTL2)
 
     namespace v2_dtl {
@@ -1002,7 +1004,8 @@ namespace boost { namespace stl_interfaces { namespace v2 {
     static_assert(concept_name<type>, "");
 
 #if 201703L < __cplusplus && defined(__cpp_lib_concepts) ||                    \
-    201703L <= __cplusplus && __has_include(<stl2/ranges.hpp>) &&              \
+    201703L <= __cplusplus && defined(__has_include) &&                        \
+    __has_include(<stl2/ranges.hpp>) &&                                        \
     !defined(BOOST_STL_INTERFACES_DISABLE_CMCSTL2)
 #define BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(iter, concept_name)         \
     BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(iter, concept_name)
