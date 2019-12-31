@@ -23,7 +23,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         `std::derived_from<view_interface<D>>` and `std::view`. */
     template<
         typename Derived,
-        bool Contiguous = discontiguous
+        element_layout Contiguity = element_layout::discontiguous
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
         typename E = std::enable_if_t<
@@ -34,13 +34,13 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     struct view_interface;
 
     namespace v1_dtl {
-        template<typename D, bool Contiguous>
-        void derived_view(view_interface<D, Contiguous> const &);
+        template<typename D, element_layout Contiguity>
+        void derived_view(view_interface<D, Contiguity> const &);
     }
 
     template<
         typename Derived,
-        bool Contiguous
+        element_layout Contiguity
 #ifndef BOOST_STL_INTERFACES_DOXYGEN
         ,
         typename E
@@ -99,8 +99,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
         template<
             typename D = Derived,
-            bool C = Contiguous,
-            typename Enable = std::enable_if_t<C>>
+            element_layout C = Contiguity,
+            typename Enable = std::enable_if_t<C == element_layout::contiguous>>
         constexpr auto data() noexcept(noexcept(std::declval<D &>().begin()))
             -> decltype(std::addressof(*std::declval<D &>().begin()))
         {
@@ -108,8 +108,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
         template<
             typename D = Derived,
-            bool C = Contiguous,
-            typename Enable = std::enable_if_t<C>>
+            element_layout C = Contiguity,
+            typename Enable = std::enable_if_t<C == element_layout::contiguous>>
         constexpr auto data() const
             noexcept(noexcept(std::declval<D const &>().begin()))
                 -> decltype(std::addressof(*std::declval<D const &>().begin()))

@@ -337,12 +337,12 @@ types your derived view type define.
 
 Here is the declaration of _view_iface_:
 
-    template<typename Derived, bool Contiguous = discontiguous>
+    template<typename Derived, element_layout Contiguity = element_layout::discontiguous>
     struct view_interface;
 
-_view_iface_ only requires the derived type and an optional `bool` non-type
-template parameter that indicates whether `Derived`'s iterators are
-contiguous.  The `bool` parameter is necessary to support pre-C++20 code.
+_view_iface_ only requires the derived type and an optional non-type template
+parameter that indicates whether `Derived`'s iterators are contiguous.  The
+non-type parameter is necessary to support pre-C++20 code.
 
 [note Proxy iterators are inherently discontiguous.]
 
@@ -393,13 +393,12 @@ _cont_iface_ exists to make bring that large development time way, way down.
 
 Here is its declaration:
 
-    template<typename Derived, bool Contiguous = discontiguous>
+    template<typename Derived, element_layout Contiguity = element_layout::discontiguous>
     struct container_interface;
 
 Just as with _view_iface_, _cont_iface_ takes the derived type and an optional
-`bool` non-type template parameter that indicates whether `Derived`'s
-iterators are contiguous.  The `bool` parameter is necessary to support
-pre-C++20 code.
+non-type template parameter that indicates whether `Derived`'s iterators are
+contiguous.  The non-type parameter is necessary to support pre-C++20 code.
 
 The tables below represent a subset of the operations needed for each of the
 container requirements tables in the standard.  _cont_iface_ covers the
@@ -944,7 +943,7 @@ subtle, and will not be noticeable.
 
 Differences you will probably notice:
 
-- _view_iface_ and _cont_iface_ each have a `bool` non-type template parameter
+- _view_iface_ and _cont_iface_ each have a non-type template parameter
   `Contiguous` that indicates whether they have a `begin()` operation that
   yields a contiguous iterator.  Before C++20, there was no way of determining
   that.  The `v2` versions do not need this template parameter.

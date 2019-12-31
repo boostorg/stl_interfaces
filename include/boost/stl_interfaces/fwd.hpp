@@ -36,9 +36,12 @@ namespace boost { namespace stl_interfaces {
     inline namespace v1 {
 
         /** An enumeration used to indicate whether the underlying data have a
-            contiguous layout when instantiating `view_interface` and
-            `container_interface`. */
-        enum element_layout : bool { discontiguous = false, contiguous = true };
+            contiguous or discontiguous layout when instantiating
+            `view_interface` and `container_interface`. */
+        enum class element_layout : bool {
+            discontiguous = false,
+            contiguous = true
+        };
 
         namespace v1_dtl {
             template<typename... T>

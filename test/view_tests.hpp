@@ -9,10 +9,13 @@
 #include <boost/stl_interfaces/view_interface.hpp>
 
 
-template<typename Iterator, typename Sentinel, bool Contiguous>
+template<
+    typename Iterator,
+    typename Sentinel,
+    boost::stl_interfaces::element_layout Contiguity>
 struct subrange
     : boost::stl_interfaces::
-          view_interface<subrange<Iterator, Sentinel, Contiguous>, Contiguous>
+          view_interface<subrange<Iterator, Sentinel, Contiguity>, Contiguity>
 {
     subrange() = default;
     constexpr subrange(Iterator it, Sentinel s) : first_(it), last_(s) {}
@@ -25,10 +28,13 @@ private:
     Sentinel last_;
 };
 
-template<bool Contiguous, typename Iterator, typename Sentinel>
+template<
+    boost::stl_interfaces::element_layout Contiguity,
+    typename Iterator,
+    typename Sentinel>
 auto range(Iterator i, Sentinel s)
 {
-    return subrange<Iterator, Sentinel, Contiguous>(i, s);
+    return subrange<Iterator, Sentinel, Contiguity>(i, s);
 }
 
 #endif

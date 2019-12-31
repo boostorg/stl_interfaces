@@ -838,7 +838,7 @@ static_assert(
         subrange<
             basic_random_access_iter,
             basic_random_access_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -846,7 +846,8 @@ static_assert(
         subrange<
             basic_random_access_iter,
             basic_random_access_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
     "");
 
 template<typename T>
@@ -855,8 +856,10 @@ using back_t = decltype(std::declval<T>().back());
 static_assert(
     ill_formed<
         back_t,
-        subrange<int *, int const *, boost::stl_interfaces::v1::discontiguous>>::
-        value,
+        subrange<
+            int *,
+            int const *,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -864,7 +867,8 @@ static_assert(
         subrange<
             int *,
             int const *,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
     "");
 
 TEST(random_access, basic_subrange)
@@ -872,8 +876,10 @@ TEST(random_access, basic_subrange)
     basic_random_access_iter first(ints.data());
     basic_random_access_iter last(ints.data() + ints.size());
 
-    auto r = range<boost::stl_interfaces::contiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::contiguous>(first, first);
+    auto r = range<boost::stl_interfaces::v1::element_layout::contiguous>(
+        first, last);
+    auto empty = range<boost::stl_interfaces::v1::element_layout::contiguous>(
+        first, first);
 
     // range begin/end
     {
@@ -953,8 +959,11 @@ TEST(random_access, zip_subrange)
     zip_iter first(ints.data(), ones.data());
     zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
 
-    auto r = range<boost::stl_interfaces::v1::discontiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::v1::discontiguous>(first, first);
+    auto r = range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+        first, last);
+    auto empty =
+        range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+            first, first);
 
     // range begin/end
     {
