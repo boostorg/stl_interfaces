@@ -5,7 +5,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 #include <boost/stl_interfaces/iterator_interface.hpp>
 #include <boost/stl_interfaces/view_interface.hpp>
-#include <boost/stl_interfaces/container_interface.hpp>
+#include <boost/stl_interfaces/sequence_container_interface.hpp>
 
 #include <boost/mpl/assert.hpp>
 

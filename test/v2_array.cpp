@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/stl_interfaces/container_interface.hpp>
+#include <boost/stl_interfaces/sequence_container_interface.hpp>
 
 #include "ill_formed.hpp"
 
@@ -19,7 +19,7 @@ namespace bsi = boost::stl_interfaces::v2;
 // Just like std::array, except for the 0-size specialization, and the fact
 // that the base class makes brace-initialization wonky.
 template<typename T, std::size_t N>
-struct array : bsi::container_interface<array<T, N>>
+struct array : bsi::sequence_container_interface<array<T, N>>
 {
     using value_type = T;
     using pointer = T *;
@@ -50,7 +50,7 @@ struct array : bsi::container_interface<array<T, N>>
         }
     }
 
-    using base_type = bsi::container_interface<array<T, N>>;
+    using base_type = bsi::sequence_container_interface<array<T, N>>;
     using base_type::begin;
     using base_type::end;
 

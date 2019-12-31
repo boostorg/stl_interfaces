@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/stl_interfaces/container_interface.hpp>
+#include <boost/stl_interfaces/sequence_container_interface.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -13,16 +13,16 @@
 
 
 // There's a test that uses this example header; this controls whether the
-// C++14 version (v1::) of container_interface gets used, or the C++20 version
-// (v2::).
+// C++14 version (v1::) of sequence_container_interface gets used, or the
+// C++20 version (v2::).
 #if defined(USE_V2)
 template<typename Derived, boost::stl_interfaces::element_layout Contiguity>
-using container_interface =
-    boost::stl_interfaces::v2::container_interface<Derived>;
+using sequence_container_interface =
+    boost::stl_interfaces::v2::sequence_container_interface<Derived>;
 #else
 template<typename Derived, boost::stl_interfaces::element_layout Contiguity>
-using container_interface =
-    boost::stl_interfaces::v1::container_interface<Derived, Contiguity>;
+using sequence_container_interface =
+    boost::stl_interfaces::v1::sequence_container_interface<Derived, Contiguity>;
 #endif
 
 
@@ -30,13 +30,13 @@ using container_interface =
 // The sections of member functions below are commented as they are in the
 // standard for std::vector.  Each section has two numbers: the number of
 // member functions in that section, and the number that are missing, because
-// they are provided by container_interface.  The purely allocator-specific
-// members are neither present nor part of the counts.
+// they are provided by sequence_container_interface.  The purely
+// allocator-specific members are neither present nor part of the counts.
 //
 // We're passing boost::stl_interfaces::contiguous here, so that
-// container_interface knows that it should provide data().
+// sequence_container_interface knows that it should provide data().
 template<typename T, std::size_t N>
-struct static_vector : container_interface<
+struct static_vector : sequence_container_interface<
                            static_vector<T, N>,
                            boost::stl_interfaces::element_layout::contiguous>
 {
@@ -58,15 +58,15 @@ struct static_vector : container_interface<
     // construct/copy/destroy (9 members, skipped 2)
     //
     // Constructors and special member functions all must be user-provided.
-    // Were they provided by container_interface, everything would break, due
+    // Were they provided by sequence_container_interface, everything would break, due
     // to the language rules related to them.  However, assignment from
     // std::initializer_list and the destructor can come from
-    // container_interface.
+    // sequence_container_interface.
     static_vector() noexcept : size_(0) {}
     explicit static_vector(size_type n) : size_(0)
     {
         // Note that you must write "this->" before all the member functions
-        // provided by container_interface, which is slightly annoying.
+        // provided by sequence_container_interface, which is slightly annoying.
         this->assign(n, T());
     }
     explicit static_vector(size_type n, T const & x) : size_(0)
@@ -132,7 +132,8 @@ struct static_vector : container_interface<
     //
     // Most of these are not even part of the general requirements, because
     // some are specific to std::vector and related types.  However, we do get
-    // empty, size, and the unary overload of resize from container_interface.
+    // empty, size, and the unary overload of resize from
+    // sequence_container_interface.
     size_type max_size() const noexcept { return N; }
     size_type capacity() const noexcept { return N; }
     void resize(size_type sz, T const & x) noexcept
@@ -150,21 +151,23 @@ struct static_vector : container_interface<
     // element access (skipped 8)
     // data access (skipped 2)
     //
-    // Another big win.  container_interface provides all of the overloads of
-    // operator[], at, front, back, and data.
+    // Another big win.  sequence_container_interface provides all of the
+    // overloads of operator[], at, front, back, and data.
 
     // modifiers (5 members, skipped 9)
     //
-    // In this section we again get most of the API from container_interface.
+    // In this section we again get most of the API from
+    // sequence_container_interface.
 
     // emplace_back does not look very necessary -- just look at its trivial
-    // implementation -- but we can't provide it from container_interface,
-    // because it is an optional sequence container interface.  We would not
-    // want emplace_front to suddenly appear on our std::vector-like type, and
-    // there may be some other type for which emplace_back is a bad idea.
+    // implementation -- but we can't provide it from
+    // sequence_container_interface, because it is an optional sequence
+    // container interface.  We would not want emplace_front to suddenly
+    // appear on our std::vector-like type, and there may be some other type
+    // for which emplace_back is a bad idea.
     //
     // However, by providing emplace_back here, we signal to the
-    // container_interface template that our container is
+    // sequence_container_interface template that our container is
     // back-mutation-friendly, and this allows it to provide all the overloads
     // of push_back and pop_back.
     template<typename... Args>
@@ -244,11 +247,11 @@ struct static_vector : container_interface<
         shorter->size_ = long_size;
     }
 
-    // Since we're getting so many overloads from container_interface, and
-    // since many of those overloads are implemented in terms of a
-    // user-defined function of the same name, we need to add quite a few
-    // using declarations here.
-    using base_type = container_interface<
+    // Since we're getting so many overloads from
+    // sequence_container_interface, and since many of those overloads are
+    // implemented in terms of a user-defined function of the same name, we
+    // need to add quite a few using declarations here.
+    using base_type = sequence_container_interface<
         static_vector<T, N>,
         boost::stl_interfaces::element_layout::contiguous>;
     using base_type::begin;

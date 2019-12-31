@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#include <boost/stl_interfaces/container_interface.hpp>
+#include <boost/stl_interfaces/sequence_container_interface.hpp>
 
 #include "ill_formed.hpp"
 
@@ -17,7 +17,7 @@
 // Just like std::array, except for the 0-size specialization, and the fact
 // that the base class makes brace-initialization wonky.
 template<typename T, std::size_t N>
-struct array : boost::stl_interfaces::container_interface<
+struct array : boost::stl_interfaces::sequence_container_interface<
                    array<T, N>,
                    boost::stl_interfaces::v1::element_layout::contiguous>
 {
@@ -50,7 +50,7 @@ struct array : boost::stl_interfaces::container_interface<
         }
     }
 
-    using base_type = boost::stl_interfaces::container_interface<
+    using base_type = boost::stl_interfaces::sequence_container_interface<
         array<T, N>,
         boost::stl_interfaces::v1::element_layout::contiguous>;
     using base_type::begin;
