@@ -155,8 +155,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 #endif
 
     public:
-        ~container_interface() { v1_dtl::clear_impl<Derived>::call(derived()); }
-
         template<typename D = Derived>
         constexpr auto empty() noexcept(
             noexcept(std::declval<D &>().begin() == std::declval<D &>().end()))
@@ -733,8 +731,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       { d.clear(); }
 
     public:
-      ~container_interface() { clear_impl(derived()); }
-
       constexpr bool empty() const {
         return std::ranges::begin(derived()) == std::ranges::end(derived());
       }
@@ -1140,8 +1136,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         }
 
     public:
-      ~container_interface() { clear_impl(derived()); }
-
       constexpr bool empty() const {
         return ranges::begin(derived()) == ranges::end(derived());
       }

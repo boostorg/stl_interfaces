@@ -536,7 +536,7 @@ X u = rv;
         [ `a.~X()` ]
         [ ]
         [ Destroys every element of `a`; any memory obtained is deallocated. ]
-        [ Containers that also meet the sequence container requirements do not need to define a destructor, as long as a call to `clear()` is sufficient _emdash_ for sequence containers, _cont_iface_ calls `clear()` in its destructor. ]
+        [ ]
     ]
     [
         [ `a.begin()` ]
@@ -746,10 +746,9 @@ a.insert(p, il)`` ]
     ]
     [
         [ `a.erase(q1, q2)` ]
-        [ ``a.~X()
-a.erase(q)
+        [ ``a.erase(q)
 a.clear()`` ]
-        [ The _cont_iface_ destructor behavior is equivalent to `a.clear()`. ]
+        [ ]
     ]
     [
         [ ``a.erase(q1, q2)

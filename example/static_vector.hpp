@@ -115,6 +115,7 @@ struct static_vector : container_interface<
         other.clear();
         return *this;
     }
+    ~static_vector() { this->clear(); }
 
     // iterators (2 members, skipped 10)
     //
