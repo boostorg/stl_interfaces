@@ -726,7 +726,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
       }
       static constexpr void clear_impl(D& d) noexcept {}
       static constexpr void clear_impl(D& d) noexcept
-        requires requires { d.clear()); }
+        requires requires { d.clear(); }
       { d.clear(); }
 
     public:
