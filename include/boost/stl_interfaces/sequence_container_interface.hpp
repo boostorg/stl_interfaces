@@ -686,8 +686,27 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 namespace boost { namespace stl_interfaces { namespace v2 {
 
-    // This is only here to satisfy clang-format.
     namespace v2_dtl {
+
+        // This needs to become an exposition-only snake-case template alias
+        // when standardized.
+        template<typename D>
+        using container_size_t = typename D::size_type;
+
+#if 201703L < __cplusplus && defined(__cpp_lib_three_way_comparison)
+        // This *may* need to become an exposition-only snake-case template
+        // when standardized.
+        struct three_way {
+          template<class T, class U>
+            requires three_way_comparable_with<T, U>// || BUILTIN-PTR-CMP(T, <=>, U)
+          constexpr bool operator()(T&& t, U&& u) const {
+            return std::forward<T>(t) <=> std::forward<U>(u);
+          }
+
+          using is_transparent = std::true_type; // = unspecified;
+        };
+#endif
+
     }
 
     // clang-format off
@@ -1076,25 +1095,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
             ranges::common_range<D> &&
             v2_dtl::empl_back<D, const ranges::ext::range_value_t<D>&> &&
             v2_dtl::erase_<D>;
-
-        // This needs to become an exposition-only snake-case template alias
-        // when standardized.
-        template<typename D>
-        using container_size_t = typename D::size_type;
-
-#if 201711L <= __cpp_lib_three_way_comparison
-        // This *may* need to become an exposition-only snake-case template
-        // when standardized.
-        struct three_way {
-          template<class T, class U>
-            requires three_way_comparable_with<T, U>// || BUILTIN-PTR-CMP(T, <=>, U)
-          constexpr bool operator()(T&& t, U&& u) const {
-            return std::forward<T>(t) <=> std::forward<U>(u);
-          }
-
-          using is_transparent = std::true_type; // = unspecified;
-        };
-#endif
     }
 
     /** A CRTP template that one may derive from to make it easier to define
@@ -1373,7 +1373,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return lhs.swap(rhs);
         }
 
-#if 201711L <= __cpp_lib_three_way_comparison
+#ifdef __cpp_lib_three_way_comparison
       friend constexpr bool operator==(const D& lhs, const D& rhs)
         requires ranges::sized_range<const D> &&
           ranges::indirect_relation<ranges::equal_to, ranges::iterator_t<const D>> {
