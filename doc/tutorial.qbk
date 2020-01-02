@@ -68,6 +68,12 @@ reasonable defaults for _iter_iface_'s parameters:
         proxy_arrow_result<Reference>,
         DifferenceType>;
 
+[note As shown above, _proxy_iter_iface_ uses a template called
+`proxy_arrow_result` as its pointer-type.  This template makes a copy of
+whatever value is obtained by `operator*`, and then returns a pointer to the
+copy in its `operator->`.  You may want to use something else if this is a
+performance concern. ]
+
 
 [heading User-Defined Iterator Operations]
 
