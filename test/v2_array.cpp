@@ -7,7 +7,8 @@
 
 #include "ill_formed.hpp"
 
-#include <boost/test/minimal.hpp>
+#define BOOST_TEST_MAIN
+#include <boost/test/included/unit_test.hpp>
 
 #include <array>
 #include <deque>
@@ -60,9 +61,7 @@ struct array : bsi::sequence_container_interface<array<T, N>>
 using arr_type = array<int, 5>;
 
 
-int test_main(int, char * [])
-{
-
+BOOST_AUTO_TEST_CASE(comparisons)
 {
     arr_type sm;
     sm[0] = 1;
@@ -151,6 +150,7 @@ int test_main(int, char * [])
 }
 
 
+BOOST_AUTO_TEST_CASE(swap_)
 {
     {
         arr_type v1;
@@ -256,6 +256,7 @@ static_assert(
     "");
 
 
+BOOST_AUTO_TEST_CASE(iterators)
 {
     arr_type v0;
     v0[0] = 3;
@@ -410,6 +411,7 @@ static_assert(!ill_formed<rvalue_push_back_t, std_vec_int>::value, "");
 static_assert(!ill_formed<pop_back_t, std_vec_int>::value, "");
 
 
+BOOST_AUTO_TEST_CASE(front_back)
 {
     {
         arr_type v;
@@ -447,6 +449,7 @@ static_assert(!ill_formed<pop_back_t, std_vec_int>::value, "");
 }
 
 
+BOOST_AUTO_TEST_CASE(cindex_at)
 {
     arr_type v0;
     v0[0] = 3;
@@ -489,8 +492,6 @@ static_assert(!ill_formed<pop_back_t, std_vec_int>::value, "");
     }
 }
 
-    return 0;
-}
 
 template<typename Container>
 using resize_t = decltype(std::declval<Container &>().resize(0));

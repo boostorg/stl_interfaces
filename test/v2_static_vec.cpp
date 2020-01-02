@@ -8,7 +8,8 @@
 
 #include "ill_formed.hpp"
 
-#include <boost/test/minimal.hpp>
+#define BOOST_TEST_MAIN
+#include <boost/test/included/unit_test.hpp>
 
 #include <array>
 
@@ -19,9 +20,7 @@ template struct static_vector<int, 1024>;
 using vec_type = static_vector<int, 10>;
 
 
-int test_main(int, char * [])
-{
-
+BOOST_AUTO_TEST_CASE(default_ctor)
 {
     vec_type v;
     BOOST_CHECK(v.empty());
@@ -51,6 +50,7 @@ int test_main(int, char * [])
 }
 
 
+BOOST_AUTO_TEST_CASE(other_ctors_assign_ctor)
 {
     {
         vec_type v(3);
@@ -138,6 +138,7 @@ int test_main(int, char * [])
 }
 
 
+BOOST_AUTO_TEST_CASE(resize)
 {
     {
         vec_type v;
@@ -163,6 +164,7 @@ int test_main(int, char * [])
 }
 
 
+BOOST_AUTO_TEST_CASE(assignment_copy_move_equality)
 {
     {
         vec_type v2 = {4, 4, 4};
@@ -202,6 +204,7 @@ int test_main(int, char * [])
 }
 
 
+BOOST_AUTO_TEST_CASE(comparisons)
 {
     vec_type sm = {1, 2, 3};
     vec_type md = {1, 2, 3, 4};
@@ -275,6 +278,7 @@ int test_main(int, char * [])
 }
 
 
+BOOST_AUTO_TEST_CASE(swap_)
 {
     {
         vec_type v1(3, 4);
@@ -351,6 +355,7 @@ static_assert(
     "");
 
 
+BOOST_AUTO_TEST_CASE(iterators)
 {
     {
         vec_type v = {3, 2, 1};
@@ -446,6 +451,7 @@ static_assert(
 }
 
 
+BOOST_AUTO_TEST_CASE(emplace_insert)
 {
     {
         vec_type v;
@@ -589,6 +595,7 @@ static_assert(
 }
 
 
+BOOST_AUTO_TEST_CASE(erase)
 {
     {
         vec_type v = {3, 2, 1};
@@ -666,6 +673,7 @@ static_assert(ill_formed<rvalue_push_front_t, vec_type>::value, "");
 static_assert(ill_formed<pop_front_t, vec_type>::value, "");
 
 
+BOOST_AUTO_TEST_CASE(front_back)
 {
     {
         vec_type v;
@@ -710,6 +718,7 @@ static_assert(ill_formed<pop_front_t, vec_type>::value, "");
 }
 
 
+BOOST_AUTO_TEST_CASE(data_index_at)
 {
     {
         vec_type v = {3, 2, 1};
@@ -750,7 +759,4 @@ static_assert(ill_formed<pop_front_t, vec_type>::value, "");
         static_assert(std::is_same<decltype(v[0]), int const &>::value, "");
         static_assert(std::is_same<decltype(v.at(0)), int const &>::value, "");
     }
-}
-
-    return 0;
 }
