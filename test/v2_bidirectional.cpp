@@ -7,7 +7,7 @@
 
 #include "ill_formed.hpp"
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -306,7 +306,9 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
 
-TEST(bidirectional, basic_std_copy)
+int test_main(int, char * [])
+{
+
 {
     basic_bidirectional_iter first(ints.data());
     basic_bidirectional_iter last(ints.data() + ints.size());
@@ -314,7 +316,7 @@ TEST(bidirectional, basic_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -324,7 +326,7 @@ TEST(bidirectional, basic_std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -332,7 +334,7 @@ TEST(bidirectional, basic_std_copy)
         basic_bidirectional_iter first(iota_ints.data());
         basic_bidirectional_iter last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -344,11 +346,11 @@ TEST(bidirectional, basic_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(bidirectional, basic_adapted_ptr_std_copy)
+
 {
     basic_adapted_bidirectional_ptr_iter first(ints.data());
     basic_adapted_bidirectional_ptr_iter last(ints.data() + ints.size());
@@ -356,7 +358,7 @@ TEST(bidirectional, basic_adapted_ptr_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -366,7 +368,7 @@ TEST(bidirectional, basic_adapted_ptr_std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -375,7 +377,7 @@ TEST(bidirectional, basic_adapted_ptr_std_copy)
         basic_adapted_bidirectional_ptr_iter last(
             iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -388,11 +390,11 @@ TEST(bidirectional, basic_adapted_ptr_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(bidirectional, basic_adapted_list_std_copy)
+
 {
     std::list<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
@@ -402,7 +404,7 @@ TEST(bidirectional, basic_adapted_list_std_copy)
     {
         std::list<int> ints_copy;
         std::copy(first, last, std::back_inserter(ints_copy));
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -412,11 +414,11 @@ TEST(bidirectional, basic_adapted_list_std_copy)
             std::make_reverse_iterator(first),
             std::back_inserter(ints_copy));
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 }
 
-TEST(bidirectional, mutable_to_const_conversions)
+
 {
     {
         bidirectional first(ints.data());
@@ -437,7 +439,7 @@ TEST(bidirectional, mutable_to_const_conversions)
     }
 }
 
-TEST(bidirectional, mutable_to_const_comparisons)
+
 {
     {
         bidirectional first(ints.data());
@@ -445,10 +447,10 @@ TEST(bidirectional, mutable_to_const_comparisons)
         const_bidirectional first_const(first);
         const_bidirectional last_const(last);
 
-        EXPECT_EQ(first, first_const);
-        EXPECT_EQ(first_const, first);
-        EXPECT_NE(first, last_const);
-        EXPECT_NE(last_const, first);
+        BOOST_CHECK(first == first_const);
+        BOOST_CHECK(first_const == first);
+        BOOST_CHECK(first != last_const);
+        BOOST_CHECK(last_const != first);
     }
 
     {
@@ -464,14 +466,14 @@ TEST(bidirectional, mutable_to_const_comparisons)
                 adapted_bidirectional_ptr_iter<int>>::value,
             "");
 
-        EXPECT_EQ(first, first_const);
-        EXPECT_EQ(first_const, first);
-        EXPECT_NE(first, last_const);
-        EXPECT_NE(last_const, first);
+        BOOST_CHECK(first == first_const);
+        BOOST_CHECK(first_const == first);
+        BOOST_CHECK(first != last_const);
+        BOOST_CHECK(last_const != first);
     }
 }
 
-TEST(bidirectional, postincrement_preincrement)
+
 {
     {
         bidirectional first(ints.data());
@@ -532,7 +534,7 @@ TEST(bidirectional, postincrement_preincrement)
     }
 }
 
-TEST(bidirectional, std_copy)
+
 {
     bidirectional first(ints.data());
     bidirectional last(ints.data() + ints.size());
@@ -540,7 +542,7 @@ TEST(bidirectional, std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -550,7 +552,7 @@ TEST(bidirectional, std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -558,7 +560,7 @@ TEST(bidirectional, std_copy)
         bidirectional first(iota_ints.data());
         bidirectional last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -570,11 +572,11 @@ TEST(bidirectional, std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(bidirectional, const_std_copy)
+
 {
     const_bidirectional first(ints.data());
     const_bidirectional last(ints.data() + ints.size());
@@ -582,15 +584,18 @@ TEST(bidirectional, const_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
-        EXPECT_TRUE(std::binary_search(first, last, 3));
-        EXPECT_TRUE(std::binary_search(
+        BOOST_CHECK(std::binary_search(first, last, 3));
+        BOOST_CHECK(std::binary_search(
             std::make_reverse_iterator(last),
             std::make_reverse_iterator(first),
             3,
             std::greater<>{}));
     }
+}
+
+    return 0;
 }

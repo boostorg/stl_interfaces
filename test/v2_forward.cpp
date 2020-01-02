@@ -7,7 +7,7 @@
 
 #include "ill_formed.hpp"
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -172,7 +172,9 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
 
-TEST(forward, basic_std_copy)
+int test_main(int, char * [])
+{
+
 {
     basic_forward_iter first(ints.data());
     basic_forward_iter last(ints.data() + ints.size());
@@ -180,7 +182,7 @@ TEST(forward, basic_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -188,11 +190,11 @@ TEST(forward, basic_std_copy)
         basic_forward_iter first(iota_ints.data());
         basic_forward_iter last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(forward, mutable_to_const_conversions)
+
 {
     forward first(ints.data());
     forward last(ints.data() + ints.size());
@@ -201,7 +203,7 @@ TEST(forward, mutable_to_const_conversions)
     std::equal(first, last, first_copy, last_copy);
 }
 
-TEST(forward, postincrement)
+
 {
     forward first(ints.data());
     forward last(ints.data() + ints.size());
@@ -209,7 +211,7 @@ TEST(forward, postincrement)
         first++;
 }
 
-TEST(forward, std_copy)
+
 {
     forward first(ints.data());
     forward last(ints.data() + ints.size());
@@ -217,7 +219,7 @@ TEST(forward, std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -225,11 +227,11 @@ TEST(forward, std_copy)
         forward first(iota_ints.data());
         forward last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(forward, const_std_copy)
+
 {
     const_forward first(ints.data());
     const_forward last(ints.data() + ints.size());
@@ -237,10 +239,13 @@ TEST(forward, const_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
-        EXPECT_TRUE(std::binary_search(first, last, 3));
+        BOOST_CHECK(std::binary_search(first, last, 3));
     }
+}
+
+    return 0;
 }

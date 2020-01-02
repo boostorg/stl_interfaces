@@ -7,7 +7,7 @@
 
 #include "ill_formed.hpp"
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -345,60 +345,62 @@ std::array<std::tuple<int_t, int>, 10> udt_tuples = {{
     std::tuple<int_t, int>{{9}, 1},
 }};
 
-TEST(random_access, basic_coverage)
+int test_main(int, char * [])
+{
+
 {
     basic_random_access_iter first(ints.data());
     basic_random_access_iter last(ints.data() + ints.size());
 
-    EXPECT_EQ(*first, 0);
-    EXPECT_EQ(*(first + 1), 1);
-    EXPECT_EQ(*(first + 2), 2);
-    EXPECT_EQ(*(1 + first), 1);
-    EXPECT_EQ(*(2 + first), 2);
+    BOOST_CHECK(*first == 0);
+    BOOST_CHECK(*(first + 1) == 1);
+    BOOST_CHECK(*(first + 2) == 2);
+    BOOST_CHECK(*(1 + first) == 1);
+    BOOST_CHECK(*(2 + first) == 2);
 
-    EXPECT_EQ(first[0], 0);
-    EXPECT_EQ(first[1], 1);
-    EXPECT_EQ(first[2], 2);
+    BOOST_CHECK(first[0] == 0);
+    BOOST_CHECK(first[1] == 1);
+    BOOST_CHECK(first[2] == 2);
 
-    EXPECT_EQ(*(last - 1), 9);
-    EXPECT_EQ(*(last - 2), 8);
-    EXPECT_EQ(*(last - 3), 7);
+    BOOST_CHECK(*(last - 1) == 9);
+    BOOST_CHECK(*(last - 2) == 8);
+    BOOST_CHECK(*(last - 3) == 7);
 
-    EXPECT_EQ(last[-1], 9);
-    EXPECT_EQ(last[-2], 8);
-    EXPECT_EQ(last[-3], 7);
+    BOOST_CHECK(last[-1] == 9);
+    BOOST_CHECK(last[-2] == 8);
+    BOOST_CHECK(last[-3] == 7);
 
-    EXPECT_EQ(last - first, 10);
-    EXPECT_EQ(first, first);
-    EXPECT_NE(first, last);
-    EXPECT_LT(first, last);
-    EXPECT_LE(first, last);
-    EXPECT_LE(first, first);
-    EXPECT_GT(last, first);
-    EXPECT_GE(last, first);
-    EXPECT_GE(last, last);
+    BOOST_CHECK(last - first == 10);
+    BOOST_CHECK(first == first);
+    BOOST_CHECK(first != last);
+    BOOST_CHECK(first < last);
+    BOOST_CHECK(first <= last);
+    BOOST_CHECK(first <= first);
+    BOOST_CHECK(last > first);
+    BOOST_CHECK(last >= first);
+    BOOST_CHECK(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        EXPECT_EQ(first_copy, last);
+        BOOST_CHECK(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        EXPECT_EQ(last_copy, first);
+        BOOST_CHECK(last_copy == first);
     }
 }
 
-TEST(random_access, basic_std_copy)
+
 {
     {
         std::array<int, 10> ints_copy;
         basic_random_access_iter first(ints.data());
         basic_random_access_iter last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -410,7 +412,7 @@ TEST(random_access, basic_std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -418,7 +420,7 @@ TEST(random_access, basic_std_copy)
         basic_random_access_iter first(iota_ints.data());
         basic_random_access_iter last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -430,7 +432,7 @@ TEST(random_access, basic_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -442,64 +444,64 @@ TEST(random_access, basic_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(random_access, basic_adapted_coverage)
+
 {
     basic_adapted_random_access_iter first(ints.data());
     basic_adapted_random_access_iter last(ints.data() + ints.size());
 
-    EXPECT_EQ(*first, 0);
-    EXPECT_EQ(*(first + 1), 1);
-    EXPECT_EQ(*(first + 2), 2);
-    EXPECT_EQ(*(1 + first), 1);
-    EXPECT_EQ(*(2 + first), 2);
+    BOOST_CHECK(*first == 0);
+    BOOST_CHECK(*(first + 1) == 1);
+    BOOST_CHECK(*(first + 2) == 2);
+    BOOST_CHECK(*(1 + first) == 1);
+    BOOST_CHECK(*(2 + first) == 2);
 
-    EXPECT_EQ(first[0], 0);
-    EXPECT_EQ(first[1], 1);
-    EXPECT_EQ(first[2], 2);
+    BOOST_CHECK(first[0] == 0);
+    BOOST_CHECK(first[1] == 1);
+    BOOST_CHECK(first[2] == 2);
 
-    EXPECT_EQ(*(last - 1), 9);
-    EXPECT_EQ(*(last - 2), 8);
-    EXPECT_EQ(*(last - 3), 7);
+    BOOST_CHECK(*(last - 1) == 9);
+    BOOST_CHECK(*(last - 2) == 8);
+    BOOST_CHECK(*(last - 3) == 7);
 
-    EXPECT_EQ(last[-1], 9);
-    EXPECT_EQ(last[-2], 8);
-    EXPECT_EQ(last[-3], 7);
+    BOOST_CHECK(last[-1] == 9);
+    BOOST_CHECK(last[-2] == 8);
+    BOOST_CHECK(last[-3] == 7);
 
-    EXPECT_EQ(last - first, 10);
-    EXPECT_EQ(first, first);
-    EXPECT_NE(first, last);
-    EXPECT_LT(first, last);
-    EXPECT_LE(first, last);
-    EXPECT_LE(first, first);
-    EXPECT_GT(last, first);
-    EXPECT_GE(last, first);
-    EXPECT_GE(last, last);
+    BOOST_CHECK(last - first == 10);
+    BOOST_CHECK(first == first);
+    BOOST_CHECK(first != last);
+    BOOST_CHECK(first < last);
+    BOOST_CHECK(first <= last);
+    BOOST_CHECK(first <= first);
+    BOOST_CHECK(last > first);
+    BOOST_CHECK(last >= first);
+    BOOST_CHECK(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        EXPECT_EQ(first_copy, last);
+        BOOST_CHECK(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        EXPECT_EQ(last_copy, first);
+        BOOST_CHECK(last_copy == first);
     }
 }
 
-TEST(random_access, basic_adapted_std_copy)
+
 {
     {
         std::array<int, 10> ints_copy;
         basic_adapted_random_access_iter first(ints.data());
         basic_adapted_random_access_iter last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -511,7 +513,7 @@ TEST(random_access, basic_adapted_std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -520,7 +522,7 @@ TEST(random_access, basic_adapted_std_copy)
         basic_adapted_random_access_iter last(
             iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -533,7 +535,7 @@ TEST(random_access, basic_adapted_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -546,11 +548,11 @@ TEST(random_access, basic_adapted_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(random_access, mutable_to_const_conversions)
+
 {
     {
         random_access first(ints.data());
@@ -571,7 +573,7 @@ TEST(random_access, mutable_to_const_conversions)
     }
 }
 
-TEST(random_access, mutable_to_const_comparisons)
+
 {
     {
         random_access first(ints.data());
@@ -579,18 +581,18 @@ TEST(random_access, mutable_to_const_comparisons)
         const_random_access first_const(first);
         const_random_access last_const(last);
 
-        EXPECT_EQ(first, first_const);
-        EXPECT_EQ(first_const, first);
-        EXPECT_NE(first, last_const);
-        EXPECT_NE(last_const, first);
-        EXPECT_LE(first, first_const);
-        EXPECT_LE(first_const, first);
-        EXPECT_GE(first, first_const);
-        EXPECT_GE(first_const, first);
-        EXPECT_GT(last_const, first);
-        EXPECT_GT(last, first_const);
-        EXPECT_LT(first_const, last);
-        EXPECT_LT(first, last_const);
+        BOOST_CHECK(first == first_const);
+        BOOST_CHECK(first_const == first);
+        BOOST_CHECK(first != last_const);
+        BOOST_CHECK(last_const != first);
+        BOOST_CHECK(first <= first_const);
+        BOOST_CHECK(first_const <= first);
+        BOOST_CHECK(first >= first_const);
+        BOOST_CHECK(first_const >= first);
+        BOOST_CHECK(last_const > first);
+        BOOST_CHECK(last > first_const);
+        BOOST_CHECK(first_const < last);
+        BOOST_CHECK(first < last_const);
     }
 
     {
@@ -599,22 +601,22 @@ TEST(random_access, mutable_to_const_comparisons)
         adapted_random_access_iter<int const> first_const(first);
         adapted_random_access_iter<int const> last_const(last);
 
-        EXPECT_EQ(first, first_const);
-        EXPECT_EQ(first_const, first);
-        EXPECT_NE(first, last_const);
-        EXPECT_NE(last_const, first);
-        EXPECT_LE(first, first_const);
-        EXPECT_LE(first_const, first);
-        EXPECT_GE(first, first_const);
-        EXPECT_GE(first_const, first);
-        EXPECT_GT(last_const, first);
-        EXPECT_GT(last, first_const);
-        EXPECT_LT(first_const, last);
-        EXPECT_LT(first, last_const);
+        BOOST_CHECK(first == first_const);
+        BOOST_CHECK(first_const == first);
+        BOOST_CHECK(first != last_const);
+        BOOST_CHECK(last_const != first);
+        BOOST_CHECK(first <= first_const);
+        BOOST_CHECK(first_const <= first);
+        BOOST_CHECK(first >= first_const);
+        BOOST_CHECK(first_const >= first);
+        BOOST_CHECK(last_const > first);
+        BOOST_CHECK(last > first_const);
+        BOOST_CHECK(first_const < last);
+        BOOST_CHECK(first < last_const);
     }
 }
 
-TEST(random_access, postincrement_preincrement)
+
 {
     {
         random_access first(ints.data());
@@ -659,53 +661,53 @@ TEST(random_access, postincrement_preincrement)
     }
 }
 
-TEST(random_access, coverage)
+
 {
     random_access first(ints.data());
     random_access last(ints.data() + ints.size());
 
-    EXPECT_EQ(*first, 0);
-    EXPECT_EQ(*(first + 1), 1);
-    EXPECT_EQ(*(first + 2), 2);
-    EXPECT_EQ(*(1 + first), 1);
-    EXPECT_EQ(*(2 + first), 2);
+    BOOST_CHECK(*first == 0);
+    BOOST_CHECK(*(first + 1) == 1);
+    BOOST_CHECK(*(first + 2) == 2);
+    BOOST_CHECK(*(1 + first) == 1);
+    BOOST_CHECK(*(2 + first) == 2);
 
-    EXPECT_EQ(first[0], 0);
-    EXPECT_EQ(first[1], 1);
-    EXPECT_EQ(first[2], 2);
+    BOOST_CHECK(first[0] == 0);
+    BOOST_CHECK(first[1] == 1);
+    BOOST_CHECK(first[2] == 2);
 
-    EXPECT_EQ(*(last - 1), 9);
-    EXPECT_EQ(*(last - 2), 8);
-    EXPECT_EQ(*(last - 3), 7);
+    BOOST_CHECK(*(last - 1) == 9);
+    BOOST_CHECK(*(last - 2) == 8);
+    BOOST_CHECK(*(last - 3) == 7);
 
-    EXPECT_EQ(last[-1], 9);
-    EXPECT_EQ(last[-2], 8);
-    EXPECT_EQ(last[-3], 7);
+    BOOST_CHECK(last[-1] == 9);
+    BOOST_CHECK(last[-2] == 8);
+    BOOST_CHECK(last[-3] == 7);
 
-    EXPECT_EQ(last - first, 10);
-    EXPECT_EQ(first, first);
-    EXPECT_NE(first, last);
-    EXPECT_LT(first, last);
-    EXPECT_LE(first, last);
-    EXPECT_LE(first, first);
-    EXPECT_GT(last, first);
-    EXPECT_GE(last, first);
-    EXPECT_GE(last, last);
+    BOOST_CHECK(last - first == 10);
+    BOOST_CHECK(first == first);
+    BOOST_CHECK(first != last);
+    BOOST_CHECK(first < last);
+    BOOST_CHECK(first <= last);
+    BOOST_CHECK(first <= first);
+    BOOST_CHECK(last > first);
+    BOOST_CHECK(last >= first);
+    BOOST_CHECK(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        EXPECT_EQ(first_copy, last);
+        BOOST_CHECK(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        EXPECT_EQ(last_copy, first);
+        BOOST_CHECK(last_copy == first);
     }
 }
 
-TEST(random_access, std_copy)
+
 {
     random_access first(ints.data());
     random_access last(ints.data() + ints.size());
@@ -713,7 +715,7 @@ TEST(random_access, std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -723,7 +725,7 @@ TEST(random_access, std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -731,7 +733,7 @@ TEST(random_access, std_copy)
         random_access first(iota_ints.data());
         random_access last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -743,7 +745,7 @@ TEST(random_access, std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -755,11 +757,11 @@ TEST(random_access, std_copy)
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(random_access, const_std_copy)
+
 {
     const_random_access first(ints.data());
     const_random_access last(ints.data() + ints.size());
@@ -767,12 +769,12 @@ TEST(random_access, const_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
-        EXPECT_TRUE(std::binary_search(first, last, 3));
-        EXPECT_TRUE(std::binary_search(
+        BOOST_CHECK(std::binary_search(first, last, 3));
+        BOOST_CHECK(std::binary_search(
             std::make_reverse_iterator(last),
             std::make_reverse_iterator(first),
             3,
@@ -780,12 +782,12 @@ TEST(random_access, const_std_copy)
     }
 }
 
-TEST(random_access, zip)
+
 {
     {
         zip_iter first(ints.data(), ones.data());
         zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
-        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
@@ -796,15 +798,15 @@ TEST(random_access, zip)
         zip_iter last(
             ints_copy.data() + ints_copy.size(),
             ones_copy.data() + ones_copy.size());
-        EXPECT_FALSE(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_CHECK(!std::equal(first, last, tuples.begin(), tuples.end()));
         std::sort(first, last);
-        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
         udt_zip_iter first(udts.data(), ones.data());
         udt_zip_iter last(udts.data() + udts.size(), ones.data() + ones.size());
-        EXPECT_TRUE(
+        BOOST_CHECK(
             std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
 
@@ -816,10 +818,13 @@ TEST(random_access, zip)
         udt_zip_iter last(
             udts_copy.data() + udts_copy.size(),
             ones_copy.data() + ones_copy.size());
-        EXPECT_FALSE(
-            std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
+        BOOST_CHECK(
+            !std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
         std::sort(first, last);
-        EXPECT_TRUE(
+        BOOST_CHECK(
             std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
+}
+
+    return 0;
 }

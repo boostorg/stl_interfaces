@@ -8,7 +8,7 @@
 
 #include "ill_formed.hpp"
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -128,79 +128,6 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
 
-TEST(forward, basic_std_copy)
-{
-    basic_forward_iter first(ints.data());
-    basic_forward_iter last(ints.data() + ints.size());
-
-    {
-        std::array<int, 10> ints_copy;
-        std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-    }
-
-    {
-        std::array<int, 10> iota_ints;
-        basic_forward_iter first(iota_ints.data());
-        basic_forward_iter last(iota_ints.data() + iota_ints.size());
-        std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
-    }
-}
-
-TEST(forward, mutable_to_const_conversions)
-{
-    forward first(ints.data());
-    forward last(ints.data() + ints.size());
-    const_forward first_copy(first);
-    const_forward last_copy(last);
-    std::equal(first, last, first_copy, last_copy);
-}
-
-TEST(forward, postincrement)
-{
-    forward first(ints.data());
-    forward last(ints.data() + ints.size());
-    while (first != last)
-        first++;
-}
-
-TEST(forward, std_copy)
-{
-    forward first(ints.data());
-    forward last(ints.data() + ints.size());
-
-    {
-        std::array<int, 10> ints_copy;
-        std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-    }
-
-    {
-        std::array<int, 10> iota_ints;
-        forward first(iota_ints.data());
-        forward last(iota_ints.data() + iota_ints.size());
-        std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
-    }
-}
-
-TEST(forward, const_std_copy)
-{
-    const_forward first(ints.data());
-    const_forward last(ints.data() + ints.size());
-
-    {
-        std::array<int, 10> ints_copy;
-        std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-    }
-
-    {
-        EXPECT_TRUE(std::binary_search(first, last, 3));
-    }
-}
-
 
 ////////////////////
 // view_interface //
@@ -291,7 +218,82 @@ static_assert(
         value,
     "");
 
-TEST(forward, basic_subrange)
+
+int test_main(int, char * [])
+{
+
+{
+    basic_forward_iter first(ints.data());
+    basic_forward_iter last(ints.data() + ints.size());
+
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(first, last, ints_copy.begin());
+        BOOST_CHECK(ints_copy == ints);
+    }
+
+    {
+        std::array<int, 10> iota_ints;
+        basic_forward_iter first(iota_ints.data());
+        basic_forward_iter last(iota_ints.data() + iota_ints.size());
+        std::iota(first, last, 0);
+        BOOST_CHECK(iota_ints == ints);
+    }
+}
+
+
+{
+    forward first(ints.data());
+    forward last(ints.data() + ints.size());
+    const_forward first_copy(first);
+    const_forward last_copy(last);
+    std::equal(first, last, first_copy, last_copy);
+}
+
+
+{
+    forward first(ints.data());
+    forward last(ints.data() + ints.size());
+    while (first != last)
+        first++;
+}
+
+
+{
+    forward first(ints.data());
+    forward last(ints.data() + ints.size());
+
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(first, last, ints_copy.begin());
+        BOOST_CHECK(ints_copy == ints);
+    }
+
+    {
+        std::array<int, 10> iota_ints;
+        forward first(iota_ints.data());
+        forward last(iota_ints.data() + iota_ints.size());
+        std::iota(first, last, 0);
+        BOOST_CHECK(iota_ints == ints);
+    }
+}
+
+
+{
+    const_forward first(ints.data());
+    const_forward last(ints.data() + ints.size());
+
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(first, last, ints_copy.begin());
+        BOOST_CHECK(ints_copy == ints);
+    }
+
+    {
+        BOOST_CHECK(std::binary_search(first, last, 3));
+    }
+}
+
 {
     basic_forward_iter first(ints.data());
     basic_forward_iter last(ints.data() + ints.size());
@@ -306,33 +308,36 @@ TEST(forward, basic_subrange)
     {
         std::array<int, 10> ints_copy;
         std::copy(r.begin(), r.end(), ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
 
-        EXPECT_EQ(empty.begin(), empty.end());
+        BOOST_CHECK(empty.begin() == empty.end());
     }
 
     // empty/op bool
     {
-        EXPECT_FALSE(r.empty());
-        EXPECT_TRUE(r);
+        BOOST_CHECK(!r.empty());
+        BOOST_CHECK(r);
 
-        EXPECT_TRUE(empty.empty());
-        EXPECT_FALSE(empty);
+        BOOST_CHECK(empty.empty());
+        BOOST_CHECK(!empty);
 
         auto const cr = r;
-        EXPECT_FALSE(cr.empty());
-        EXPECT_TRUE(cr);
+        BOOST_CHECK(!cr.empty());
+        BOOST_CHECK(cr);
 
         auto const cempty = empty;
-        EXPECT_TRUE(cempty.empty());
-        EXPECT_FALSE(cempty);
+        BOOST_CHECK(cempty.empty());
+        BOOST_CHECK(!cempty);
     }
 
     // front/back
     {
-        EXPECT_EQ(r.front(), 0);
+        BOOST_CHECK(r.front() == 0);
 
         auto const cr = r;
-        EXPECT_EQ(cr.front(), 0);
+        BOOST_CHECK(cr.front() == 0);
     }
+}
+
+    return 0;
 }

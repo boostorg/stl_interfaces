@@ -6,7 +6,7 @@
 #include <boost/stl_interfaces/iterator_interface.hpp>
 #include <boost/stl_interfaces/reverse_iterator.hpp>
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <algorithm>
 #include <array>
@@ -44,7 +44,9 @@ private:
 };
 
 
-TEST(reverse_iter, std_list_iterator)
+int test_main(int, char * [])
+{
+
 {
     std::list<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
@@ -56,20 +58,20 @@ TEST(reverse_iter, std_list_iterator)
             std::list<int>::const_iterator>(first);
         auto clast = boost::stl_interfaces::reverse_iterator<
             std::list<int>::const_iterator>(last);
-        EXPECT_TRUE(std::equal(first, last, cfirst, clast));
+        BOOST_CHECK(std::equal(first, last, cfirst, clast));
     }
 
     {
         auto ints_copy = ints;
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_TRUE(
+        BOOST_CHECK(
             std::equal(first, last, ints_copy.begin(), ints_copy.end()));
     }
 
     {
         std::list<int> ints_copy;
         std::reverse_copy(first, last, std::back_inserter(ints_copy));
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -77,7 +79,7 @@ TEST(reverse_iter, std_list_iterator)
         for (auto it = first; it != last; ++it) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 
     {
@@ -85,7 +87,7 @@ TEST(reverse_iter, std_list_iterator)
         for (auto it = first; it != last; it++) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 
     {
@@ -93,7 +95,7 @@ TEST(reverse_iter, std_list_iterator)
         for (auto it = last; it != first; --it) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 
     {
@@ -101,11 +103,11 @@ TEST(reverse_iter, std_list_iterator)
         for (auto it = last; it != first; it--) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 }
 
-TEST(reverse_iter, std_vector_iterator)
+
 {
     std::vector<int> ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
@@ -117,21 +119,21 @@ TEST(reverse_iter, std_vector_iterator)
             std::vector<int>::const_iterator>(first);
         auto clast = boost::stl_interfaces::reverse_iterator<
             std::vector<int>::const_iterator>(last);
-        EXPECT_TRUE(std::equal(first, last, cfirst, clast));
+        BOOST_CHECK(std::equal(first, last, cfirst, clast));
     }
 
     {
         auto ints_copy = ints;
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(first - last, ints_copy.begin() - ints_copy.end());
-        EXPECT_TRUE(
+        BOOST_CHECK(first - last == ints_copy.begin() - ints_copy.end());
+        BOOST_CHECK(
             std::equal(first, last, ints_copy.begin(), ints_copy.end()));
     }
 
     {
         std::vector<int> ints_copy;
         std::reverse_copy(first, last, std::back_inserter(ints_copy));
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -139,7 +141,7 @@ TEST(reverse_iter, std_vector_iterator)
         for (auto it = first; it != last; ++it) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 
     {
@@ -147,7 +149,7 @@ TEST(reverse_iter, std_vector_iterator)
         for (auto it = first; it != last; it++) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 
     {
@@ -155,7 +157,7 @@ TEST(reverse_iter, std_vector_iterator)
         for (auto it = last; it != first; --it) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 
     {
@@ -163,11 +165,11 @@ TEST(reverse_iter, std_vector_iterator)
         for (auto it = last; it != first; it--) {
             ++count;
         }
-        EXPECT_EQ(count, ints.size());
+        BOOST_CHECK(count == ints.size());
     }
 }
 
-TEST(reverse_iter, zip_iterator)
+
 {
     std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
     std::array<int, 10> ones = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
@@ -192,15 +194,15 @@ TEST(reverse_iter, zip_iterator)
     {
         auto tuples_copy = tuples;
         std::reverse(tuples_copy.begin(), tuples_copy.end());
-        EXPECT_EQ(first - last, tuples_copy.begin() - tuples_copy.end());
-        EXPECT_TRUE(
+        BOOST_CHECK(first - last == tuples_copy.begin() - tuples_copy.end());
+        BOOST_CHECK(
             std::equal(first, last, tuples_copy.begin(), tuples_copy.end()));
     }
 
     {
         std::array<std::tuple<int, int>, 10> tuples_copy;
         std::reverse_copy(first, last, tuples_copy.begin());
-        EXPECT_EQ(tuples_copy, tuples);
+        BOOST_CHECK(tuples_copy == tuples);
     }
 
     {
@@ -208,7 +210,7 @@ TEST(reverse_iter, zip_iterator)
         for (auto it = first; it != last; ++it) {
             ++count;
         }
-        EXPECT_EQ(count, tuples.size());
+        BOOST_CHECK(count == tuples.size());
     }
 
     {
@@ -216,7 +218,7 @@ TEST(reverse_iter, zip_iterator)
         for (auto it = first; it != last; it++) {
             ++count;
         }
-        EXPECT_EQ(count, tuples.size());
+        BOOST_CHECK(count == tuples.size());
     }
 
     {
@@ -224,7 +226,7 @@ TEST(reverse_iter, zip_iterator)
         for (auto it = last; it != first; --it) {
             ++count;
         }
-        EXPECT_EQ(count, tuples.size());
+        BOOST_CHECK(count == tuples.size());
     }
 
     {
@@ -232,6 +234,9 @@ TEST(reverse_iter, zip_iterator)
         for (auto it = last; it != first; it--) {
             ++count;
         }
-        EXPECT_EQ(count, tuples.size());
+        BOOST_CHECK(count == tuples.size());
     }
+}
+
+    return 0;
 }

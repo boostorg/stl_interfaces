@@ -9,7 +9,7 @@
 
 #include <boost/mpl/assert.hpp>
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <list>
@@ -76,7 +76,9 @@ static_assert(!v1_dtl::common_range<ridiculous_range>::value, "");
 struct no_clear
 {};
 
-TEST(v1_dtl, clear_impl)
+int test_main(int, char * [])
+{
+
 {
     {
         no_clear nc;
@@ -85,16 +87,19 @@ TEST(v1_dtl, clear_impl)
     {
         std::vector<int> vec(10);
         v1_dtl::clear_impl<std::vector<int>>::call(vec);
-        EXPECT_TRUE(vec.empty());
+        BOOST_CHECK(vec.empty());
     }
 }
 
-TEST(detail, n_iter)
+
 {
     std::array<int, 5> ints = {{0, 1, 2, 3, 4}};
     int const new_value = 6;
     detail::n_iter<int, int> first = detail::make_n_iter(new_value, 3);
     detail::n_iter<int, int> last = detail::make_n_iter_end(new_value, 3);
     std::copy(first, last, &ints[1]);
-    EXPECT_EQ(ints, (std::array<int, 5>{{0, 6, 6, 6, 4}}));
+    BOOST_CHECK(ints == (std::array<int, 5>{{0, 6, 6, 6, 4}}));
+}
+
+    return 0;
 }

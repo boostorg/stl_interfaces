@@ -7,7 +7,7 @@
 
 #include "ill_formed.hpp"
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -175,7 +175,9 @@ std::array<std::pair<int, int>, 10> pairs = {{
 }};
 
 
-TEST(input, basic_std_copy)
+int test_main(int, char * [])
+{
+
 {
     basic_input_iter first(ints.data());
     basic_input_iter last(ints.data() + ints.size());
@@ -183,11 +185,11 @@ TEST(input, basic_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 }
 
-TEST(input, mutable_to_const_conversions)
+
 {
     int_input first(ints.data());
     int_input last(ints.data() + ints.size());
@@ -196,7 +198,7 @@ TEST(input, mutable_to_const_conversions)
     std::equal(first, last, first_copy, last_copy);
 }
 
-TEST(input, postincrement)
+
 {
     int_input first(ints.data());
     int_input last(ints.data() + ints.size());
@@ -204,14 +206,14 @@ TEST(input, postincrement)
         first++;
 }
 
-TEST(input, std_copy)
+
 {
     {
         std::array<int, 10> ints_copy;
         int_input first(ints.data());
         int_input last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -219,7 +221,7 @@ TEST(input, std_copy)
         pair_input first(pairs.data());
         pair_input last(pairs.data() + pairs.size());
         std::copy(first, last, pairs_copy.begin());
-        EXPECT_EQ(pairs_copy, pairs);
+        BOOST_CHECK(pairs_copy == pairs);
     }
 
     {
@@ -229,7 +231,7 @@ TEST(input, std_copy)
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        EXPECT_EQ(firsts_copy, ints);
+        BOOST_CHECK(firsts_copy == ints);
     }
 
     {
@@ -239,18 +241,18 @@ TEST(input, std_copy)
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        EXPECT_EQ(firsts_copy, ints);
+        BOOST_CHECK(firsts_copy == ints);
     }
 }
 
-TEST(input, const_std_copy)
+
 {
     {
         std::array<int, 10> ints_copy;
         const_int_input first(ints.data());
         const_int_input last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -258,7 +260,7 @@ TEST(input, const_std_copy)
         const_pair_input first(pairs.data());
         const_pair_input last(pairs.data() + pairs.size());
         std::copy(first, last, pairs_copy.begin());
-        EXPECT_EQ(pairs_copy, pairs);
+        BOOST_CHECK(pairs_copy == pairs);
     }
 
     {
@@ -268,7 +270,7 @@ TEST(input, const_std_copy)
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        EXPECT_EQ(firsts_copy, ints);
+        BOOST_CHECK(firsts_copy == ints);
     }
 
     {
@@ -279,6 +281,9 @@ TEST(input, const_std_copy)
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        EXPECT_EQ(firsts_copy, ints);
+        BOOST_CHECK(firsts_copy == ints);
     }
+}
+
+    return 0;
 }
