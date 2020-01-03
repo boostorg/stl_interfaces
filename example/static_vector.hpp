@@ -199,16 +199,17 @@ struct static_vector : sequence_container_interface<
         auto position = const_cast<T *>(pos);
         auto const insertions = std::distance(first, last);
         assert(this->size() + insertions < capacity());
-        std::uninitialized_fill_n(end(), insertions, T());
+        uninitialized_generate(end(), end() + insertions, [] { return T(); });
         std::move_backward(position, end(), end() + insertions);
         std::copy(first, last, position);
         size_ += insertions;
         return position;
     }
-    iterator erase(const_iterator f, const_iterator last)
+    iterator erase(const_iterator f, const_iterator l)
     {
         auto first = const_cast<T *>(f);
-        auto end_ = this->cend();
+        auto last = const_cast<T *>(l);
+        auto end_ = this->end();
         auto it = std::move(last, end_, first);
         for (; it != end_; ++it) {
             it->~T();
