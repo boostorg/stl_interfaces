@@ -555,14 +555,23 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
 
 namespace boost { namespace stl_interfaces { namespace v2 {
 
-    // This is only here to satisfy clang-format.
-    namespace v2_dtl {
-    }
-
     // clang-format off
 
 #if 201703L < __cplusplus && defined(__cpp_lib_concepts) ||                    \
     defined(BOOST_STL_INTERFACES_DOXYGEN)
+
+    namespace v2_dtl {
+        template<typename D, typename DifferenceType>
+        BOOST_STL_INTERFACES_CONCEPT plus_eq = requires (D & d) {
+            d += typename DifferenceType(1); };
+
+        template<typename D>
+        BOOST_STL_INTERFACES_CONCEPT base_3way =
+            requires (D & d) { access::base(d) - access::base(d); };
+
+        template<typename D>
+        BOOST_STL_INTERFACES_CONCEPT sub = requires (D & d) { d - d; };
+    }
 
     /** A CRTP template that one may derive from to make defining iterators
         easier.
@@ -624,7 +633,7 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
       constexpr decltype(auto) operator++()
         requires requires { ++access::base(derived()); } &&
-          !requires { derived() += difference_type(1); } {
+          !v2_dtl::plus_eq<decltype(derived()), difference_type> {
             ++access::base(derived());
             return derived();
           }
@@ -653,10 +662,10 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
       constexpr decltype(auto) operator--()
         requires requires { --access::base(derived()); } &&
-          !requires { derived() += difference_type(1); } {
-          --access::base(derived());
-          return derived();
-        }
+          !v2_dtl::plus_eq<decltype(derived()), difference_type> {
+            --access::base(derived());
+            return derived();
+          }
       constexpr decltype(auto) operator--()
         requires requires { derived() += -difference_type(1); } {
           return derived() += -difference_type(1);
@@ -681,25 +690,23 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 
       friend constexpr std::strong_equality operator<=>(D lhs, D rhs)
         requires requires { access::base(lhs) == access::base(rhs); } &&
-          !requires { access::base(lhs) <=> access::base(rhs); } &&
-          !requires { lhs - rhs; } {
+          !v2_dtl::base_3way<D> && !v2_dtl::sub<D> {
             return access::base(lhs) == access::base(rhs) ?
                 std::strong_equality::equal : std::strong_equality::unequal;
           }
       friend constexpr std::strong_ordering operator<=>(D lhs, D rhs)
-        requires requires { access::base(lhs) <=> access::base(rhs); } ||
-          requires { lhs - rhs; } {
-            if constexpr (requires { access::base(lhs) <=> access::base(rhs); }) {
-              return access::base(lhs) <=> access::base(rhs);
-            } else {
-              auto delta = lhs - rhs;
-              if (delta < 0)
-                  return std::strong_ordering::less;
-              if (0 < delta)
-                  return std::strong_ordering::greater;
-              return  std::strong_ordering::equal;
-            }
+        requires v2_dtl::base_3way<D> || v2_dtl::sub<D> {
+          if constexpr (requires { access::base(lhs) <=> access::base(rhs); }) {
+            return access::base(lhs) <=> access::base(rhs);
+          } else {
+            auto delta = lhs - rhs;
+            if (delta < 0)
+                return std::strong_ordering::less;
+            if (0 < delta)
+                return std::strong_ordering::greater;
+            return  std::strong_ordering::equal;
           }
+        }
     };
 
 #elif 201703L <= __cplusplus && defined(__has_include) &&                      \
@@ -752,6 +759,10 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         template<typename D1, typename D2 = D1>
         BOOST_STL_INTERFACES_CONCEPT eq =
             requires (D1 & d1, D2 & d2) { d1 == d2; };
+
+        template<typename D>
+        BOOST_STL_INTERFACES_CONCEPT base_3way =
+            requires (D & d) { access::base(d) - access::base(d); };
     }
 
     /** A CRTP template that one may derive from to make defining iterators
@@ -870,25 +881,23 @@ namespace boost { namespace stl_interfaces { namespace v2 {
 #if defined(__cpp_lib_three_way_comparison)
       friend constexpr std::strong_equality operator<=>(D lhs, D rhs)
         requires requires { access::base(lhs) == access::base(rhs); } &&
-          !requires { access::base(lhs) == access::base(rhs); } &&
-          !requires { lhs - rhs; } {
+          !v2_dtl::base_3way<D> && !v2_dtl::sub<D> {
             return access::base(lhs) == access::base(rhs) ?
                 std::strong_equality::equal : std::strong_equality::unequal;
           }
       friend constexpr std::strong_ordering operator<=>(D lhs, D rhs)
-        requires requires { access::base(lhs) <=> access::base(rhs); } ||
-          requires { lhs - rhs; } {
-            if constexpr (requires { access::base(lhs) <=> access::base(rhs); }) {
-              return access::base(lhs) <=> access::base(rhs);
-            } else {
-              auto delta = lhs - rhs;
-              if (delta < 0)
-                  return std::strong_ordering::less;
-              if (0 < delta)
-                  return std::strong_ordering::greater;
-              return  std::strong_ordering::equal;
-            }
+        requires v2_dtl::base_3way<D> || v2_dtl::sub<D> {
+          if constexpr (requires { access::base(lhs) <=> access::base(rhs); }) {
+            return access::base(lhs) <=> access::base(rhs);
+          } else {
+            auto delta = lhs - rhs;
+            if (delta < 0)
+                return std::strong_ordering::less;
+            if (0 < delta)
+                return std::strong_ordering::greater;
+            return  std::strong_ordering::equal;
           }
+        }
 #else
       friend constexpr bool operator<(D lhs, D rhs)
         requires v2_dtl::eq<D> {
