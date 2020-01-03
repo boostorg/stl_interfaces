@@ -344,16 +344,6 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             return derived()[i];
         }
 
-        template<typename D = Derived>
-        constexpr auto resize(typename D::size_type n) noexcept(
-            noexcept(std::declval<D &>().resize(
-                n, std::declval<typename D::value_type const &>())))
-            -> decltype(std::declval<D &>().resize(
-                n, std::declval<typename D::value_type const &>()))
-        {
-            return derived().resize(n, typename D::value_type());
-        }
-
         template<typename D = Derived, typename Iter = typename D::const_iterator>
         constexpr Iter begin() const
             noexcept(noexcept(std::declval<D &>().begin()))
@@ -846,15 +836,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           return std::ranges::begin(derived())[n];
         }
 
-      template<typename C = D>
-        constexpr void resize(v2_dtl::container_size_t<C> n)
-          requires requires {
-            std::ranges::range_value_t<D>();
-            derived().resize(n, std::ranges::range_value_t<D>());
-          } {
-            derived().resize(n, std::ranges::range_value_t<D>());
-          }
-
       constexpr auto begin() {
         return typename D::const_iterator(std::ranges::begin(mutable_derived()));
       }
@@ -1030,14 +1011,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
         BOOST_STL_INTERFACES_CONCEPT erase =
           requires (D & d, ranges::iterator_t<const D> pos) {
             d.erase(pos, pos);
-          };
-
-        template<typename D>
-        BOOST_STL_INTERFACES_CONCEPT resz_n_x =
-          requires (D & d,
-                    typename D::size_type n,
-                    const typename D::value_type& x) {
-            d.resize(n, x);
           };
 
         template<typename D, typename ValueType>
@@ -1224,12 +1197,6 @@ namespace boost { namespace stl_interfaces { namespace v2 {
           if (derived().size() <= n)
             throw std::out_of_range("Bounds check failed in sequence_container_interface::at()");
           return ranges::begin(derived())[n];
-        }
-
-      template<typename C = D>
-        requires v2_dtl::resz_n_x<C>
-        constexpr void resize(v2_dtl::container_size_t<C> n) {
-          derived().resize(n, ranges::ext::range_value_t<C>());
         }
 
       constexpr auto begin() const {

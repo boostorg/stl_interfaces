@@ -837,11 +837,6 @@ respectively).  However, they are each used as the user-defined operation that
 indicates that the container being defined is front- or
 back-mutation-friendly. ]
 
-_cont_iface_ will provide one more operation that is not part of the C++
-container requirements tables, but that is pretty commonly found on sequence
-containers.  If you define `resize(n, t)`, _cont_iface_ will provide a
-`resize(n)` overload.
-
 User-defined functions required by the tables above must also meet these
 general requirements:
 
@@ -881,8 +876,8 @@ the allocatory bits.
 [static_vector_defn]
 
 That's quite a bit of code.  However, by using _cont_iface_, we were able to
-write only 21 functions, and let _cont_iface_ provide the other 40.  9 of the
-21 function that we did have to write were constructors and special member
+write only 22 functions, and let _cont_iface_ provide the other 39.  9 of the
+22 function that we did have to write were constructors and special member
 functions, and those always have to be written in the derived class;
 _cont_iface_ never could have helped with those.
 
