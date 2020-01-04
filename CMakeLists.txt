@@ -66,28 +66,14 @@ add_library(stl_interfaces INTERFACE)
 
 target_include_directories(stl_interfaces INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(stl_interfaces INTERFACE boost)
-if (link_flags OR HAVE_CMCSTL2)
+if (link_flags)
     target_link_libraries(stl_interfaces INTERFACE ${link_flags})
     target_compile_options(stl_interfaces INTERFACE ${compile_flags})
-    if (HAVE_CMCSTL2)
-        target_link_libraries(stl_interfaces INTERFACE stl2)
-    endif()
 endif ()
 if (NOT MSVC)
     target_compile_options(stl_interfaces INTERFACE -Wall)
 endif ()
 
 
-##################################################
-# Tests and examples
-##################################################
-## Built conditionally, because it relies on libFuzzer.
-#set(BUILD_FUZZ_TESTS false CACHE BOOL "Set to true to build fuzz tests.")
-#
-#if (BUILD_FUZZ_TESTS AND NOT CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-#    message(FATAL_ERROR "BUILD_FUZZ_TESTS only works with Clang; it uses libFuzzer.")
-#endif ()
-
 add_subdirectory(test)
 add_subdirectory(example)
-#add_subdirectory(doc)

@@ -65,7 +65,6 @@
 [def _CRTP_                [@https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern CRTP]]
 [def _Iterator_            [@https://www.boost.org/doc/libs/release/libs/iterator Boost.Iterator]]
 [def _Container_           [@https://www.boost.org/doc/libs/release/libs/container Boost.Container]]
-[def _cmcstl2_             [@https://github.com/CaseyCarter/cmcstl2 cmcstl2]]
 
 [def _emdash_              \u2014]
 

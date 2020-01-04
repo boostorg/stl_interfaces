@@ -29,12 +29,3 @@ else ()
   add_dependencies(boost install-Boost)
   unset(SOURCE_DIR)
 endif ()
-
-
-###############################################################################
-# cmcstl2, and experimental implementation of P0896R4 "The One Ranges Proposal"
-###############################################################################
-if (EXISTS "${CMAKE_SOURCE_DIR}/cmcstl2")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/cmcstl2)
-    set(HAVE_CMCSTL2 true)
-endif()
