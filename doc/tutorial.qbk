@@ -445,6 +445,8 @@ any user-defined insertion or erasure member functions into your container.
 If it has bidirectional iterators, the `std::array`-like container will have
 `back()` too.
 
+[heading The `sequence_container_interface` Tables]
+
 After each requirements table, there's a table indicating how _cont_iface_
 maps the user-defined operations to the operations it provides.  These mapping
 tables can be handy if you have a container that meets only some of the
@@ -462,6 +464,8 @@ iterator to `a`; `[q1, q2)` is a valid range of constant iterators to `a`; `t`
 is an lvalue or a const rvalue of T; and `rv` denotes a non-const rvalue of
 `T`. `Args` is a template parameter pack; `args` denotes a function parameter
 pack with the pattern `Args &&`.
+
+[heading Container]
 
 All containers must meet the requirements of this table:
 
@@ -616,6 +620,8 @@ a.cend()`` ]
     ]
 ]
 
+[heading Reversible Container]
+
 Containers that are reverse-iterable must meet the requirements of this table
 (in addition to the container requirements):
 
@@ -651,6 +657,8 @@ a.crend()`` ]
     ]
 ]
 
+[heading Optional Container Operations]
+
 Containers that are comparable with `<`, `>`, `<=`, and `>=` must meet the
 requirements of this table (in addition to the container requirements):
 
@@ -677,6 +685,8 @@ a >= b`` ]
         [ `a == b` is also required to be user-defined; it comes from the (non-optional) container requirements. ]
     ]
 ]
+
+[heading Sequence Container]
 
 Sequence containers meet the requirements of this table (in addition to the
 container requirements):
@@ -765,6 +775,8 @@ a.assign(il)`` ]
     ]
 ]
 
+[heading Optional Sequence Container Operations]
+
 Sequence containers with `front()`, `back()`, or any of the other operations
 in this table must define these operations (in addition to the container
 requirements):
@@ -837,8 +849,11 @@ respectively).  However, they are each used as the user-defined operation that
 indicates that the container being defined is front- or
 back-mutation-friendly. ]
 
-User-defined functions required by the tables above must also meet these
-general requirements:
+[heading General Requirements on All User-Defined Operations]
+
+There are other requirements listed in the standard that do not appear in any
+of the requirements tables; user-defined operations must conform to those as
+well:
 
 - If an exception is thrown by an `insert()` or `emplace()` call while
   inserting a single element, that function has no effect.
