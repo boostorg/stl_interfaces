@@ -339,7 +339,7 @@ As with _iter_iface_, _view_iface_ makes it possible to write very few
 operations _emdash_ only `begin()` and `end()` are actually used by
 _view_iface_ _emdash_ and get all the other operations that go with view
 types.  The operations added depend on what kinds of iterator and/or sentinel
-types your derived view type define.
+types your derived view type defines.
 
 Here is the declaration of _view_iface_:
 
@@ -841,7 +841,7 @@ User-defined functions required by the tables above must also meet these
 general requirements:
 
 - If an exception is thrown by an `insert()` or `emplace()` call while
-  inserting a single element, that function has no effects.
+  inserting a single element, that function has no effect.
 
 - No `erase()` function throws an exception.
 
