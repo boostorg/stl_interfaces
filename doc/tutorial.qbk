@@ -373,8 +373,9 @@ _view_iface_ that we did not have to write:
 [drop_while_view_usage]
 
 If you want more details on _view_iface_, you can find it wherever you usually
-find reference documentation on the standard library.  We won't cover it in
-too much detail here, for that reason.
+find reference documentation on the standard library.  We won't cover it here
+for that reason.  See [@http://eel.is/c++draft/view.interface [view.interface]
+on eel.is] or [@https://cppreference.com] for details.
 
 [endsect]
 
@@ -406,31 +407,68 @@ Just as with _view_iface_, _cont_iface_ takes the derived type and an optional
 non-type template parameter that indicates whether `Derived`'s iterators are
 contiguous.  The non-type parameter is necessary to support pre-C++20 code.
 
-The tables below represent a subset of the operations needed for each of the
-container requirements tables in the standard.  _cont_iface_ covers the
-definition of containers (including the optional container requirements);
-reversible containers; and sequence containers (including the optional
-sequence container requirements).  Each table lists all the user-defined types
-and operations required to make standard-conforming containers with
-_cont_iface_.  Note that _cont_iface_ does not interact at all with the
-allocator-aware container requirements, the associative container
-requirements, or the unordered associative container requirements.
-Specifically, nothing precludes you from satisfying any of those sets or
-requirements _emdash_ it's just that _cont_iface_ does not.
+[heading How `sequence_container_interface` is Organized]
 
-For instance, to make a `std::array`-like container (but not a sequence
-container, because it has no `insert()`, `erase()`, etc.), you need to define
-the types and operations in the "User-Defined Types and Operations for
-Containers" table, and optionally the ones in the "Optional User-Defined Types
-and Operations for Containers".
+The tables below represent a subset of the operations needed for each of the
+container requirements tables in the standard.  Here are the tables that apply
+to sequence containers (from `[container.requirements]` in the standard):
+
+* Container requirements `[tab:container.req]`
+* Reversible container requirements `[tab:container.rev.req]`
+* Optional container operations `[tab:container.opt]`
+* Allocator-aware container requirements `[tab:container.alloc.req]`
+* Sequence container requirements `[tab:container.seq.req]`
+* Optional sequence container operations `[tab:container.seq.opt]`
+
+Each requirements table lists all the types and operations required by a
+standard-conforming container.  All of these sets of requirements are
+supported by _cont_iface_, except the allocator-aware container requirements.
+The container and sequence container requirements are required for any
+sequence container.  _cont_iface_ provides each member in any table above
+(again, except the allocator-aware ones).  Each member is individually
+constrained, so if a given member (say, a particular `insert()` overload) is
+ill-formed, it will not be usable in the resulting container.
+
+[note All table requirements satisfied by _IFaces_ use the 2017 version of the
+C++ Standard.  See your favorite online resource for the contents of these
+tables.  Many people like [@http://eel.is/c++draft eel.is], which is really
+easy to navigate.]
+
+Note that _cont_iface_ does not interact at all with the allocator-aware
+container requirements, the associative container requirements, or the
+unordered associative container requirements.  Specifically, nothing precludes
+you from satisfying any of those sets or requirements _emdash_ it's just that
+_cont_iface_ does not.
+
+[heading How `sequence_container_interface` Works]
+
+To use _cont_iface_, you provide certain operations yourself, and _cont_iface_
+fills in the rest.  If any provided operation `O` is not to your liking
+_emdash_ say, because you know of a way to do `O` directly in a way that is
+more efficient than the way that _cont_iface_ does it _emdash_ you can
+implement `O` yourself.  Since your implementation is in a class `D` derived
+from _cont_iface_, it will hide the `O` from _cont_iface_.
+
+Below, there are tables that show what user-defined types and operations are
+required for _cont_iface_ to fulfill all the requirements from one of the C++
+Standard's requirements tables.  For instance, the table "Optional
+User-Defined Types and Operations for Containers" below shows what you need to
+provide to fulfill all the requirements in the standard's "Container
+requirements `[tab:container.req]`" table.
+
+So, to use _cont_iface_ to make a `std::array`-like container (which is not a
+sequence container, because it has no `insert()`, `erase()`, etc.), you need
+to define the types and operations in the "User-Defined Types and Operations
+for Containers" table, and optionally the ones in the "Optional User-Defined
+Types and Operations for Containers".
 
 To make a `std::forward_list`-like type, you need to define the types and
 operations in the "User-Defined Types and Operations for Containers" table,
 and optionally the ones in the "Optional User-Defined Types and Operations for
-Containers".  You cannot define the types and operations in the "User-Defined
-Types and Operations for Reversible Containers" table, because your container
-is forward-only.  You would also define the types and operations in the
-"User-Defined Types and Operations for Sequence Containers" table.
+Containers".  You would also define the types and operations in the
+"User-Defined Types and Operations for Sequence Containers" table.  You cannot
+define the types and operations in the "User-Defined Types and Operations for
+Reversible Containers" table, because your container is forward-only.
 
 To make a `std::vector`-like type, you would provide the types and operations
 in all the tables below.
@@ -841,21 +879,16 @@ There are other requirements listed in the standard that do not appear in any
 of the requirements tables; user-defined operations must conform to those as
 well:
 
-- If an exception is thrown by an `insert()` or `emplace()` call while
+* If an exception is thrown by an `insert()` or `emplace()` call while
   inserting a single element, that function has no effect.
-
-- No `erase()` function throws an exception.
-
-- No copy constructor or assignment operator of a returned iterator throws an
+* No `erase()` function throws an exception.
+* No copy constructor or assignment operator of a returned iterator throws an
   exception.
-
-- The iterator returned from `a.emplace(p, args)` points to the new element
+* The iterator returned from `a.emplace(p, args)` points to the new element
   constructed from `args` into `a`.
-
-- The iterator returned from `a.insert(p, i, j)` points to the copy of the
+* The iterator returned from `a.insert(p, i, j)` points to the copy of the
   first element inserted into `a`, or `p` if `i == j`.
-
-- The iterator returned by `a.erase(q1, q2)` points to the element pointed to
+* The iterator returned by `a.erase(q1, q2)` points to the element pointed to
   by `q2` prior to any elements being erased. If no such element exists,
   `a.end()` is returned.
 
