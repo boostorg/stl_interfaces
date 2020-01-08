@@ -560,12 +560,6 @@ X u = rv;
         [ This is the non-`const` overload; the `const` overload is not needed. ]
     ]
     [
-        [ `a == b` ]
-        [ Convertible to `bool`. ]
-        [ `std::equal(a.begin(), a.end(), b.begin(), b.end())` ]
-        [ ['Expects:] `T` is equality comparable. ]
-    ]
-    [
         [ `a.swap(b)` ]
         [ Convertible to `bool`. ]
         [ Exchanges the contents of `a` and `b`. ]
@@ -611,7 +605,7 @@ a.cend()`` ]
     [
         [ `a == b` ]
         [ `a != b` ]
-        [ ]
+        [ Though `a == b` is provided by _cont_iface_, any user-defined replacement will be used to provide `a != b`. ]
     ]
     [
         [ `a.swap(b)` ]
@@ -659,21 +653,13 @@ a.crend()`` ]
 
 [heading Optional Container Operations]
 
-Containers that are comparable with `<`, `>`, `<=`, and `>=` must meet the
-requirements of this table (in addition to the container requirements):
+Containers that are comparable with `<`, `>`, `<=`, and `>=` get those
+operations automatically, so long as `T` is less-than comparable.  In this
+case, there are no required user-defined operations, so that table is not
+needed.
 
-[table Optional User-Defined Types and Operations for Containers
-    [[Expression]   [Return Type]   [Semantics]   [Assertion/note/pre-/post-condition]]
-    [
-        [ `a < b` ]
-        [ Convertible to `bool`. ]
-        [ `std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end())` ]
-        [ ['Expects:] `T` is less-than comparable. ]
-    ]
-]
-
-If you provide the types and operations above, _cont_iface_ will provide the
-rest of the optional container requirements, using this mapping:
+_cont_iface_ will provide the optional container requirements using this
+mapping:
 
 [table User-Defined Operations to sequence_container_interface Operations
     [[User-Defined]   [_cont_iface_-Provided]   [Note]]
@@ -682,7 +668,7 @@ rest of the optional container requirements, using this mapping:
         [ ``a <= b
 a > b
 a >= b`` ]
-        [ `a == b` is also required to be user-defined; it comes from the (non-optional) container requirements. ]
+        [ Though `a < b` is provided by _cont_iface_, any user-defined replacement will be used to provide the other operations listed here. ]
     ]
 ]
 
