@@ -3,12 +3,11 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#define BOOST_STL_INTERFACES_DISABLE_CMCSTL2
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include "ill_formed.hpp"
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -174,115 +173,6 @@ std::array<std::pair<int, int>, 10> pairs = {{
 }};
 
 
-TEST(input, basic_std_copy)
-{
-    basic_input_iter first(ints.data());
-    basic_input_iter last(ints.data() + ints.size());
-
-    {
-        std::array<int, 10> ints_copy;
-        std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-    }
-}
-
-TEST(input, mutable_to_const_conversions)
-{
-    int_input first(ints.data());
-    int_input last(ints.data() + ints.size());
-    const_int_input first_copy(first);
-    const_int_input last_copy(last);
-    std::equal(first, last, first_copy, last_copy);
-}
-
-TEST(input, postincrement)
-{
-    int_input first(ints.data());
-    int_input last(ints.data() + ints.size());
-    while (first != last)
-        first++;
-}
-
-TEST(input, std_copy)
-{
-    {
-        std::array<int, 10> ints_copy;
-        int_input first(ints.data());
-        int_input last(ints.data() + ints.size());
-        std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-    }
-
-    {
-        std::array<std::pair<int, int>, 10> pairs_copy;
-        pair_input first(pairs.data());
-        pair_input last(pairs.data() + pairs.size());
-        std::copy(first, last, pairs_copy.begin());
-        EXPECT_EQ(pairs_copy, pairs);
-    }
-
-    {
-        std::array<int, 10> firsts_copy;
-        pair_input first(pairs.data());
-        pair_input last(pairs.data() + pairs.size());
-        for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
-        }
-        EXPECT_EQ(firsts_copy, ints);
-    }
-
-    {
-        std::array<int, 10> firsts_copy;
-        proxy_input_iter<std::pair<int, int>> first(pairs.data());
-        proxy_input_iter<std::pair<int, int>> last(pairs.data() + pairs.size());
-        for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
-        }
-        EXPECT_EQ(firsts_copy, ints);
-    }
-}
-
-TEST(input, const_std_copy)
-{
-    {
-        std::array<int, 10> ints_copy;
-        const_int_input first(ints.data());
-        const_int_input last(ints.data() + ints.size());
-        std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
-    }
-
-    {
-        std::array<std::pair<int, int>, 10> pairs_copy;
-        const_pair_input first(pairs.data());
-        const_pair_input last(pairs.data() + pairs.size());
-        std::copy(first, last, pairs_copy.begin());
-        EXPECT_EQ(pairs_copy, pairs);
-    }
-
-    {
-        std::array<int, 10> firsts_copy;
-        const_pair_input first(pairs.data());
-        const_pair_input last(pairs.data() + pairs.size());
-        for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
-        }
-        EXPECT_EQ(firsts_copy, ints);
-    }
-
-    {
-        std::array<int, 10> firsts_copy;
-        proxy_input_iter<std::pair<int, int> const> first(pairs.data());
-        proxy_input_iter<std::pair<int, int> const> last(
-            pairs.data() + pairs.size());
-        for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
-        }
-        EXPECT_EQ(firsts_copy, ints);
-    }
-}
-
-
 ////////////////////
 // view_interface //
 ////////////////////
@@ -297,7 +187,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -305,7 +195,8 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
     "");
 
 template<typename T>
@@ -317,7 +208,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -325,7 +216,8 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
     "");
 
 template<typename T>
@@ -337,7 +229,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -345,7 +237,8 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
     "");
 
 template<typename T>
@@ -357,7 +250,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -365,48 +258,165 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
     "");
 
-TEST(input, basic_subrange)
+
+int test_main(int, char * [])
+{
+
 {
     basic_input_iter first(ints.data());
     basic_input_iter last(ints.data() + ints.size());
 
-    auto r = range<boost::stl_interfaces::v1::discontiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::v1::discontiguous>(first, first);
+    {
+        std::array<int, 10> ints_copy;
+        std::copy(first, last, ints_copy.begin());
+        BOOST_CHECK(ints_copy == ints);
+    }
+}
+
+
+{
+    int_input first(ints.data());
+    int_input last(ints.data() + ints.size());
+    const_int_input first_copy(first);
+    const_int_input last_copy(last);
+    std::equal(first, last, first_copy, last_copy);
+}
+
+
+{
+    int_input first(ints.data());
+    int_input last(ints.data() + ints.size());
+    while (first != last)
+        first++;
+}
+
+
+{
+    {
+        std::array<int, 10> ints_copy;
+        int_input first(ints.data());
+        int_input last(ints.data() + ints.size());
+        std::copy(first, last, ints_copy.begin());
+        BOOST_CHECK(ints_copy == ints);
+    }
+
+    {
+        std::array<std::pair<int, int>, 10> pairs_copy;
+        pair_input first(pairs.data());
+        pair_input last(pairs.data() + pairs.size());
+        std::copy(first, last, pairs_copy.begin());
+        BOOST_CHECK(pairs_copy == pairs);
+    }
+
+    {
+        std::array<int, 10> firsts_copy;
+        pair_input first(pairs.data());
+        pair_input last(pairs.data() + pairs.size());
+        for (auto out = firsts_copy.begin(); first != last; ++first) {
+            *out++ = first->first;
+        }
+        BOOST_CHECK(firsts_copy == ints);
+    }
+
+    {
+        std::array<int, 10> firsts_copy;
+        proxy_input_iter<std::pair<int, int>> first(pairs.data());
+        proxy_input_iter<std::pair<int, int>> last(pairs.data() + pairs.size());
+        for (auto out = firsts_copy.begin(); first != last; ++first) {
+            *out++ = first->first;
+        }
+        BOOST_CHECK(firsts_copy == ints);
+    }
+}
+
+
+{
+    {
+        std::array<int, 10> ints_copy;
+        const_int_input first(ints.data());
+        const_int_input last(ints.data() + ints.size());
+        std::copy(first, last, ints_copy.begin());
+        BOOST_CHECK(ints_copy == ints);
+    }
+
+    {
+        std::array<std::pair<int, int>, 10> pairs_copy;
+        const_pair_input first(pairs.data());
+        const_pair_input last(pairs.data() + pairs.size());
+        std::copy(first, last, pairs_copy.begin());
+        BOOST_CHECK(pairs_copy == pairs);
+    }
+
+    {
+        std::array<int, 10> firsts_copy;
+        const_pair_input first(pairs.data());
+        const_pair_input last(pairs.data() + pairs.size());
+        for (auto out = firsts_copy.begin(); first != last; ++first) {
+            *out++ = first->first;
+        }
+        BOOST_CHECK(firsts_copy == ints);
+    }
+
+    {
+        std::array<int, 10> firsts_copy;
+        proxy_input_iter<std::pair<int, int> const> first(pairs.data());
+        proxy_input_iter<std::pair<int, int> const> last(
+            pairs.data() + pairs.size());
+        for (auto out = firsts_copy.begin(); first != last; ++first) {
+            *out++ = first->first;
+        }
+        BOOST_CHECK(firsts_copy == ints);
+    }
+}
+
+{
+    basic_input_iter first(ints.data());
+    basic_input_iter last(ints.data() + ints.size());
+
+    auto r = range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+        first, last);
+    auto empty =
+        range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+            first, first);
 
     // range begin/end
     {
         std::array<int, 10> ints_copy;
         std::copy(r.begin(), r.end(), ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
 
-        EXPECT_EQ(empty.begin(), empty.end());
+        BOOST_CHECK(empty.begin() == empty.end());
     }
 
     // empty/op bool
     {
-        EXPECT_FALSE(r.empty());
-        EXPECT_TRUE(r);
+        BOOST_CHECK(!r.empty());
+        BOOST_CHECK(r);
 
-        EXPECT_TRUE(empty.empty());
-        EXPECT_FALSE(empty);
+        BOOST_CHECK(empty.empty());
+        BOOST_CHECK(!empty);
 
         auto const cr = r;
-        EXPECT_FALSE(cr.empty());
-        EXPECT_TRUE(cr);
+        BOOST_CHECK(!cr.empty());
+        BOOST_CHECK(cr);
 
         auto const cempty = empty;
-        EXPECT_TRUE(cempty.empty());
-        EXPECT_FALSE(cempty);
+        BOOST_CHECK(cempty.empty());
+        BOOST_CHECK(!cempty);
     }
 
     // front/back
     {
-        EXPECT_EQ(r.front(), 0);
+        BOOST_CHECK(r.front() == 0);
 
         auto const cr = r;
-        EXPECT_EQ(cr.front(), 0);
+        BOOST_CHECK(cr.front() == 0);
     }
+}
+
+    return 0;
 }

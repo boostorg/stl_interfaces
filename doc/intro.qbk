@@ -1,3 +1,8 @@
+[/
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
 [section Introduction]
 
 Writing STL iterators, views, and containers is surprisingly hard.  There are a
@@ -12,7 +17,7 @@ you write full-coverage tests for each iterator.
 
 Writing view types like those found in `std::ranges` is also laborious,
 considering that most of each view type's API can be derived from `begin()`
-and `end()`.  C++20 has a template that doe exactly this,
+and `end()`.  C++20 has a template that does exactly this,
 `std::ranges::view_interface`; _IFaces_ provides a pre-C++20-friendly
 implementation.
 
@@ -204,7 +209,7 @@ for use in C++11 and later.  Specifically:
 - _Iterator_ contains two templates, `iterator_facade` and `iterator_adaptor`,
   that represent two ways of writing a new iterator while writing as little
   code as possible.  It would be nice to have the functionality for both
-  available in on template, but it is difficult to unify those two templates
+  available in one template, but it is difficult to unify those two templates
   as written.
 
 For these reasons, it seems more appropriate to introduce a new Boost library

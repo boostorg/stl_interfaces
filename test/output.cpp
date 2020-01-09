@@ -3,10 +3,9 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#define BOOST_STL_INTERFACES_DISABLE_CMCSTL2
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -102,24 +101,29 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 std::vector<int> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
 
-TEST(output, basic_std_copy)
+int test_main(int, char * [])
+{
+
 {
     std::vector<int> ints_copy(ints.size());
     std::copy(ints.begin(), ints.end(), output(&ints_copy[0]));
-    EXPECT_EQ(ints_copy, ints);
+    BOOST_CHECK(ints_copy == ints);
 }
 
-TEST(output, back_insert_std_copy)
+
 {
     std::vector<int> ints_copy;
     std::copy(ints.begin(), ints.end(), back_insert(ints_copy));
-    EXPECT_EQ(ints_copy, ints);
+    BOOST_CHECK(ints_copy == ints);
 }
 
-TEST(output, postincrement)
+
 {
     std::vector<int> ints_copy;
     back_insert out(ints_copy);
     for (int i = 0; i < 10; ++i)
         out++;
+}
+
+    return 0;
 }

@@ -29,25 +29,3 @@ else ()
   add_dependencies(boost install-Boost)
   unset(SOURCE_DIR)
 endif ()
-
-
-###############################################################################
-# GoogleTest
-###############################################################################
-add_subdirectory(${CMAKE_SOURCE_DIR}/googletest-release-1.8.0)
-target_include_directories(gtest      INTERFACE ${CMAKE_HOME_DIRECTORY}/googletest-release-1.8.0/googletest/include)
-target_include_directories(gtest_main INTERFACE ${CMAKE_HOME_DIRECTORY}/googletest-release-1.8.0/googletest/include)
-
-
-###############################################################################
-# Google Benchmark
-###############################################################################
-#add_subdirectory(${CMAKE_SOURCE_DIR}/benchmark-v1.2.0)
-
-###############################################################################
-# cmcstl2, and experimental implementation of P0896R4 "The One Ranges Proposal"
-###############################################################################
-if (EXISTS "${CMAKE_SOURCE_DIR}/cmcstl2")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/cmcstl2)
-    set(HAVE_CMCSTL2 true)
-endif()

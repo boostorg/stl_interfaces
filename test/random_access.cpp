@@ -3,12 +3,11 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-#define BOOST_STL_INTERFACES_DISABLE_CMCSTL2
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include "ill_formed.hpp"
 
-#include <gtest/gtest.h>
+#include <boost/test/minimal.hpp>
 
 #include <array>
 #include <numeric>
@@ -344,60 +343,111 @@ std::array<std::tuple<int_t, int>, 10> udt_tuples = {{
     std::tuple<int_t, int>{{9}, 1},
 }};
 
-TEST(random_access, basic_coverage)
+
+////////////////////
+// view_interface //
+////////////////////
+#include "view_tests.hpp"
+
+template<typename T>
+using data_t = decltype(std::declval<T>().data());
+
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_random_access_iter,
+            basic_random_access_iter,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        data_t,
+        subrange<
+            basic_random_access_iter,
+            basic_random_access_iter,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
+    "");
+
+template<typename T>
+using back_t = decltype(std::declval<T>().back());
+
+static_assert(
+    ill_formed<
+        back_t,
+        subrange<
+            int *,
+            int const *,
+            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
+    "");
+static_assert(
+    ill_formed<
+        back_t,
+        subrange<
+            int *,
+            int const *,
+            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+        value,
+    "");
+
+
+int test_main(int, char * [])
+{
+
 {
     basic_random_access_iter first(ints.data());
     basic_random_access_iter last(ints.data() + ints.size());
 
-    EXPECT_EQ(*first, 0);
-    EXPECT_EQ(*(first + 1), 1);
-    EXPECT_EQ(*(first + 2), 2);
-    EXPECT_EQ(*(1 + first), 1);
-    EXPECT_EQ(*(2 + first), 2);
+    BOOST_CHECK(*first == 0);
+    BOOST_CHECK(*(first + 1) == 1);
+    BOOST_CHECK(*(first + 2) == 2);
+    BOOST_CHECK(*(1 + first) == 1);
+    BOOST_CHECK(*(2 + first) == 2);
 
-    EXPECT_EQ(first[0], 0);
-    EXPECT_EQ(first[1], 1);
-    EXPECT_EQ(first[2], 2);
+    BOOST_CHECK(first[0] == 0);
+    BOOST_CHECK(first[1] == 1);
+    BOOST_CHECK(first[2] == 2);
 
-    EXPECT_EQ(*(last - 1), 9);
-    EXPECT_EQ(*(last - 2), 8);
-    EXPECT_EQ(*(last - 3), 7);
+    BOOST_CHECK(*(last - 1) == 9);
+    BOOST_CHECK(*(last - 2) == 8);
+    BOOST_CHECK(*(last - 3) == 7);
 
-    EXPECT_EQ(last[-1], 9);
-    EXPECT_EQ(last[-2], 8);
-    EXPECT_EQ(last[-3], 7);
+    BOOST_CHECK(last[-1] == 9);
+    BOOST_CHECK(last[-2] == 8);
+    BOOST_CHECK(last[-3] == 7);
 
-    EXPECT_EQ(last - first, 10);
-    EXPECT_EQ(first, first);
-    EXPECT_NE(first, last);
-    EXPECT_LT(first, last);
-    EXPECT_LE(first, last);
-    EXPECT_LE(first, first);
-    EXPECT_GT(last, first);
-    EXPECT_GE(last, first);
-    EXPECT_GE(last, last);
+    BOOST_CHECK(last - first == 10);
+    BOOST_CHECK(first == first);
+    BOOST_CHECK(first != last);
+    BOOST_CHECK(first < last);
+    BOOST_CHECK(first <= last);
+    BOOST_CHECK(first <= first);
+    BOOST_CHECK(last > first);
+    BOOST_CHECK(last >= first);
+    BOOST_CHECK(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        EXPECT_EQ(first_copy, last);
+        BOOST_CHECK(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        EXPECT_EQ(last_copy, first);
+        BOOST_CHECK(last_copy == first);
     }
 }
 
-TEST(random_access, basic_std_copy)
+
 {
     {
         std::array<int, 10> ints_copy;
         basic_random_access_iter first(ints.data());
         basic_random_access_iter last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -409,7 +459,7 @@ TEST(random_access, basic_std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -417,7 +467,7 @@ TEST(random_access, basic_std_copy)
         basic_random_access_iter first(iota_ints.data());
         basic_random_access_iter last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -429,7 +479,7 @@ TEST(random_access, basic_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -441,64 +491,64 @@ TEST(random_access, basic_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(random_access, basic_adapted_coverage)
+
 {
     basic_adapted_random_access_iter first(ints.data());
     basic_adapted_random_access_iter last(ints.data() + ints.size());
 
-    EXPECT_EQ(*first, 0);
-    EXPECT_EQ(*(first + 1), 1);
-    EXPECT_EQ(*(first + 2), 2);
-    EXPECT_EQ(*(1 + first), 1);
-    EXPECT_EQ(*(2 + first), 2);
+    BOOST_CHECK(*first == 0);
+    BOOST_CHECK(*(first + 1) == 1);
+    BOOST_CHECK(*(first + 2) == 2);
+    BOOST_CHECK(*(1 + first) == 1);
+    BOOST_CHECK(*(2 + first) == 2);
 
-    EXPECT_EQ(first[0], 0);
-    EXPECT_EQ(first[1], 1);
-    EXPECT_EQ(first[2], 2);
+    BOOST_CHECK(first[0] == 0);
+    BOOST_CHECK(first[1] == 1);
+    BOOST_CHECK(first[2] == 2);
 
-    EXPECT_EQ(*(last - 1), 9);
-    EXPECT_EQ(*(last - 2), 8);
-    EXPECT_EQ(*(last - 3), 7);
+    BOOST_CHECK(*(last - 1) == 9);
+    BOOST_CHECK(*(last - 2) == 8);
+    BOOST_CHECK(*(last - 3) == 7);
 
-    EXPECT_EQ(last[-1], 9);
-    EXPECT_EQ(last[-2], 8);
-    EXPECT_EQ(last[-3], 7);
+    BOOST_CHECK(last[-1] == 9);
+    BOOST_CHECK(last[-2] == 8);
+    BOOST_CHECK(last[-3] == 7);
 
-    EXPECT_EQ(last - first, 10);
-    EXPECT_EQ(first, first);
-    EXPECT_NE(first, last);
-    EXPECT_LT(first, last);
-    EXPECT_LE(first, last);
-    EXPECT_LE(first, first);
-    EXPECT_GT(last, first);
-    EXPECT_GE(last, first);
-    EXPECT_GE(last, last);
+    BOOST_CHECK(last - first == 10);
+    BOOST_CHECK(first == first);
+    BOOST_CHECK(first != last);
+    BOOST_CHECK(first < last);
+    BOOST_CHECK(first <= last);
+    BOOST_CHECK(first <= first);
+    BOOST_CHECK(last > first);
+    BOOST_CHECK(last >= first);
+    BOOST_CHECK(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        EXPECT_EQ(first_copy, last);
+        BOOST_CHECK(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        EXPECT_EQ(last_copy, first);
+        BOOST_CHECK(last_copy == first);
     }
 }
 
-TEST(random_access, basic_adapted_std_copy)
+
 {
     {
         std::array<int, 10> ints_copy;
         basic_adapted_random_access_iter first(ints.data());
         basic_adapted_random_access_iter last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -510,7 +560,7 @@ TEST(random_access, basic_adapted_std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -519,7 +569,7 @@ TEST(random_access, basic_adapted_std_copy)
         basic_adapted_random_access_iter last(
             iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -532,7 +582,7 @@ TEST(random_access, basic_adapted_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -545,11 +595,11 @@ TEST(random_access, basic_adapted_std_copy)
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(random_access, mutable_to_const_conversions)
+
 {
     {
         random_access first(ints.data());
@@ -570,7 +620,7 @@ TEST(random_access, mutable_to_const_conversions)
     }
 }
 
-TEST(random_access, mutable_to_const_comparisons)
+
 {
     {
         random_access first(ints.data());
@@ -578,18 +628,18 @@ TEST(random_access, mutable_to_const_comparisons)
         const_random_access first_const(first);
         const_random_access last_const(last);
 
-        EXPECT_EQ(first, first_const);
-        EXPECT_EQ(first_const, first);
-        EXPECT_NE(first, last_const);
-        EXPECT_NE(last_const, first);
-        EXPECT_LE(first, first_const);
-        EXPECT_LE(first_const, first);
-        EXPECT_GE(first, first_const);
-        EXPECT_GE(first_const, first);
-        EXPECT_GT(last_const, first);
-        EXPECT_GT(last, first_const);
-        EXPECT_LT(first_const, last);
-        EXPECT_LT(first, last_const);
+        BOOST_CHECK(first == first_const);
+        BOOST_CHECK(first_const == first);
+        BOOST_CHECK(first != last_const);
+        BOOST_CHECK(last_const != first);
+        BOOST_CHECK(first <= first_const);
+        BOOST_CHECK(first_const <= first);
+        BOOST_CHECK(first >= first_const);
+        BOOST_CHECK(first_const >= first);
+        BOOST_CHECK(last_const > first);
+        BOOST_CHECK(last > first_const);
+        BOOST_CHECK(first_const < last);
+        BOOST_CHECK(first < last_const);
     }
 
     {
@@ -598,22 +648,22 @@ TEST(random_access, mutable_to_const_comparisons)
         adapted_random_access_iter<int const> first_const(first);
         adapted_random_access_iter<int const> last_const(last);
 
-        EXPECT_EQ(first, first_const);
-        EXPECT_EQ(first_const, first);
-        EXPECT_NE(first, last_const);
-        EXPECT_NE(last_const, first);
-        EXPECT_LE(first, first_const);
-        EXPECT_LE(first_const, first);
-        EXPECT_GE(first, first_const);
-        EXPECT_GE(first_const, first);
-        EXPECT_GT(last_const, first);
-        EXPECT_GT(last, first_const);
-        EXPECT_LT(first_const, last);
-        EXPECT_LT(first, last_const);
+        BOOST_CHECK(first == first_const);
+        BOOST_CHECK(first_const == first);
+        BOOST_CHECK(first != last_const);
+        BOOST_CHECK(last_const != first);
+        BOOST_CHECK(first <= first_const);
+        BOOST_CHECK(first_const <= first);
+        BOOST_CHECK(first >= first_const);
+        BOOST_CHECK(first_const >= first);
+        BOOST_CHECK(last_const > first);
+        BOOST_CHECK(last > first_const);
+        BOOST_CHECK(first_const < last);
+        BOOST_CHECK(first < last_const);
     }
 }
 
-TEST(random_access, postincrement_preincrement)
+
 {
     {
         random_access first(ints.data());
@@ -658,53 +708,53 @@ TEST(random_access, postincrement_preincrement)
     }
 }
 
-TEST(random_access, coverage)
+
 {
     random_access first(ints.data());
     random_access last(ints.data() + ints.size());
 
-    EXPECT_EQ(*first, 0);
-    EXPECT_EQ(*(first + 1), 1);
-    EXPECT_EQ(*(first + 2), 2);
-    EXPECT_EQ(*(1 + first), 1);
-    EXPECT_EQ(*(2 + first), 2);
+    BOOST_CHECK(*first == 0);
+    BOOST_CHECK(*(first + 1) == 1);
+    BOOST_CHECK(*(first + 2) == 2);
+    BOOST_CHECK(*(1 + first) == 1);
+    BOOST_CHECK(*(2 + first) == 2);
 
-    EXPECT_EQ(first[0], 0);
-    EXPECT_EQ(first[1], 1);
-    EXPECT_EQ(first[2], 2);
+    BOOST_CHECK(first[0] == 0);
+    BOOST_CHECK(first[1] == 1);
+    BOOST_CHECK(first[2] == 2);
 
-    EXPECT_EQ(*(last - 1), 9);
-    EXPECT_EQ(*(last - 2), 8);
-    EXPECT_EQ(*(last - 3), 7);
+    BOOST_CHECK(*(last - 1) == 9);
+    BOOST_CHECK(*(last - 2) == 8);
+    BOOST_CHECK(*(last - 3) == 7);
 
-    EXPECT_EQ(last[-1], 9);
-    EXPECT_EQ(last[-2], 8);
-    EXPECT_EQ(last[-3], 7);
+    BOOST_CHECK(last[-1] == 9);
+    BOOST_CHECK(last[-2] == 8);
+    BOOST_CHECK(last[-3] == 7);
 
-    EXPECT_EQ(last - first, 10);
-    EXPECT_EQ(first, first);
-    EXPECT_NE(first, last);
-    EXPECT_LT(first, last);
-    EXPECT_LE(first, last);
-    EXPECT_LE(first, first);
-    EXPECT_GT(last, first);
-    EXPECT_GE(last, first);
-    EXPECT_GE(last, last);
+    BOOST_CHECK(last - first == 10);
+    BOOST_CHECK(first == first);
+    BOOST_CHECK(first != last);
+    BOOST_CHECK(first < last);
+    BOOST_CHECK(first <= last);
+    BOOST_CHECK(first <= first);
+    BOOST_CHECK(last > first);
+    BOOST_CHECK(last >= first);
+    BOOST_CHECK(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        EXPECT_EQ(first_copy, last);
+        BOOST_CHECK(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        EXPECT_EQ(last_copy, first);
+        BOOST_CHECK(last_copy == first);
     }
 }
 
-TEST(random_access, std_copy)
+
 {
     random_access first(ints.data());
     random_access last(ints.data() + ints.size());
@@ -712,7 +762,7 @@ TEST(random_access, std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -722,7 +772,7 @@ TEST(random_access, std_copy)
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
@@ -730,7 +780,7 @@ TEST(random_access, std_copy)
         random_access first(iota_ints.data());
         random_access last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -742,7 +792,7 @@ TEST(random_access, std_copy)
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 
     {
@@ -754,11 +804,11 @@ TEST(random_access, std_copy)
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        EXPECT_EQ(iota_ints, ints);
+        BOOST_CHECK(iota_ints == ints);
     }
 }
 
-TEST(random_access, const_std_copy)
+
 {
     const_random_access first(ints.data());
     const_random_access last(ints.data() + ints.size());
@@ -766,12 +816,12 @@ TEST(random_access, const_std_copy)
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
     }
 
     {
-        EXPECT_TRUE(std::binary_search(first, last, 3));
-        EXPECT_TRUE(std::binary_search(
+        BOOST_CHECK(std::binary_search(first, last, 3));
+        BOOST_CHECK(std::binary_search(
             std::make_reverse_iterator(last),
             std::make_reverse_iterator(first),
             3,
@@ -779,12 +829,12 @@ TEST(random_access, const_std_copy)
     }
 }
 
-TEST(random_access, zip)
+
 {
     {
         zip_iter first(ints.data(), ones.data());
         zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
-        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
@@ -795,15 +845,15 @@ TEST(random_access, zip)
         zip_iter last(
             ints_copy.data() + ints_copy.size(),
             ones_copy.data() + ones_copy.size());
-        EXPECT_FALSE(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_CHECK(!std::equal(first, last, tuples.begin(), tuples.end()));
         std::sort(first, last);
-        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
         udt_zip_iter first(udts.data(), ones.data());
         udt_zip_iter last(udts.data() + udts.size(), ones.data() + ones.size());
-        EXPECT_TRUE(
+        BOOST_CHECK(
             std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
 
@@ -815,197 +865,160 @@ TEST(random_access, zip)
         udt_zip_iter last(
             udts_copy.data() + udts_copy.size(),
             ones_copy.data() + ones_copy.size());
-        EXPECT_FALSE(
-            std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
+        BOOST_CHECK(
+            !std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
         std::sort(first, last);
-        EXPECT_TRUE(
+        BOOST_CHECK(
             std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
 }
 
-
-////////////////////
-// view_interface //
-////////////////////
-#include "view_tests.hpp"
-
-template<typename T>
-using data_t = decltype(std::declval<T>().data());
-
-static_assert(
-    ill_formed<
-        data_t,
-        subrange<
-            basic_random_access_iter,
-            basic_random_access_iter,
-            boost::stl_interfaces::v1::discontiguous>>::value,
-    "");
-static_assert(
-    ill_formed<
-        data_t,
-        subrange<
-            basic_random_access_iter,
-            basic_random_access_iter,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-template<typename T>
-using back_t = decltype(std::declval<T>().back());
-
-static_assert(
-    ill_formed<
-        back_t,
-        subrange<int *, int const *, boost::stl_interfaces::v1::discontiguous>>::
-        value,
-    "");
-static_assert(
-    ill_formed<
-        back_t,
-        subrange<
-            int *,
-            int const *,
-            boost::stl_interfaces::v1::discontiguous> const>::value,
-    "");
-
-TEST(random_access, basic_subrange)
 {
     basic_random_access_iter first(ints.data());
     basic_random_access_iter last(ints.data() + ints.size());
 
-    auto r = range<boost::stl_interfaces::contiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::contiguous>(first, first);
+    auto r = range<boost::stl_interfaces::v1::element_layout::contiguous>(
+        first, last);
+    auto empty = range<boost::stl_interfaces::v1::element_layout::contiguous>(
+        first, first);
 
     // range begin/end
     {
         std::array<int, 10> ints_copy;
         std::copy(r.begin(), r.end(), ints_copy.begin());
-        EXPECT_EQ(ints_copy, ints);
+        BOOST_CHECK(ints_copy == ints);
 
-        EXPECT_EQ(empty.begin(), empty.end());
+        BOOST_CHECK(empty.begin() == empty.end());
     }
 
     // empty/op bool
     {
-        EXPECT_FALSE(r.empty());
-        EXPECT_TRUE(r);
+        BOOST_CHECK(!r.empty());
+        BOOST_CHECK(r);
 
-        EXPECT_TRUE(empty.empty());
-        EXPECT_FALSE(empty);
+        BOOST_CHECK(empty.empty());
+        BOOST_CHECK(!empty);
 
         auto const cr = r;
-        EXPECT_FALSE(cr.empty());
-        EXPECT_TRUE(cr);
+        BOOST_CHECK(!cr.empty());
+        BOOST_CHECK(cr);
 
         auto const cempty = empty;
-        EXPECT_TRUE(cempty.empty());
-        EXPECT_FALSE(cempty);
+        BOOST_CHECK(cempty.empty());
+        BOOST_CHECK(!cempty);
     }
 
     // data
     {
-        EXPECT_NE(r.data(), nullptr);
-        EXPECT_EQ(r.data()[2], 2);
+        BOOST_CHECK(r.data() != nullptr);
+        BOOST_CHECK(r.data()[2] == 2);
 
-        EXPECT_NE(empty.data(), nullptr);
+        BOOST_CHECK(empty.data() != nullptr);
 
         auto const cr = r;
-        EXPECT_NE(cr.data(), nullptr);
-        EXPECT_EQ(cr.data()[2], 2);
+        BOOST_CHECK(cr.data() != nullptr);
+        BOOST_CHECK(cr.data()[2] == 2);
 
         auto const cempty = empty;
-        EXPECT_NE(cempty.data(), nullptr);
+        BOOST_CHECK(cempty.data() != nullptr);
     }
 
     // size
     {
-        EXPECT_EQ(r.size(), 10u);
+        BOOST_CHECK(r.size() == 10u);
 
-        EXPECT_EQ(empty.size(), 0u);
+        BOOST_CHECK(empty.size() == 0u);
 
         auto const cr = r;
-        EXPECT_EQ(cr.size(), 10u);
+        BOOST_CHECK(cr.size() == 10u);
 
         auto const cempty = empty;
-        EXPECT_EQ(cempty.size(), 0u);
+        BOOST_CHECK(cempty.size() == 0u);
     }
 
     // front/back
     {
-        EXPECT_EQ(r.front(), 0);
-        EXPECT_EQ(r.back(), 9);
+        BOOST_CHECK(r.front() == 0);
+        BOOST_CHECK(r.back() == 9);
 
         auto const cr = r;
-        EXPECT_EQ(cr.front(), 0);
-        EXPECT_EQ(cr.back(), 9);
+        BOOST_CHECK(cr.front() == 0);
+        BOOST_CHECK(cr.back() == 9);
     }
 
     // op[]
     {
-        EXPECT_EQ(r[2], 2);
+        BOOST_CHECK(r[2] == 2);
 
         auto const cr = r;
-        EXPECT_EQ(cr[2], 2);
+        BOOST_CHECK(cr[2] == 2);
     }
 }
 
-TEST(random_access, zip_subrange)
+
 {
     zip_iter first(ints.data(), ones.data());
     zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
 
-    auto r = range<boost::stl_interfaces::v1::discontiguous>(first, last);
-    auto empty = range<boost::stl_interfaces::v1::discontiguous>(first, first);
+    auto r = range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+        first, last);
+    auto empty =
+        range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+            first, first);
 
     // range begin/end
     {
-        EXPECT_TRUE(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     // empty/op bool
     {
-        EXPECT_FALSE(r.empty());
-        EXPECT_TRUE(r);
+        BOOST_CHECK(!r.empty());
+        BOOST_CHECK(r);
 
-        EXPECT_TRUE(empty.empty());
-        EXPECT_FALSE(empty);
+        BOOST_CHECK(empty.empty());
+        BOOST_CHECK(!empty);
 
         auto const cr = r;
-        EXPECT_FALSE(cr.empty());
-        EXPECT_TRUE(cr);
+        BOOST_CHECK(!cr.empty());
+        BOOST_CHECK(cr);
 
         auto const cempty = empty;
-        EXPECT_TRUE(cempty.empty());
-        EXPECT_FALSE(cempty);
+        BOOST_CHECK(cempty.empty());
+        BOOST_CHECK(!cempty);
     }
 
     // size
     {
-        EXPECT_EQ(r.size(), 10u);
+        BOOST_CHECK(r.size() == 10u);
 
-        EXPECT_EQ(empty.size(), 0u);
+        BOOST_CHECK(empty.size() == 0u);
 
         auto const cr = r;
-        EXPECT_EQ(cr.size(), 10u);
+        BOOST_CHECK(cr.size() == 10u);
 
         auto const cempty = empty;
-        EXPECT_EQ(cempty.size(), 0u);
+        BOOST_CHECK(cempty.size() == 0u);
     }
 
     // front/back
     {
-        EXPECT_EQ(r.front(), (std::tuple<int, int>(0, 1)));
-        EXPECT_EQ(r.back(), (std::tuple<int, int>(9, 1)));
+        BOOST_CHECK(r.front() == (std::tuple<int, int>(0, 1)));
+        BOOST_CHECK(r.back() == (std::tuple<int, int>(9, 1)));
 
         auto const cr = r;
-        EXPECT_EQ(cr.front(), (std::tuple<int, int>(0, 1)));
-        EXPECT_EQ(cr.back(), (std::tuple<int, int>(9, 1)));
+        BOOST_CHECK(cr.front() == (std::tuple<int, int>(0, 1)));
+        BOOST_CHECK(cr.back() == (std::tuple<int, int>(9, 1)));
     }
 
     // op[]
     {
-        EXPECT_EQ(r[2], (std::tuple<int, int>(2, 1)));
+        BOOST_CHECK(r[2] == (std::tuple<int, int>(2, 1)));
 
         auto const cr = r;
-        EXPECT_EQ(cr[2], (std::tuple<int, int>(2, 1)));
+        BOOST_CHECK(cr[2] == (std::tuple<int, int>(2, 1)));
     }
+}
+
+    return 0;
 }

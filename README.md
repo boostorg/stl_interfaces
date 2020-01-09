@@ -183,8 +183,10 @@ This library includes a temporary implementation for those who wish to experimen
 a concept-constrained version before C++20 is widely implemented.  Casey Carter's cmcstl2
 is an implementation of the `std::ranges` portion of the C++20 standard library.  To use it:
 
+- check out the cmcstl2 branch of this library; then
+
 - put its headers in your include path, so that they can be included with
-  `#include <stl2/foo.hpp>`, and
+  `#include <stl2/foo.hpp>`; and
 
 - build with GCC 8 or 9, including the `-fconcepts` and `-std=c++2a` flags.
 
