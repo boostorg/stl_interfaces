@@ -9,6 +9,7 @@
 
 #include <array>
 #include <numeric>
+#include <vector>
 #include <type_traits>
 
 
