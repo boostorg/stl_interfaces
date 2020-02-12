@@ -21,6 +21,11 @@ else ()
     git clone --depth 100 -b ${BOOST_BRANCH}
       https://github.com/boostorg/boost.git boost_root
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  if (MSVC)
+    set(bootstrap_cmd ./bootstrap.bat)
+  else()
+    set(bootstrap_cmd ./bootstrap.sh)
+  endif()
   add_custom_target(
     boost_clone
     COMMAND git submodule init libs/test
@@ -52,7 +57,7 @@ else ()
     COMMAND git submodule init libs/headers
     COMMAND git submodule init tools/boost_install
     COMMAND git submodule update --jobs 3
-    COMMAND ./bootstrap.sh
+    COMMAND ${bootstrap_cmd}
     COMMAND ./b2 headers
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/boost_root
     DEPENDS boost_root_clone)
