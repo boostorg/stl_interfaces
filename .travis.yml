@@ -88,25 +88,6 @@ install:
       fi
     - echo $PATH
 
-    # Install Boost dependencies
-    - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
-    - git clone -b $BOOST_BRANCH https://github.com/boostorg/boost.git boost_root
-    - cd boost_root
-    - git submodule init libs/test
-    - git submodule init libs/mpl
-    - git submodule init libs/assert
-    - git submodule init libs/config
-    - git submodule init libs/core
-    - git submodule init libs/predef
-    - git submodule init libs/detail
-    - git submodule init tools/build
-    - git submodule init libs/headers
-    - git submodule init tools/boost_install
-    - git submodule update --jobs 3
-    - ./bootstrap.sh
-    - ./b2 headers
-    - cd ..
-
     # Show compiler info
     - $CXX --version
     - which $CXX
@@ -129,9 +110,9 @@ script:
           mkdir $build_dir
           cd $build_dir
           if [[ "$asan_type" == "true" ]]; then 
-            CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_ROOT=${DEPS_DIR}/boost_root -DCMAKE_BUILD_TYPE=$build_type ..
+            CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
           else
-            cmake -DBOOST_ROOT=${DEPS_DIR}/boost_root -DCMAKE_BUILD_TYPE=$build_type ..
+            cmake -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
           fi
           VERBOSE=1 make -j4 && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=4 ASAN_OPTIONS=alloc_dealloc_mismatch=0 make check
           if [ $? -ne 0 ]
