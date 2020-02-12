@@ -12,10 +12,10 @@ if (Boost_INCLUDE_DIR)
   add_library(boost INTERFACE)
   target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIR})
 else ()
-  message("-- Boost was not found; it will be cloned locally.")
   if (NOT BOOST_BRANCH)
     set(BOOST_BRANCH master)
   endif()
+  message("-- Boost was not found; it will be cloned locally from ${BOOST_BRANCH}.")
   add_custom_target(
     boost_root_clone
     git clone --depth 100 -b ${BOOST_BRANCH}
