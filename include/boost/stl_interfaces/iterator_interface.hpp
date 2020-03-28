@@ -450,7 +450,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator==(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) == 0)
     {
         return detail::common_diff(lhs, rhs) == 0;
     }
@@ -474,7 +474,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator<(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) < 0)
     {
         return detail::common_diff(lhs, rhs) < 0;
     }
@@ -487,7 +487,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator<=(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) <= 0)
     {
         return detail::common_diff(lhs, rhs) <= 0;
     }
@@ -500,7 +500,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator>(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) > 0)
     {
         return detail::common_diff(lhs, rhs) > 0;
     }
@@ -513,7 +513,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator>=(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) >= 0)
     {
         return detail::common_diff(lhs, rhs) >= 0;
     }
