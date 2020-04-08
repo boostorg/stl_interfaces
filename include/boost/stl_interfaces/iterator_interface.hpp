@@ -347,8 +347,12 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
 
         template<typename D = Derived>
-        constexpr D operator+(difference_type i) const
+        constexpr auto operator+(difference_type i) const
             noexcept(noexcept(D(std::declval<D &>()), std::declval<D &>() += i))
+                -> std::remove_reference_t<decltype(
+                    D(std::declval<D &>()),
+                    std::declval<D &>() += i,
+                    std::declval<D &>())>
         {
             D retval = derived();
             retval += i;
