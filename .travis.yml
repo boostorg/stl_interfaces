@@ -11,25 +11,26 @@ script: cmake
 matrix:
     include:
         # OSX
-#        - env: ASAN=on MAC_OSX=true
-#          os: osx
-#          osx_image: xcode7.3
-#          compiler: clang
-#
-#        - env: ASAN=on MAC_OSX=true
-#          os: osx
-#          osx_image: xcode8
-#          compiler: clang
-
         - env: ASAN=on MAC_OSX=true
           os: osx
-          osx_image: xcode8.1
+          osx_image: xcode8.3
           compiler: clang
 
         - env: ASAN=on MAC_OSX=true
           os: osx
-          osx_image: xcode8.2
+          osx_image: xcode9.4
           compiler: clang
+
+        - env: ASAN=on MAC_OSX=true
+          os: osx
+          osx_image: xcode10.3
+          compiler: clang
+
+        - env: ASAN=on MAC_OSX=true
+          os: osx
+          osx_image: xcode11.4
+          compiler: clang
+
 
         # Gcc
         - env: GCC_VERSION=6 ASAN=off
