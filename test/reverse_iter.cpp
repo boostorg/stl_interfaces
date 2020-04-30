@@ -6,11 +6,12 @@
 #include <boost/stl_interfaces/iterator_interface.hpp>
 #include <boost/stl_interfaces/reverse_iterator.hpp>
 
-#include <boost/test/minimal.hpp>
+#include <boost/core/lightweight_test.hpp>
 
 #include <algorithm>
 #include <array>
 #include <list>
+#include <tuple>
 #include <vector>
 
 
@@ -44,7 +45,7 @@ private:
 };
 
 
-int test_main(int, char * [])
+int main()
 {
 
 {
@@ -58,20 +59,20 @@ int test_main(int, char * [])
             std::list<int>::const_iterator>(first);
         auto clast = boost::stl_interfaces::reverse_iterator<
             std::list<int>::const_iterator>(last);
-        BOOST_CHECK(std::equal(first, last, cfirst, clast));
+        BOOST_TEST(std::equal(first, last, cfirst, clast));
     }
 
     {
         auto ints_copy = ints;
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(
+        BOOST_TEST(
             std::equal(first, last, ints_copy.begin(), ints_copy.end()));
     }
 
     {
         std::list<int> ints_copy;
         std::reverse_copy(first, last, std::back_inserter(ints_copy));
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -79,7 +80,7 @@ int test_main(int, char * [])
         for (auto it = first; it != last; ++it) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 
     {
@@ -87,7 +88,7 @@ int test_main(int, char * [])
         for (auto it = first; it != last; it++) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 
     {
@@ -95,7 +96,7 @@ int test_main(int, char * [])
         for (auto it = last; it != first; --it) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 
     {
@@ -103,7 +104,7 @@ int test_main(int, char * [])
         for (auto it = last; it != first; it--) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 }
 
@@ -119,21 +120,21 @@ int test_main(int, char * [])
             std::vector<int>::const_iterator>(first);
         auto clast = boost::stl_interfaces::reverse_iterator<
             std::vector<int>::const_iterator>(last);
-        BOOST_CHECK(std::equal(first, last, cfirst, clast));
+        BOOST_TEST(std::equal(first, last, cfirst, clast));
     }
 
     {
         auto ints_copy = ints;
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(first - last == ints_copy.begin() - ints_copy.end());
-        BOOST_CHECK(
+        BOOST_TEST(first - last == ints_copy.begin() - ints_copy.end());
+        BOOST_TEST(
             std::equal(first, last, ints_copy.begin(), ints_copy.end()));
     }
 
     {
         std::vector<int> ints_copy;
         std::reverse_copy(first, last, std::back_inserter(ints_copy));
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -141,7 +142,7 @@ int test_main(int, char * [])
         for (auto it = first; it != last; ++it) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 
     {
@@ -149,7 +150,7 @@ int test_main(int, char * [])
         for (auto it = first; it != last; it++) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 
     {
@@ -157,7 +158,7 @@ int test_main(int, char * [])
         for (auto it = last; it != first; --it) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 
     {
@@ -165,7 +166,7 @@ int test_main(int, char * [])
         for (auto it = last; it != first; it--) {
             ++count;
         }
-        BOOST_CHECK(count == ints.size());
+        BOOST_TEST(count == ints.size());
     }
 }
 
@@ -194,15 +195,15 @@ int test_main(int, char * [])
     {
         auto tuples_copy = tuples;
         std::reverse(tuples_copy.begin(), tuples_copy.end());
-        BOOST_CHECK(first - last == tuples_copy.begin() - tuples_copy.end());
-        BOOST_CHECK(
+        BOOST_TEST(first - last == tuples_copy.begin() - tuples_copy.end());
+        BOOST_TEST(
             std::equal(first, last, tuples_copy.begin(), tuples_copy.end()));
     }
 
     {
         std::array<std::tuple<int, int>, 10> tuples_copy;
         std::reverse_copy(first, last, tuples_copy.begin());
-        BOOST_CHECK(tuples_copy == tuples);
+        BOOST_TEST(tuples_copy == tuples);
     }
 
     {
@@ -210,7 +211,7 @@ int test_main(int, char * [])
         for (auto it = first; it != last; ++it) {
             ++count;
         }
-        BOOST_CHECK(count == tuples.size());
+        BOOST_TEST(count == tuples.size());
     }
 
     {
@@ -218,7 +219,7 @@ int test_main(int, char * [])
         for (auto it = first; it != last; it++) {
             ++count;
         }
-        BOOST_CHECK(count == tuples.size());
+        BOOST_TEST(count == tuples.size());
     }
 
     {
@@ -226,7 +227,7 @@ int test_main(int, char * [])
         for (auto it = last; it != first; --it) {
             ++count;
         }
-        BOOST_CHECK(count == tuples.size());
+        BOOST_TEST(count == tuples.size());
     }
 
     {
@@ -234,9 +235,9 @@ int test_main(int, char * [])
         for (auto it = last; it != first; it--) {
             ++count;
         }
-        BOOST_CHECK(count == tuples.size());
+        BOOST_TEST(count == tuples.size());
     }
 }
 
-    return 0;
+    return boost::report_errors();
 }
