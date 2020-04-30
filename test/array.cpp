@@ -7,8 +7,7 @@
 
 #include "ill_formed.hpp"
 
-#define BOOST_TEST_MAIN
-#include <boost/test/included/unit_test.hpp>
+#include <boost/core/lightweight_test.hpp>
 
 #include <array>
 #include <deque>
@@ -63,7 +62,7 @@ struct array : boost::stl_interfaces::sequence_container_interface<
 using arr_type = array<int, 5>;
 
 
-BOOST_AUTO_TEST_CASE(comparisons)
+void test_comparisons()
 {
     arr_type sm;
     sm[0] = 1;
@@ -84,75 +83,75 @@ BOOST_AUTO_TEST_CASE(comparisons)
     lg[3] = 4;
     lg[4] = 5;
 
-    BOOST_CHECK(sm == sm);
-    BOOST_CHECK(!(sm == md));
-    BOOST_CHECK(!(sm == lg));
+    BOOST_TEST(sm == sm);
+    BOOST_TEST(!(sm == md));
+    BOOST_TEST(!(sm == lg));
 
-    BOOST_CHECK(!(sm != sm));
-    BOOST_CHECK(sm != md);
-    BOOST_CHECK(sm != lg);
+    BOOST_TEST(!(sm != sm));
+    BOOST_TEST(sm != md);
+    BOOST_TEST(sm != lg);
 
-    BOOST_CHECK(!(sm < sm));
-    BOOST_CHECK(sm < md);
-    BOOST_CHECK(sm < lg);
+    BOOST_TEST(!(sm < sm));
+    BOOST_TEST(sm < md);
+    BOOST_TEST(sm < lg);
 
-    BOOST_CHECK(sm <= sm);
-    BOOST_CHECK(sm <= md);
-    BOOST_CHECK(sm <= lg);
+    BOOST_TEST(sm <= sm);
+    BOOST_TEST(sm <= md);
+    BOOST_TEST(sm <= lg);
 
-    BOOST_CHECK(!(sm > sm));
-    BOOST_CHECK(!(sm > md));
-    BOOST_CHECK(!(sm > lg));
+    BOOST_TEST(!(sm > sm));
+    BOOST_TEST(!(sm > md));
+    BOOST_TEST(!(sm > lg));
 
-    BOOST_CHECK(sm >= sm);
-    BOOST_CHECK(!(sm >= md));
-    BOOST_CHECK(!(sm >= lg));
-
-
-    BOOST_CHECK(!(md == sm));
-    BOOST_CHECK(md == md);
-    BOOST_CHECK(!(md == lg));
-
-    BOOST_CHECK(!(md < sm));
-    BOOST_CHECK(!(md < md));
-    BOOST_CHECK(md < lg);
-
-    BOOST_CHECK(!(md <= sm));
-    BOOST_CHECK(md <= md);
-    BOOST_CHECK(md <= lg);
-
-    BOOST_CHECK(md > sm);
-    BOOST_CHECK(!(md > md));
-    BOOST_CHECK(!(md > lg));
-
-    BOOST_CHECK(md >= sm);
-    BOOST_CHECK(md >= md);
-    BOOST_CHECK(!(md >= lg));
+    BOOST_TEST(sm >= sm);
+    BOOST_TEST(!(sm >= md));
+    BOOST_TEST(!(sm >= lg));
 
 
-    BOOST_CHECK(!(lg == sm));
-    BOOST_CHECK(!(lg == md));
-    BOOST_CHECK(lg == lg);
+    BOOST_TEST(!(md == sm));
+    BOOST_TEST(md == md);
+    BOOST_TEST(!(md == lg));
 
-    BOOST_CHECK(!(lg < sm));
-    BOOST_CHECK(!(lg < md));
-    BOOST_CHECK(!(lg < lg));
+    BOOST_TEST(!(md < sm));
+    BOOST_TEST(!(md < md));
+    BOOST_TEST(md < lg);
 
-    BOOST_CHECK(!(lg <= sm));
-    BOOST_CHECK(!(lg <= md));
-    BOOST_CHECK(lg <= lg);
+    BOOST_TEST(!(md <= sm));
+    BOOST_TEST(md <= md);
+    BOOST_TEST(md <= lg);
 
-    BOOST_CHECK(lg > sm);
-    BOOST_CHECK(lg > md);
-    BOOST_CHECK(!(lg > lg));
+    BOOST_TEST(md > sm);
+    BOOST_TEST(!(md > md));
+    BOOST_TEST(!(md > lg));
 
-    BOOST_CHECK(lg >= sm);
-    BOOST_CHECK(lg >= md);
-    BOOST_CHECK(lg >= lg);
+    BOOST_TEST(md >= sm);
+    BOOST_TEST(md >= md);
+    BOOST_TEST(!(md >= lg));
+
+
+    BOOST_TEST(!(lg == sm));
+    BOOST_TEST(!(lg == md));
+    BOOST_TEST(lg == lg);
+
+    BOOST_TEST(!(lg < sm));
+    BOOST_TEST(!(lg < md));
+    BOOST_TEST(!(lg < lg));
+
+    BOOST_TEST(!(lg <= sm));
+    BOOST_TEST(!(lg <= md));
+    BOOST_TEST(lg <= lg);
+
+    BOOST_TEST(lg > sm);
+    BOOST_TEST(lg > md);
+    BOOST_TEST(!(lg > lg));
+
+    BOOST_TEST(lg >= sm);
+    BOOST_TEST(lg >= md);
+    BOOST_TEST(lg >= lg);
 }
 
 
-BOOST_AUTO_TEST_CASE(swap_)
+void test_swap()
 {
     {
         arr_type v1;
@@ -176,8 +175,8 @@ BOOST_AUTO_TEST_CASE(swap_)
 
         v1.swap(v2);
 
-        BOOST_CHECK(v1 == v2_copy);
-        BOOST_CHECK(v2 == v1_copy);
+        BOOST_TEST(v1 == v2_copy);
+        BOOST_TEST(v2 == v1_copy);
     }
 
     {
@@ -199,8 +198,8 @@ BOOST_AUTO_TEST_CASE(swap_)
 
         swap(v1, v2);
 
-        BOOST_CHECK(v1 == v2_copy);
-        BOOST_CHECK(v2 == v1_copy);
+        BOOST_TEST(v1 == v2_copy);
+        BOOST_TEST(v2 == v1_copy);
     }
 }
 
@@ -257,7 +256,7 @@ static_assert(
         value,
     "");
 
-BOOST_AUTO_TEST_CASE(iterators)
+void test_iterators()
 {
     arr_type v0;
     v0[0] = 3;
@@ -301,11 +300,11 @@ BOOST_AUTO_TEST_CASE(iterators)
         std::array<int, 5> const a = {{3, 2, 1, 0, 0}};
         std::array<int, 5> const ra = {{0, 0, 1, 2, 3}};
 
-        BOOST_CHECK(std::equal(v.begin(), v.end(), a.begin(), a.end()));
-        BOOST_CHECK(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.begin(), v.end(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
 
-        BOOST_CHECK(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
-        BOOST_CHECK(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
 
         arr_type v2;
         v2[0] = 8;
@@ -316,7 +315,7 @@ BOOST_AUTO_TEST_CASE(iterators)
 
         *v.begin() = 8;
         *v.rbegin() = 9;
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
     }
 
     {
@@ -358,11 +357,11 @@ BOOST_AUTO_TEST_CASE(iterators)
         std::array<int, 5> const a = {{3, 2, 1, 0, 0}};
         std::array<int, 5> const ra = {{0, 0, 1, 2, 3}};
 
-        BOOST_CHECK(std::equal(v.begin(), v.end(), a.begin(), a.end()));
-        BOOST_CHECK(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.begin(), v.end(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
 
-        BOOST_CHECK(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
-        BOOST_CHECK(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
     }
 }
 
@@ -413,7 +412,7 @@ static_assert(!ill_formed<rvalue_push_back_t, std_vec_int>::value, "");
 static_assert(!ill_formed<pop_back_t, std_vec_int>::value, "");
 
 
-BOOST_AUTO_TEST_CASE(front_back)
+void test_front_back()
 {
     {
         arr_type v;
@@ -428,8 +427,8 @@ BOOST_AUTO_TEST_CASE(front_back)
 
         v.front() = 9;
         v.back() = 8;
-        BOOST_CHECK(v[0] == v.front());
-        BOOST_CHECK(v[4] == v.back());
+        BOOST_TEST(v[0] == v.front());
+        BOOST_TEST(v[4] == v.back());
     }
 
     {
@@ -441,8 +440,8 @@ BOOST_AUTO_TEST_CASE(front_back)
         v0[4] = 1;
 
         arr_type const v = v0;
-        BOOST_CHECK(v.front() == 3);
-        BOOST_CHECK(v.back() == 1);
+        BOOST_TEST(v.front() == 3);
+        BOOST_TEST(v.back() == 1);
 
         static_assert(
             std::is_same<decltype(v.front()), int const &>::value, "");
@@ -451,7 +450,7 @@ BOOST_AUTO_TEST_CASE(front_back)
 }
 
 
-BOOST_AUTO_TEST_CASE(cindex_at)
+void test_cindex_at()
 {
     arr_type v0;
     v0[0] = 3;
@@ -462,32 +461,32 @@ BOOST_AUTO_TEST_CASE(cindex_at)
 
     {
         arr_type v = v0;
-        BOOST_CHECK(v[0] == 3);
-        BOOST_CHECK(v[1] == 2);
-        BOOST_CHECK(v[2] == 1);
-        BOOST_CHECK_NO_THROW(v.at(0));
-        BOOST_CHECK_NO_THROW(v.at(1));
-        BOOST_CHECK_NO_THROW(v.at(2));
-        BOOST_CHECK_THROW(v.at(5), std::out_of_range);
+        BOOST_TEST(v[0] == 3);
+        BOOST_TEST(v[1] == 2);
+        BOOST_TEST(v[2] == 1);
+        BOOST_TEST_NO_THROW(v.at(0));
+        BOOST_TEST_NO_THROW(v.at(1));
+        BOOST_TEST_NO_THROW(v.at(2));
+        BOOST_TEST_THROWS(v.at(5), std::out_of_range);
 
         static_assert(std::is_same<decltype(v[0]), int &>::value, "");
         static_assert(std::is_same<decltype(v.at(0)), int &>::value, "");
 
         v[0] = 8;
         v.at(1) = 9;
-        BOOST_CHECK(v[0] == 8);
-        BOOST_CHECK(v[1] == 9);
+        BOOST_TEST(v[0] == 8);
+        BOOST_TEST(v[1] == 9);
     }
 
     {
         arr_type const v = v0;
-        BOOST_CHECK(v[0] == 3);
-        BOOST_CHECK(v[1] == 2);
-        BOOST_CHECK(v[2] == 1);
-        BOOST_CHECK_NO_THROW(v.at(0));
-        BOOST_CHECK_NO_THROW(v.at(1));
-        BOOST_CHECK_NO_THROW(v.at(2));
-        BOOST_CHECK_THROW(v.at(5), std::out_of_range);
+        BOOST_TEST(v[0] == 3);
+        BOOST_TEST(v[1] == 2);
+        BOOST_TEST(v[2] == 1);
+        BOOST_TEST_NO_THROW(v.at(0));
+        BOOST_TEST_NO_THROW(v.at(1));
+        BOOST_TEST_NO_THROW(v.at(2));
+        BOOST_TEST_THROWS(v.at(5), std::out_of_range);
 
         static_assert(std::is_same<decltype(v[0]), int const &>::value, "");
         static_assert(std::is_same<decltype(v.at(0)), int const &>::value, "");
@@ -578,3 +577,13 @@ using clear_t = decltype(std::declval<Container &>().clear());
 static_assert(ill_formed<clear_t, arr_type>::value, "");
 
 static_assert(!ill_formed<clear_t, std_vec_int>::value, "");
+
+int main()
+{
+    test_comparisons();
+    test_swap();
+    test_iterators();
+    test_front_back();
+    test_cindex_at();
+    return boost::report_errors();
+}

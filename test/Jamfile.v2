@@ -9,23 +9,18 @@
 import testing ;
 import ../../config/checks/config : requires ;
 
-project boost/stl_interfaces/test :
+project :
     requirements
-        <library>../../test/build//boost_unit_test_framework
-        <link>static
         [ requires cxx14_constexpr ]
 ;
 
-test-suite all :
-[ run forward.cpp : : : : ]
-[ run detail.cpp : : : : ]
-[ run array.cpp : : : : ]
-[ run output.cpp : : : : ]
-[ run input.cpp : : : : ]
-[ run reverse_iter.cpp : : : : ]
-[ run static_vec_noncopyable.cpp : : : : ]
-[ run bidirectional.cpp : : : : ]
-[ run random_access.cpp : : : : ]
-[ run static_vec.cpp : : : : ]
-;
-
+run forward.cpp ;
+run detail.cpp ;
+run array.cpp ;
+run output.cpp ;
+run input.cpp ;
+run reverse_iter.cpp ;
+run static_vec_noncopyable.cpp ;
+run bidirectional.cpp ;
+run random_access.cpp ;
+run static_vec.cpp ;
