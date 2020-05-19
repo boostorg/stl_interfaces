@@ -6,7 +6,7 @@ a pre-C++20 version of C++20's `view_interface`; and a new template called
 `container_interface`, meant to aid the creation of new containers; all
 targeting standardization.  This library requires at least C++14.
 
-For the iterator portion -- if you need to write an iterator, iterator_iterface turns this:
+For the iterator portion -- if you need to write an iterator, `iterator_interface` turns this:
 
 ```c++
     struct repeated_chars_iterator
