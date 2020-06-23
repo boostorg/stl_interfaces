@@ -177,7 +177,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     adapted_bidirectional_ptr_iter<int const>,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
-    int const,
+    int,
     int const &,
     int const *,
     std::ptrdiff_t)
@@ -192,10 +192,9 @@ struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
     bidirectional_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    bidirectional_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    bidirectional_iter(bidirectional_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType & operator*() const { return *it_; }
@@ -249,7 +248,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_bidirectional,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
-    int const,
+    int,
     int const &,
     int const *,
     std::ptrdiff_t)

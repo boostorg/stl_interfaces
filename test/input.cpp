@@ -61,10 +61,9 @@ struct input_iter : boost::stl_interfaces::iterator_interface<
     input_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    input_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    input_iter(input_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType & operator*() const noexcept { return *it_; }
@@ -116,10 +115,9 @@ struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
     proxy_input_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    proxy_input_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    proxy_input_iter(proxy_input_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType operator*() const noexcept { return *it_; }

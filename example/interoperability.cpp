@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <array>
+#include <numeric>
 
 #include <cassert>
 
@@ -35,10 +36,11 @@ struct random_access_iterator : boost::stl_interfaces::iterator_interface<
     // expression it_ = other.it_ is well-formed.
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    constexpr random_access_iterator(ValueType2 other) noexcept : it_(other.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    constexpr random_access_iterator(
+        random_access_iterator<ValueType2> other) noexcept :
+        it_(other.it_)
     {}
 
     constexpr ValueType & operator*() const noexcept { return *it_; }
@@ -76,10 +78,10 @@ int main()
 
     // Create and use two constant iterators, one from an existing mutable
     // iterator.
-    std::array<int, 10> ints_copy;
+    std::array<int, 10> int_sums;
     const_iterator cfirst(ints.data());
     const_iterator clast = last;
-    std::copy(cfirst, clast, ints_copy.begin());
-    assert(ints_copy == (std::array<int, 10>{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}}));
+    std::partial_sum(cfirst, clast, int_sums.begin());
+    assert(int_sums == (std::array<int, 10>{{0, 1, 3, 6, 10, 15, 21, 28, 36, 45}}));
 }
 //]
