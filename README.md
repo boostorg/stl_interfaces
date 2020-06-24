@@ -6,7 +6,7 @@ a pre-C++20 version of C++20's `view_interface`; and a new template called
 `container_interface`, meant to aid the creation of new containers; all
 targeting standardization.  This library requires at least C++14.
 
-For the iterator portion -- if you need to write an iterator, iterator_iterface turns this:
+For the iterator portion -- if you need to write an iterator, `iterator_interface` turns this:
 
 ```c++
     struct repeated_chars_iterator
@@ -177,7 +177,7 @@ The code size savings are even more dramatic for `view_interface` and
 `container_interface`! If you don't ever write iterators, range views, or
 containers, this is not for you.
 
-Online docs: https://tzlaine.github.io/stl_interfaces.
+Online docs: https://boostorg.github.io/stl_interfaces.
 
 This library includes a temporary implementation for those who wish to experiment with
 a concept-constrained version before C++20 is widely implemented.  Casey Carter's cmcstl2
@@ -194,6 +194,6 @@ GCC 8 and 9 are the only compilers with an adequate concepts implementation at
 the time of this writing.
 
 
-[![Build Status](https://travis-ci.org/tzlaine/stl_interfaces.svg?branch=master)](https://travis-ci.org/tzlaine/stl_interfaces)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/stl_interfaces?branch=master&svg=true)](https://ci.appveyor.com/project/tzlaine/stl_interfaces)
+[![Build Status](https://travis-ci.org/boostorg/stl_interfaces.svg?branch=develop)](https://travis-ci.org/boostorg/stl_interfaces)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/stl-interfaces?branch=develop&svg=true)](https://ci.appveyor.com/project/tzlaine/stl-interfaces)
 [![License](https://img.shields.io/badge/license-boost-brightgreen.svg)](LICENSE_1_0.txt)

@@ -7,8 +7,9 @@
 
 #include "ill_formed.hpp"
 
-#include <boost/test/minimal.hpp>
+#include <boost/core/lightweight_test.hpp>
 
+#include <algorithm>
 #include <array>
 #include <numeric>
 #include <type_traits>
@@ -67,10 +68,9 @@ struct forward_iter : boost::stl_interfaces::iterator_interface<
     forward_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    forward_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    forward_iter(forward_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType & operator*() const { return *it_; }
@@ -118,7 +118,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_forward,
     std::forward_iterator_tag,
     std::forward_iterator_tag,
-    int const,
+    int,
     int const &,
     int const *,
     std::ptrdiff_t)
@@ -218,7 +218,7 @@ static_assert(
     "");
 
 
-int test_main(int, char * [])
+int main()
 {
 
 {
@@ -228,7 +228,7 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -236,7 +236,7 @@ int test_main(int, char * [])
         basic_forward_iter first(iota_ints.data());
         basic_forward_iter last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -265,7 +265,7 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -273,7 +273,7 @@ int test_main(int, char * [])
         forward first(iota_ints.data());
         forward last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -285,11 +285,11 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
-        BOOST_CHECK(std::binary_search(first, last, 3));
+        BOOST_TEST(std::binary_search(first, last, 3));
     }
 }
 
@@ -307,36 +307,36 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(r.begin(), r.end(), ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
 
-        BOOST_CHECK(empty.begin() == empty.end());
+        BOOST_TEST(empty.begin() == empty.end());
     }
 
     // empty/op bool
     {
-        BOOST_CHECK(!r.empty());
-        BOOST_CHECK(r);
+        BOOST_TEST(!r.empty());
+        BOOST_TEST(r);
 
-        BOOST_CHECK(empty.empty());
-        BOOST_CHECK(!empty);
+        BOOST_TEST(empty.empty());
+        BOOST_TEST(!empty);
 
         auto const cr = r;
-        BOOST_CHECK(!cr.empty());
-        BOOST_CHECK(cr);
+        BOOST_TEST(!cr.empty());
+        BOOST_TEST(cr);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.empty());
-        BOOST_CHECK(!cempty);
+        BOOST_TEST(cempty.empty());
+        BOOST_TEST(!cempty);
     }
 
     // front/back
     {
-        BOOST_CHECK(r.front() == 0);
+        BOOST_TEST(r.front() == 0);
 
         auto const cr = r;
-        BOOST_CHECK(cr.front() == 0);
+        BOOST_TEST(cr.front() == 0);
     }
 }
 
-    return 0;
+    return boost::report_errors();
 }

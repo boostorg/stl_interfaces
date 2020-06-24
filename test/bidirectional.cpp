@@ -7,8 +7,9 @@
 
 #include "ill_formed.hpp"
 
-#include <boost/test/minimal.hpp>
+#include <boost/core/lightweight_test.hpp>
 
+#include <algorithm>
 #include <array>
 #include <numeric>
 #include <list>
@@ -176,7 +177,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     adapted_bidirectional_ptr_iter<int const>,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
-    int const,
+    int,
     int const &,
     int const *,
     std::ptrdiff_t)
@@ -191,10 +192,9 @@ struct bidirectional_iter : boost::stl_interfaces::iterator_interface<
     bidirectional_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    bidirectional_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    bidirectional_iter(bidirectional_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType & operator*() const { return *it_; }
@@ -248,7 +248,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_bidirectional,
     std::bidirectional_iterator_tag,
     std::bidirectional_iterator_tag,
-    int const,
+    int,
     int const &,
     int const *,
     std::ptrdiff_t)
@@ -326,7 +326,7 @@ static_assert(
     "");
 
 
-int test_main(int, char * [])
+int main()
 {
 
 {
@@ -336,7 +336,7 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -346,7 +346,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -354,7 +354,7 @@ int test_main(int, char * [])
         basic_bidirectional_iter first(iota_ints.data());
         basic_bidirectional_iter last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -366,7 +366,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -378,7 +378,7 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -388,7 +388,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -397,7 +397,7 @@ int test_main(int, char * [])
         basic_adapted_bidirectional_ptr_iter last(
             iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -410,7 +410,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -424,7 +424,7 @@ int test_main(int, char * [])
     {
         std::list<int> ints_copy;
         std::copy(first, last, std::back_inserter(ints_copy));
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -434,7 +434,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             std::back_inserter(ints_copy));
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 }
 
@@ -467,10 +467,10 @@ int test_main(int, char * [])
         const_bidirectional first_const(first);
         const_bidirectional last_const(last);
 
-        BOOST_CHECK(first == first_const);
-        BOOST_CHECK(first_const == first);
-        BOOST_CHECK(first != last_const);
-        BOOST_CHECK(last_const != first);
+        BOOST_TEST(first == first_const);
+        BOOST_TEST(first_const == first);
+        BOOST_TEST(first != last_const);
+        BOOST_TEST(last_const != first);
     }
 
     {
@@ -486,10 +486,10 @@ int test_main(int, char * [])
                 adapted_bidirectional_ptr_iter<int>>::value,
             "");
 
-        BOOST_CHECK(first == first_const);
-        BOOST_CHECK(first_const == first);
-        BOOST_CHECK(first != last_const);
-        BOOST_CHECK(last_const != first);
+        BOOST_TEST(first == first_const);
+        BOOST_TEST(first_const == first);
+        BOOST_TEST(first != last_const);
+        BOOST_TEST(last_const != first);
     }
 }
 
@@ -562,7 +562,7 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -572,7 +572,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -580,7 +580,7 @@ int test_main(int, char * [])
         bidirectional first(iota_ints.data());
         bidirectional last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -592,7 +592,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -604,12 +604,12 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
-        BOOST_CHECK(std::binary_search(first, last, 3));
-        BOOST_CHECK(std::binary_search(
+        BOOST_TEST(std::binary_search(first, last, 3));
+        BOOST_TEST(std::binary_search(
             std::make_reverse_iterator(last),
             std::make_reverse_iterator(first),
             3,
@@ -631,38 +631,38 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(r.begin(), r.end(), ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
 
-        BOOST_CHECK(empty.begin() == empty.end());
+        BOOST_TEST(empty.begin() == empty.end());
     }
 
     // empty/op bool
     {
-        BOOST_CHECK(!r.empty());
-        BOOST_CHECK(r);
+        BOOST_TEST(!r.empty());
+        BOOST_TEST(r);
 
-        BOOST_CHECK(empty.empty());
-        BOOST_CHECK(!empty);
+        BOOST_TEST(empty.empty());
+        BOOST_TEST(!empty);
 
         auto const cr = r;
-        BOOST_CHECK(!cr.empty());
-        BOOST_CHECK(cr);
+        BOOST_TEST(!cr.empty());
+        BOOST_TEST(cr);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.empty());
-        BOOST_CHECK(!cempty);
+        BOOST_TEST(cempty.empty());
+        BOOST_TEST(!cempty);
     }
 
     // front/back
     {
-        BOOST_CHECK(r.front() == 0);
-        BOOST_CHECK(r.back() == 9);
+        BOOST_TEST(r.front() == 0);
+        BOOST_TEST(r.back() == 9);
 
         auto const cr = r;
-        BOOST_CHECK(cr.front() == 0);
-        BOOST_CHECK(cr.back() == 9);
+        BOOST_TEST(cr.front() == 0);
+        BOOST_TEST(cr.back() == 9);
     }
 }
 
-    return 0;
+    return boost::report_errors();
 }

@@ -11,25 +11,26 @@ script: cmake
 matrix:
     include:
         # OSX
-#        - env: ASAN=on MAC_OSX=true
-#          os: osx
-#          osx_image: xcode7.3
-#          compiler: clang
-#
-#        - env: ASAN=on MAC_OSX=true
-#          os: osx
-#          osx_image: xcode8
-#          compiler: clang
-
         - env: ASAN=on MAC_OSX=true
           os: osx
-          osx_image: xcode8.1
+          osx_image: xcode8.3
           compiler: clang
 
         - env: ASAN=on MAC_OSX=true
           os: osx
-          osx_image: xcode8.2
+          osx_image: xcode9.4
           compiler: clang
+
+        - env: ASAN=on MAC_OSX=true
+          os: osx
+          osx_image: xcode10.3
+          compiler: clang
+
+        - env: ASAN=on MAC_OSX=true
+          os: osx
+          osx_image: xcode11.4
+          compiler: clang
+
 
         # Gcc
         - env: GCC_VERSION=6 ASAN=off
@@ -65,6 +66,17 @@ matrix:
               sources:
                 - ubuntu-toolchain-r-test
 
+        - env: GCC_VERSION=9 ASAN=off
+          os: linux
+          compiler: gcc-9
+          addons: &gcc9
+            apt:
+              packages:
+                - g++-9
+                - valgrind
+              sources:
+                - ubuntu-toolchain-r-test
+
 install:
     - export CHECKOUT_PATH=`pwd`;
     - if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
@@ -80,32 +92,12 @@ install:
     # Install cmake
     - |
       if [[ "$MAC_OSX" == "true" ]]; then
-        export CMAKE_URL="http://www.cmake.org/files/v3.7/cmake-3.7.0-Darwin-x86_64.tar.gz"
-        travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=3 -xz -C usr
+        export CMAKE_URL="http://www.cmake.org/files/v3.17/cmake-3.17.0-Darwin-x86_64.tar.gz"
       else
-        export CMAKE_URL="http://www.cmake.org/files/v3.7/cmake-3.7.0-Linux-x86_64.tar.gz"
-        travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C usr
+        export CMAKE_URL="http://www.cmake.org/files/v3.17/cmake-3.17.0-Linux-x86_64.tar.gz"
       fi
+      travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=3 -xz -C usr
     - echo $PATH
-
-    # Install Boost dependencies
-    - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
-    - git clone -b $BOOST_BRANCH https://github.com/boostorg/boost.git boost_root
-    - cd boost_root
-    - git submodule init libs/test
-    - git submodule init libs/mpl
-    - git submodule init libs/assert
-    - git submodule init libs/config
-    - git submodule init libs/core
-    - git submodule init libs/predef
-    - git submodule init libs/detail
-    - git submodule init tools/build
-    - git submodule init libs/headers
-    - git submodule init tools/boost_install
-    - git submodule update --jobs 3
-    - ./bootstrap.sh
-    - ./b2 headers
-    - cd ..
 
     # Show compiler info
     - $CXX --version
@@ -129,9 +121,9 @@ script:
           mkdir $build_dir
           cd $build_dir
           if [[ "$asan_type" == "true" ]]; then 
-            CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_ROOT=${DEPS_DIR}/boost_root -DCMAKE_BUILD_TYPE=$build_type ..
+            CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
           else
-            cmake -DBOOST_ROOT=${DEPS_DIR}/boost_root -DCMAKE_BUILD_TYPE=$build_type ..
+            cmake -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
           fi
           VERBOSE=1 make -j4 && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=4 ASAN_OPTIONS=alloc_dealloc_mismatch=0 make check
           if [ $? -ne 0 ]

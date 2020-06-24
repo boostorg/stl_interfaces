@@ -7,25 +7,32 @@
 # Boost
 ###############################################################################
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.64.0 COMPONENTS ${boost_components})
-if (Boost_INCLUDE_DIR)
-  add_library(boost INTERFACE)
-  target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIR})
-else ()
-  message("-- Boost was not found; attempting to download it if we haven't already...")
-  include(ExternalProject)
-  ExternalProject_Add(install-Boost
-    PREFIX ${CMAKE_BINARY_DIR}/dependencies/boost_1_64_0
-    URL https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.bz2
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-  )
-
-  ExternalProject_Get_Property(install-Boost SOURCE_DIR)
-  add_library(boost INTERFACE)
-  target_include_directories(boost INTERFACE ${SOURCE_DIR})
-  add_dependencies(boost install-Boost)
-  unset(SOURCE_DIR)
-endif ()
+if (NOT BOOST_BRANCH)
+  set(BOOST_BRANCH master)
+endif()
+add_custom_target(
+  boost_root_clone
+  git clone --depth 100 -b ${BOOST_BRANCH}
+    https://github.com/boostorg/boost.git boost_root
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+if (MSVC)
+  set(bootstrap_cmd ./bootstrap.bat)
+else()
+  set(bootstrap_cmd ./bootstrap.sh)
+endif()
+add_custom_target(
+  boost_clone
+  COMMAND git submodule init libs/assert
+  COMMAND git submodule init libs/config
+  COMMAND git submodule init libs/core
+  COMMAND git submodule init tools/build
+  COMMAND git submodule init libs/headers
+  COMMAND git submodule init tools/boost_install
+  COMMAND git submodule update --jobs 3
+  COMMAND ${bootstrap_cmd}
+  COMMAND ./b2 headers
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/boost_root
+  DEPENDS boost_root_clone)
+add_library(boost INTERFACE)
+add_dependencies(boost boost_clone)
+target_include_directories(boost INTERFACE ${CMAKE_BINARY_DIR}/boost_root)

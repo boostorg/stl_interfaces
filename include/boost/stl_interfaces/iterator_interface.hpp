@@ -273,7 +273,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     public:
         using iterator_concept = IteratorConcept;
         using iterator_category = detail::concept_category_t<iterator_concept>;
-        using value_type = ValueType;
+        using value_type = std::remove_const_t<ValueType>;
         using reference = Reference;
         using pointer = detail::pointer_t<Pointer, iterator_concept>;
         using difference_type = DifferenceType;
@@ -287,8 +287,10 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
 
         template<typename D = Derived>
-        constexpr pointer operator->() const noexcept(
+        constexpr auto operator-> () const noexcept(
             noexcept(detail::make_pointer<pointer>(*std::declval<D const &>())))
+            -> decltype(
+                detail::make_pointer<pointer>(*std::declval<D const &>()))
         {
             return detail::make_pointer<pointer>(*derived());
         }
@@ -347,15 +349,19 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
 
         template<typename D = Derived>
-        constexpr D operator+(difference_type i) const
+        constexpr auto operator+(difference_type i) const
             noexcept(noexcept(D(std::declval<D &>()), std::declval<D &>() += i))
+                -> std::remove_reference_t<decltype(
+                    D(std::declval<D &>()),
+                    std::declval<D &>() += i,
+                    std::declval<D &>())>
         {
             D retval = derived();
             retval += i;
             return retval;
         }
         friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR Derived
-        operator+(difference_type i, Derived it) noexcept(noexcept(it + i))
+        operator+(difference_type i, Derived it) noexcept
         {
             return it + i;
         }
@@ -394,8 +400,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
         }
 
         template<typename D = Derived>
-        constexpr D & operator-=(difference_type i) noexcept(
-            noexcept(std::declval<D &>() += -i))
+        constexpr D & operator-=(difference_type i) noexcept
         {
             derived() += -i;
             return derived();
@@ -410,9 +415,8 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
             return access::base(derived()) - access::base(other);
         }
 
-        friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR Derived operator-(
-            Derived it,
-            difference_type i) noexcept(noexcept(Derived(it), it += -i))
+        friend BOOST_STL_INTERFACES_HIDDEN_FRIEND_CONSTEXPR Derived
+        operator-(Derived it, difference_type i) noexcept
         {
             Derived retval = it;
             retval += -i;
@@ -450,7 +454,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator==(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) == 0)
     {
         return detail::common_diff(lhs, rhs) == 0;
     }
@@ -474,7 +478,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator<(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) < 0)
     {
         return detail::common_diff(lhs, rhs) < 0;
     }
@@ -487,7 +491,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator<=(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) <= 0)
     {
         return detail::common_diff(lhs, rhs) <= 0;
     }
@@ -500,7 +504,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator>(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) > 0)
     {
         return detail::common_diff(lhs, rhs) > 0;
     }
@@ -513,7 +517,7 @@ namespace boost { namespace stl_interfaces { inline namespace v1 {
     operator>=(IteratorInterface1 lhs, IteratorInterface2 rhs) noexcept(
         noexcept(detail::common_diff(lhs, rhs)))
         -> decltype(
-            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs))
+            v1_dtl::derived_iterator(lhs), detail::common_diff(lhs, rhs) >= 0)
     {
         return detail::common_diff(lhs, rhs) >= 0;
     }

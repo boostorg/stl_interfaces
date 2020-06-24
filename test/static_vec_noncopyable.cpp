@@ -7,8 +7,7 @@
 
 #include "ill_formed.hpp"
 
-#define BOOST_TEST_MAIN
-#include <boost/test/included/unit_test.hpp>
+#include <boost/core/lightweight_test.hpp>
 
 #include <array>
 
@@ -52,100 +51,100 @@ using vec_type = static_vector<noncopyable_int, 10>;
 #endif
 
 
-BOOST_AUTO_TEST_CASE(default_ctor)
+void test_default_ctor()
 {
     vec_type v;
-    BOOST_CHECK(v.empty());
-    BOOST_CHECK(v.size() == 0u);
+    BOOST_TEST(v.empty());
+    BOOST_TEST(v.size() == 0u);
 
 #if !USE_STD_VECTOR
-    BOOST_CHECK(v.max_size() == 10u);
-    BOOST_CHECK(v.capacity() == 10u);
+    BOOST_TEST(v.max_size() == 10u);
+    BOOST_TEST(v.capacity() == 10u);
 #endif
 
-    BOOST_CHECK(v == v);
-    BOOST_CHECK(v <= v);
-    BOOST_CHECK(v >= v);
+    BOOST_TEST(v == v);
+    BOOST_TEST(v <= v);
+    BOOST_TEST(v >= v);
 
-    BOOST_CHECK_THROW(v.at(0), std::out_of_range);
+    BOOST_TEST_THROWS(v.at(0), std::out_of_range);
 
     vec_type const & cv = v;
-    BOOST_CHECK(cv.empty());
-    BOOST_CHECK(cv.size() == 0u);
+    BOOST_TEST(cv.empty());
+    BOOST_TEST(cv.size() == 0u);
 
 #if !USE_STD_VECTOR
-    BOOST_CHECK(cv.max_size() == 10u);
-    BOOST_CHECK(cv.capacity() == 10u);
+    BOOST_TEST(cv.max_size() == 10u);
+    BOOST_TEST(cv.capacity() == 10u);
 #endif
 
-    BOOST_CHECK(cv == cv);
-    BOOST_CHECK(cv <= cv);
-    BOOST_CHECK(cv >= cv);
+    BOOST_TEST(cv == cv);
+    BOOST_TEST(cv <= cv);
+    BOOST_TEST(cv >= cv);
 
-    BOOST_CHECK_THROW(cv.at(0), std::out_of_range);
+    BOOST_TEST_THROWS(cv.at(0), std::out_of_range);
 }
 
 
-BOOST_AUTO_TEST_CASE(other_ctors_assign_ctor)
+void test_other_ctors_assign_ctor()
 {
     {
         vec_type v(3);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 3u);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 3u);
     }
 
 #if 0 // initializer_list construction is not supported for move-only value_type.
         vec_type v2(std::initializer_list<noncopyable_int>{0, 0, 0});
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
 
     {
         std::initializer_list<noncopyable_int> il{3, 2, 1};
         vec_type v(il);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 3u);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 3u);
 
         static_assert(std::is_same<decltype(v = il), vec_type &>::value, "");
 
         vec_type v2;
         v2 = il;
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
     }
 
     {
         std::initializer_list<noncopyable_int> il{3, 2, 1};
         vec_type v;
         v.assign(il);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 3u);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 3u);
 
         static_assert(std::is_same<decltype(v.assign(il)), void>::value, "");
 
         vec_type v2;
         v2 = il;
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
     }
 #endif
 
 #if 0 // Code that boils down to fill-insert is not supported for move-only value_type.
     {
         vec_type v(3, 4);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 3u);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 3u);
 
         vec_type v2 = {4, 4, 4};
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
     }
 
     {
         vec_type v;
         v.assign(3, 4);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 3u);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 3u);
 
         static_assert(std::is_same<decltype(v.assign(3, 4)), void>::value, "");
 
         vec_type v2 = {4, 4, 4};
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
     }
 #endif
 
@@ -153,14 +152,14 @@ BOOST_AUTO_TEST_CASE(other_ctors_assign_ctor)
         std::array<int, 3> a = {{1, 2, 3}};
 
         vec_type v(a.begin(), a.end());
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 3u);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 3u);
 
         vec_type v2;
         v2.push_back(1);
         v2.push_back(2);
         v2.push_back(3);
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
     }
 
     {
@@ -168,8 +167,8 @@ BOOST_AUTO_TEST_CASE(other_ctors_assign_ctor)
 
         vec_type v;
         v.assign(a.begin(), a.end());
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 3u);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 3u);
 
         static_assert(
             std::is_same<decltype(v.assign(a.begin(), a.end())), void>::value,
@@ -179,12 +178,12 @@ BOOST_AUTO_TEST_CASE(other_ctors_assign_ctor)
         v2.push_back(1);
         v2.push_back(2);
         v2.push_back(3);
-        BOOST_CHECK(v == v2);
+        BOOST_TEST(v == v2);
     }
 }
 
 
-BOOST_AUTO_TEST_CASE(resize)
+void test_resize()
 {
     {
         vec_type v;
@@ -192,25 +191,25 @@ BOOST_AUTO_TEST_CASE(resize)
         static_assert(std::is_same<decltype(v.resize(1)), void>::value, "");
 
         v.resize(3);
-        BOOST_CHECK(v == vec_type(3));
+        BOOST_TEST(v == vec_type(3));
 
         v.resize(6);
-        BOOST_CHECK(v == vec_type(6));
+        BOOST_TEST(v == vec_type(6));
     }
 
     {
         vec_type v(6);
 
         v.resize(3);
-        BOOST_CHECK(v == vec_type(3));
+        BOOST_TEST(v == vec_type(3));
 
         v.resize(0);
-        BOOST_CHECK(v == vec_type{});
+        BOOST_TEST(v == vec_type{});
     }
 }
 
 
-BOOST_AUTO_TEST_CASE(assignment_copy_move_equality)
+void test_assignment_copy_move_equality()
 {
     {
         vec_type v2;
@@ -219,10 +218,10 @@ BOOST_AUTO_TEST_CASE(assignment_copy_move_equality)
         v2.push_back(4);
 
         vec_type v(std::move(v2));
-        BOOST_CHECK(v[0] == 4);
-        BOOST_CHECK(v[1] == 4);
-        BOOST_CHECK(v[2] == 4);
-        BOOST_CHECK(v2.empty());
+        BOOST_TEST(v[0] == 4);
+        BOOST_TEST(v[1] == 4);
+        BOOST_TEST(v[2] == 4);
+        BOOST_TEST(v2.empty());
     }
 
     {
@@ -233,15 +232,15 @@ BOOST_AUTO_TEST_CASE(assignment_copy_move_equality)
         v2.push_back(4);
 
         v = std::move(v2);
-        BOOST_CHECK(v[0] == 4);
-        BOOST_CHECK(v[1] == 4);
-        BOOST_CHECK(v[2] == 4);
-        BOOST_CHECK(v2.empty());
+        BOOST_TEST(v[0] == 4);
+        BOOST_TEST(v[1] == 4);
+        BOOST_TEST(v[2] == 4);
+        BOOST_TEST(v2.empty());
     }
 }
 
 
-BOOST_AUTO_TEST_CASE(comparisons)
+void test_comparisons()
 {
     vec_type sm;
     sm.push_back(1);
@@ -259,75 +258,75 @@ BOOST_AUTO_TEST_CASE(comparisons)
     lg.push_back(4);
     lg.push_back(5);
 
-    BOOST_CHECK(sm == sm);
-    BOOST_CHECK(!(sm == md));
-    BOOST_CHECK(!(sm == lg));
+    BOOST_TEST(sm == sm);
+    BOOST_TEST(!(sm == md));
+    BOOST_TEST(!(sm == lg));
 
-    BOOST_CHECK(!(sm != sm));
-    BOOST_CHECK(sm != md);
-    BOOST_CHECK(sm != lg);
+    BOOST_TEST(!(sm != sm));
+    BOOST_TEST(sm != md);
+    BOOST_TEST(sm != lg);
 
-    BOOST_CHECK(!(sm < sm));
-    BOOST_CHECK(sm < md);
-    BOOST_CHECK(sm < lg);
+    BOOST_TEST(!(sm < sm));
+    BOOST_TEST(sm < md);
+    BOOST_TEST(sm < lg);
 
-    BOOST_CHECK(sm <= sm);
-    BOOST_CHECK(sm <= md);
-    BOOST_CHECK(sm <= lg);
+    BOOST_TEST(sm <= sm);
+    BOOST_TEST(sm <= md);
+    BOOST_TEST(sm <= lg);
 
-    BOOST_CHECK(!(sm > sm));
-    BOOST_CHECK(!(sm > md));
-    BOOST_CHECK(!(sm > lg));
+    BOOST_TEST(!(sm > sm));
+    BOOST_TEST(!(sm > md));
+    BOOST_TEST(!(sm > lg));
 
-    BOOST_CHECK(sm >= sm);
-    BOOST_CHECK(!(sm >= md));
-    BOOST_CHECK(!(sm >= lg));
-
-
-    BOOST_CHECK(!(md == sm));
-    BOOST_CHECK(md == md);
-    BOOST_CHECK(!(md == lg));
-
-    BOOST_CHECK(!(md < sm));
-    BOOST_CHECK(!(md < md));
-    BOOST_CHECK(md < lg);
-
-    BOOST_CHECK(!(md <= sm));
-    BOOST_CHECK(md <= md);
-    BOOST_CHECK(md <= lg);
-
-    BOOST_CHECK(md > sm);
-    BOOST_CHECK(!(md > md));
-    BOOST_CHECK(!(md > lg));
-
-    BOOST_CHECK(md >= sm);
-    BOOST_CHECK(md >= md);
-    BOOST_CHECK(!(md >= lg));
+    BOOST_TEST(sm >= sm);
+    BOOST_TEST(!(sm >= md));
+    BOOST_TEST(!(sm >= lg));
 
 
-    BOOST_CHECK(!(lg == sm));
-    BOOST_CHECK(!(lg == md));
-    BOOST_CHECK(lg == lg);
+    BOOST_TEST(!(md == sm));
+    BOOST_TEST(md == md);
+    BOOST_TEST(!(md == lg));
 
-    BOOST_CHECK(!(lg < sm));
-    BOOST_CHECK(!(lg < md));
-    BOOST_CHECK(!(lg < lg));
+    BOOST_TEST(!(md < sm));
+    BOOST_TEST(!(md < md));
+    BOOST_TEST(md < lg);
 
-    BOOST_CHECK(!(lg <= sm));
-    BOOST_CHECK(!(lg <= md));
-    BOOST_CHECK(lg <= lg);
+    BOOST_TEST(!(md <= sm));
+    BOOST_TEST(md <= md);
+    BOOST_TEST(md <= lg);
 
-    BOOST_CHECK(lg > sm);
-    BOOST_CHECK(lg > md);
-    BOOST_CHECK(!(lg > lg));
+    BOOST_TEST(md > sm);
+    BOOST_TEST(!(md > md));
+    BOOST_TEST(!(md > lg));
 
-    BOOST_CHECK(lg >= sm);
-    BOOST_CHECK(lg >= md);
-    BOOST_CHECK(lg >= lg);
+    BOOST_TEST(md >= sm);
+    BOOST_TEST(md >= md);
+    BOOST_TEST(!(md >= lg));
+
+
+    BOOST_TEST(!(lg == sm));
+    BOOST_TEST(!(lg == md));
+    BOOST_TEST(lg == lg);
+
+    BOOST_TEST(!(lg < sm));
+    BOOST_TEST(!(lg < md));
+    BOOST_TEST(!(lg < lg));
+
+    BOOST_TEST(!(lg <= sm));
+    BOOST_TEST(!(lg <= md));
+    BOOST_TEST(lg <= lg);
+
+    BOOST_TEST(lg > sm);
+    BOOST_TEST(lg > md);
+    BOOST_TEST(!(lg > lg));
+
+    BOOST_TEST(lg >= sm);
+    BOOST_TEST(lg >= md);
+    BOOST_TEST(lg >= lg);
 }
 
 
-BOOST_AUTO_TEST_CASE(swap_)
+void test_swap()
 {
     {
         vec_type v1;
@@ -345,11 +344,11 @@ BOOST_AUTO_TEST_CASE(swap_)
 
         v1.swap(v2);
 
-        BOOST_CHECK(v1.size() == 4u);
-        BOOST_CHECK(v2.size() == 3u);
+        BOOST_TEST(v1.size() == 4u);
+        BOOST_TEST(v2.size() == 3u);
 
-        BOOST_CHECK(v1[0] == 3);
-        BOOST_CHECK(v2[0] == 4);
+        BOOST_TEST(v1[0] == 3);
+        BOOST_TEST(v2[0] == 4);
     }
 
     {
@@ -365,11 +364,11 @@ BOOST_AUTO_TEST_CASE(swap_)
 
         swap(v1, v2);
 
-        BOOST_CHECK(v1.size() == 4u);
-        BOOST_CHECK(v2.size() == 3u);
+        BOOST_TEST(v1.size() == 4u);
+        BOOST_TEST(v2.size() == 3u);
 
-        BOOST_CHECK(v1[0] == 3);
-        BOOST_CHECK(v2[0] == 4);
+        BOOST_TEST(v1[0] == 3);
+        BOOST_TEST(v2[0] == 4);
     }
 }
 
@@ -417,7 +416,7 @@ static_assert(
         value,
     "");
 
-BOOST_AUTO_TEST_CASE(iterators)
+void test_iterators()
 {
     {
         vec_type v;
@@ -457,16 +456,16 @@ BOOST_AUTO_TEST_CASE(iterators)
         std::array<int, 3> const a = {{3, 2, 1}};
 	std::array<int, 3> const ra = {{1, 2, 3}};
 
-        BOOST_CHECK(std::equal(v.begin(), v.end(), a.begin(), a.end()));
-        BOOST_CHECK(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.begin(), v.end(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
 
-        BOOST_CHECK(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
-        BOOST_CHECK(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
 
         *v.begin() = 8;
         *v.rbegin() = 9;
-        BOOST_CHECK(v[0] == 8);
-        BOOST_CHECK(v[2] == 9);
+        BOOST_TEST(v[0] == 8);
+        BOOST_TEST(v[2] == 9);
     }
 
     {
@@ -512,16 +511,16 @@ BOOST_AUTO_TEST_CASE(iterators)
         std::array<int, 3> const a = {{3, 2, 1}};
         std::array<int, 3> const ra = {{1, 2, 3}};
 
-        BOOST_CHECK(std::equal(v.begin(), v.end(), a.begin(), a.end()));
-        BOOST_CHECK(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.begin(), v.end(), a.begin(), a.end()));
+        BOOST_TEST(std::equal(v.cbegin(), v.cend(), a.begin(), a.end()));
 
-        BOOST_CHECK(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
-        BOOST_CHECK(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.rbegin(), v.rend(), ra.begin(), ra.end()));
+        BOOST_TEST(std::equal(v.crbegin(), v.crend(), ra.begin(), ra.end()));
     }
 }
 
 
-BOOST_AUTO_TEST_CASE(emplace_insert)
+void test_emplace_insert()
 {
     {
         vec_type v;
@@ -537,20 +536,20 @@ BOOST_AUTO_TEST_CASE(emplace_insert)
             "");
 
         v.emplace_back(i);
-        BOOST_CHECK(v.front() == i);
-        BOOST_CHECK(v.back() == i);
+        BOOST_TEST(v.front() == i);
+        BOOST_TEST(v.back() == i);
 
         v.emplace_back(1);
-        BOOST_CHECK(v.front() == i);
-        BOOST_CHECK(v.back() == 1);
+        BOOST_TEST(v.front() == i);
+        BOOST_TEST(v.back() == 1);
 
         v.emplace_back(2);
-        BOOST_CHECK(v.front() == i);
-        BOOST_CHECK(v.back() == 2);
+        BOOST_TEST(v.front() == i);
+        BOOST_TEST(v.back() == 2);
 
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 2);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 2);
     }
 
     {
@@ -571,22 +570,22 @@ BOOST_AUTO_TEST_CASE(emplace_insert)
             "");
 
         v.emplace(v.begin(), i);
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 2);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 2);
 
         v.emplace(v.end(), 3);
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 2);
-        BOOST_CHECK(v[3] == 3);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 2);
+        BOOST_TEST(v[3] == 3);
 
         v.emplace(v.begin() + 2, 9);
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 9);
-        BOOST_CHECK(v[3] == 2);
-        BOOST_CHECK(v[4] == 3);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 9);
+        BOOST_TEST(v[3] == 2);
+        BOOST_TEST(v[4] == 3);
     }
 
     {
@@ -605,30 +604,30 @@ BOOST_AUTO_TEST_CASE(emplace_insert)
             "");
 
         auto const it0 = v.insert(v.begin(), a1.begin(), a1.end());
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 0);
-        BOOST_CHECK(v[2] == 1);
-        BOOST_CHECK(v[3] == 2);
-        BOOST_CHECK(it0 == v.begin());
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 0);
+        BOOST_TEST(v[2] == 1);
+        BOOST_TEST(v[3] == 2);
+        BOOST_TEST(it0 == v.begin());
 
         auto const it1 = v.insert(v.end(), a2.begin(), a2.end());
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 0);
-        BOOST_CHECK(v[2] == 1);
-        BOOST_CHECK(v[3] == 2);
-        BOOST_CHECK(v[4] == 3);
-        BOOST_CHECK(it1 == v.begin() + 4);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 0);
+        BOOST_TEST(v[2] == 1);
+        BOOST_TEST(v[3] == 2);
+        BOOST_TEST(v[4] == 3);
+        BOOST_TEST(it1 == v.begin() + 4);
 
         auto const it2 = v.insert(v.begin() + 2, a3.begin(), a3.end());
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 0);
-        BOOST_CHECK(v[2] == 9);
-        BOOST_CHECK(v[3] == 9);
-        BOOST_CHECK(v[4] == 9);
-        BOOST_CHECK(v[5] == 1);
-        BOOST_CHECK(v[6] == 2);
-        BOOST_CHECK(v[7] == 3);
-        BOOST_CHECK(it2 == v.begin() + 2);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 0);
+        BOOST_TEST(v[2] == 9);
+        BOOST_TEST(v[3] == 9);
+        BOOST_TEST(v[4] == 9);
+        BOOST_TEST(v[5] == 1);
+        BOOST_TEST(v[6] == 2);
+        BOOST_TEST(v[7] == 3);
+        BOOST_TEST(it2 == v.begin() + 2);
     }
 
     {
@@ -647,22 +646,22 @@ BOOST_AUTO_TEST_CASE(emplace_insert)
             "");
 
         v.emplace(v.begin(), i);
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 2);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 2);
 
         v.emplace(v.end(), 3);
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 2);
-        BOOST_CHECK(v[3] == 3);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 2);
+        BOOST_TEST(v[3] == 3);
 
         v.emplace(v.begin() + 2, 9);
-        BOOST_CHECK(v[0] == 0);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 9);
-        BOOST_CHECK(v[3] == 2);
-        BOOST_CHECK(v[4] == 3);
+        BOOST_TEST(v[0] == 0);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 9);
+        BOOST_TEST(v[3] == 2);
+        BOOST_TEST(v[4] == 3);
     }
 
 #if 0 // Fill-insert is not supported for move-only value_type.
@@ -703,7 +702,7 @@ BOOST_AUTO_TEST_CASE(emplace_insert)
 }
 
 
-BOOST_AUTO_TEST_CASE(erase)
+void test_erase()
 {
     {
         vec_type v;
@@ -722,8 +721,8 @@ BOOST_AUTO_TEST_CASE(erase)
             "");
 
         v.erase(v.begin(), v.end());
-        BOOST_CHECK(v.empty());
-        BOOST_CHECK(v.size() == 0u);
+        BOOST_TEST(v.empty());
+        BOOST_TEST(v.size() == 0u);
     }
 
     {
@@ -732,9 +731,9 @@ BOOST_AUTO_TEST_CASE(erase)
         v.push_back(2);
         v.push_back(1);
         v.erase(v.begin() + 1, v.end());
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 1u);
-        BOOST_CHECK(v[0] == 3);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 1u);
+        BOOST_TEST(v[0] == 3);
     }
 
     {
@@ -743,9 +742,9 @@ BOOST_AUTO_TEST_CASE(erase)
         v.push_back(2);
         v.push_back(1);
         v.erase(v.begin(), v.end() - 1);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 1u);
-        BOOST_CHECK(v[0] == 1);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 1u);
+        BOOST_TEST(v[0] == 1);
     }
 
     {
@@ -754,10 +753,10 @@ BOOST_AUTO_TEST_CASE(erase)
         v.push_back(2);
         v.push_back(1);
         v.erase(v.begin());
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 2u);
-        BOOST_CHECK(v[0] == 2);
-        BOOST_CHECK(v[1] == 1);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 2u);
+        BOOST_TEST(v[0] == 2);
+        BOOST_TEST(v[1] == 1);
     }
 
     {
@@ -766,10 +765,10 @@ BOOST_AUTO_TEST_CASE(erase)
         v.push_back(2);
         v.push_back(1);
         v.erase(v.begin() + 1);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 2u);
-        BOOST_CHECK(v[0] == 3);
-        BOOST_CHECK(v[1] == 1);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 2u);
+        BOOST_TEST(v[0] == 3);
+        BOOST_TEST(v[1] == 1);
     }
 
     {
@@ -778,10 +777,10 @@ BOOST_AUTO_TEST_CASE(erase)
         v.push_back(2);
         v.push_back(1);
         v.erase(v.begin() + 2);
-        BOOST_CHECK(!v.empty());
-        BOOST_CHECK(v.size() == 2u);
-        BOOST_CHECK(v[0] == 3);
-        BOOST_CHECK(v[1] == 2);
+        BOOST_TEST(!v.empty());
+        BOOST_TEST(v.size() == 2u);
+        BOOST_TEST(v[0] == 3);
+        BOOST_TEST(v[1] == 2);
     }
 }
 
@@ -801,7 +800,7 @@ static_assert(ill_formed<lvalue_push_front_t, vec_type>::value, "");
 static_assert(ill_formed<rvalue_push_front_t, vec_type>::value, "");
 static_assert(ill_formed<pop_front_t, vec_type>::value, "");
 
-BOOST_AUTO_TEST_CASE(front_back)
+void test_front_back()
 {
     {
         vec_type v;
@@ -812,29 +811,29 @@ BOOST_AUTO_TEST_CASE(front_back)
         static_assert(std::is_same<decltype(v.pop_back()), void>::value, "");
 
         v.emplace_back(i);
-        BOOST_CHECK(v.front() == i);
-        BOOST_CHECK(v.back() == i);
+        BOOST_TEST(v.front() == i);
+        BOOST_TEST(v.back() == i);
 
         v.emplace_back(1);
-        BOOST_CHECK(v.front() == i);
-        BOOST_CHECK(v.back() == 1);
+        BOOST_TEST(v.front() == i);
+        BOOST_TEST(v.back() == 1);
 
         v.emplace_back(2);
-        BOOST_CHECK(v.front() == i);
-        BOOST_CHECK(v.back() == 2);
+        BOOST_TEST(v.front() == i);
+        BOOST_TEST(v.back() == 2);
 
         static_assert(std::is_same<decltype(v.front()), noncopyable_int &>::value, "");
         static_assert(std::is_same<decltype(v.back()), noncopyable_int &>::value, "");
 
         v.front() = 9;
         v.back() = 8;
-        BOOST_CHECK(v[0] == 9);
-        BOOST_CHECK(v[1] == 1);
-        BOOST_CHECK(v[2] == 8);
+        BOOST_TEST(v[0] == 9);
+        BOOST_TEST(v[1] == 1);
+        BOOST_TEST(v[2] == 8);
 
         v.pop_back();
-        BOOST_CHECK(v[0] == 9);
-        BOOST_CHECK(v[1] == 1);
+        BOOST_TEST(v[0] == 9);
+        BOOST_TEST(v[1] == 1);
     }
 
     {
@@ -843,8 +842,8 @@ BOOST_AUTO_TEST_CASE(front_back)
         v_.push_back(2);
         v_.push_back(1);
         vec_type const & v = v_;
-        BOOST_CHECK(v.front() == 3);
-        BOOST_CHECK(v.back() == 1);
+        BOOST_TEST(v.front() == 3);
+        BOOST_TEST(v.back() == 1);
 
         static_assert(
             std::is_same<decltype(v.front()), noncopyable_int const &>::value, "");
@@ -853,23 +852,23 @@ BOOST_AUTO_TEST_CASE(front_back)
 }
 
 
-BOOST_AUTO_TEST_CASE(data_index_at)
+void test_data_index_at()
 {
     {
         vec_type v;
         v.push_back(3);
         v.push_back(2);
         v.push_back(1);
-        BOOST_CHECK(v.data()[0] == 3);
-        BOOST_CHECK(v.data()[1] == 2);
-        BOOST_CHECK(v.data()[2] == 1);
-        BOOST_CHECK(v[0] == 3);
-        BOOST_CHECK(v[1] == 2);
-        BOOST_CHECK(v[2] == 1);
-        BOOST_CHECK_NO_THROW(v.at(0));
-        BOOST_CHECK_NO_THROW(v.at(1));
-        BOOST_CHECK_NO_THROW(v.at(2));
-        BOOST_CHECK_THROW(v.at(3), std::out_of_range);
+        BOOST_TEST(v.data()[0] == 3);
+        BOOST_TEST(v.data()[1] == 2);
+        BOOST_TEST(v.data()[2] == 1);
+        BOOST_TEST(v[0] == 3);
+        BOOST_TEST(v[1] == 2);
+        BOOST_TEST(v[2] == 1);
+        BOOST_TEST_NO_THROW(v.at(0));
+        BOOST_TEST_NO_THROW(v.at(1));
+        BOOST_TEST_NO_THROW(v.at(2));
+        BOOST_TEST_THROWS(v.at(3), std::out_of_range);
 
         static_assert(std::is_same<decltype(v.data()), noncopyable_int *>::value, "");
         static_assert(std::is_same<decltype(v[0]), noncopyable_int &>::value, "");
@@ -877,9 +876,9 @@ BOOST_AUTO_TEST_CASE(data_index_at)
 
         v[0] = 8;
         v.at(1) = 9;
-        BOOST_CHECK(v[0] == 8);
-        BOOST_CHECK(v[1] == 9);
-        BOOST_CHECK(v[2] == 1);
+        BOOST_TEST(v[0] == 8);
+        BOOST_TEST(v[1] == 9);
+        BOOST_TEST(v[2] == 1);
     }
 
     {
@@ -888,19 +887,35 @@ BOOST_AUTO_TEST_CASE(data_index_at)
         v_.push_back(2);
         v_.push_back(1);
         vec_type const & v = v_;
-        BOOST_CHECK(v.data()[0] == 3);
-        BOOST_CHECK(v.data()[1] == 2);
-        BOOST_CHECK(v.data()[2] == 1);
-        BOOST_CHECK(v[0] == 3);
-        BOOST_CHECK(v[1] == 2);
-        BOOST_CHECK(v[2] == 1);
-        BOOST_CHECK_NO_THROW(v.at(0));
-        BOOST_CHECK_NO_THROW(v.at(1));
-        BOOST_CHECK_NO_THROW(v.at(2));
-        BOOST_CHECK_THROW(v.at(3), std::out_of_range);
+        BOOST_TEST(v.data()[0] == 3);
+        BOOST_TEST(v.data()[1] == 2);
+        BOOST_TEST(v.data()[2] == 1);
+        BOOST_TEST(v[0] == 3);
+        BOOST_TEST(v[1] == 2);
+        BOOST_TEST(v[2] == 1);
+        BOOST_TEST_NO_THROW(v.at(0));
+        BOOST_TEST_NO_THROW(v.at(1));
+        BOOST_TEST_NO_THROW(v.at(2));
+        BOOST_TEST_THROWS(v.at(3), std::out_of_range);
 
         static_assert(std::is_same<decltype(v.data()), noncopyable_int const *>::value, "");
         static_assert(std::is_same<decltype(v[0]), noncopyable_int const &>::value, "");
         static_assert(std::is_same<decltype(v.at(0)), noncopyable_int const &>::value, "");
     }
+}
+
+int main()
+{
+    test_default_ctor();
+    test_other_ctors_assign_ctor();
+    test_resize();
+    test_assignment_copy_move_equality();
+    test_comparisons();
+    test_swap();
+    test_iterators();
+    test_emplace_insert();
+    test_erase();
+    test_front_back();
+    test_data_index_at();
+    return boost::report_errors();
 }

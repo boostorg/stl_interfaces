@@ -51,6 +51,23 @@ iterators. ]
 `DifferenceType` is used to define the iterator's `difference_type`.  Don't be
 a weirdo; just leave this as the default type, `std::ptrdiff_t`.
 
+[heading Proxy Iterators]
+
+Sometimes you need to create an iterator `I` such that `I::reference_type` is
+not a (possibly `const`) reference to `I::value_type`.  For instance, let's
+say you want to make a zip-iterator that produces pairs of values from two
+separate underlying sequences.  For sequences `A` and `B`, with respective
+`value_type`s `T` and `U`, one possible `reference_type` for a zip iterator
+would be `std::pair<T &, U &>` (this is distinct from a reference to a pair,
+such as `std::pair<T, U> &`).  Each such pair would contain a reference to one
+element from `A` and a reference to the corresponding element from `B`.
+
+As another example, if you wanted an iterator `I` that represents the infinite
+sequence 0, 1, 2, ..., you'd be unable to form a reference to most or all of
+those values; you'd instead produce a temporary for each value as it is
+needed.  This implies that `I::value_type` does not involve references at all;
+it may instead by `int` or `double`.
+
 When defining a proxy iterator, you can use a template alias that provides
 reasonable defaults for _iter_iface_'s parameters:
 

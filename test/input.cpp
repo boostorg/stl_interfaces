@@ -7,7 +7,7 @@
 
 #include "ill_formed.hpp"
 
-#include <boost/test/minimal.hpp>
+#include <boost/core/lightweight_test.hpp>
 
 #include <array>
 #include <numeric>
@@ -61,10 +61,9 @@ struct input_iter : boost::stl_interfaces::iterator_interface<
     input_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    input_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    input_iter(input_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType & operator*() const noexcept { return *it_; }
@@ -116,10 +115,9 @@ struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
     proxy_input_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    proxy_input_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    proxy_input_iter(proxy_input_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType operator*() const noexcept { return *it_; }
@@ -263,7 +261,7 @@ static_assert(
     "");
 
 
-int test_main(int, char * [])
+int main()
 {
 
 {
@@ -273,7 +271,7 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 }
 
@@ -301,7 +299,7 @@ int test_main(int, char * [])
         int_input first(ints.data());
         int_input last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -309,7 +307,7 @@ int test_main(int, char * [])
         pair_input first(pairs.data());
         pair_input last(pairs.data() + pairs.size());
         std::copy(first, last, pairs_copy.begin());
-        BOOST_CHECK(pairs_copy == pairs);
+        BOOST_TEST(pairs_copy == pairs);
     }
 
     {
@@ -319,7 +317,7 @@ int test_main(int, char * [])
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        BOOST_CHECK(firsts_copy == ints);
+        BOOST_TEST(firsts_copy == ints);
     }
 
     {
@@ -329,7 +327,7 @@ int test_main(int, char * [])
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        BOOST_CHECK(firsts_copy == ints);
+        BOOST_TEST(firsts_copy == ints);
     }
 }
 
@@ -340,7 +338,7 @@ int test_main(int, char * [])
         const_int_input first(ints.data());
         const_int_input last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -348,7 +346,7 @@ int test_main(int, char * [])
         const_pair_input first(pairs.data());
         const_pair_input last(pairs.data() + pairs.size());
         std::copy(first, last, pairs_copy.begin());
-        BOOST_CHECK(pairs_copy == pairs);
+        BOOST_TEST(pairs_copy == pairs);
     }
 
     {
@@ -358,7 +356,7 @@ int test_main(int, char * [])
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        BOOST_CHECK(firsts_copy == ints);
+        BOOST_TEST(firsts_copy == ints);
     }
 
     {
@@ -369,7 +367,7 @@ int test_main(int, char * [])
         for (auto out = firsts_copy.begin(); first != last; ++first) {
             *out++ = first->first;
         }
-        BOOST_CHECK(firsts_copy == ints);
+        BOOST_TEST(firsts_copy == ints);
     }
 }
 
@@ -387,36 +385,36 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(r.begin(), r.end(), ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
 
-        BOOST_CHECK(empty.begin() == empty.end());
+        BOOST_TEST(empty.begin() == empty.end());
     }
 
     // empty/op bool
     {
-        BOOST_CHECK(!r.empty());
-        BOOST_CHECK(r);
+        BOOST_TEST(!r.empty());
+        BOOST_TEST(r);
 
-        BOOST_CHECK(empty.empty());
-        BOOST_CHECK(!empty);
+        BOOST_TEST(empty.empty());
+        BOOST_TEST(!empty);
 
         auto const cr = r;
-        BOOST_CHECK(!cr.empty());
-        BOOST_CHECK(cr);
+        BOOST_TEST(!cr.empty());
+        BOOST_TEST(cr);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.empty());
-        BOOST_CHECK(!cempty);
+        BOOST_TEST(cempty.empty());
+        BOOST_TEST(!cempty);
     }
 
     // front/back
     {
-        BOOST_CHECK(r.front() == 0);
+        BOOST_TEST(r.front() == 0);
 
         auto const cr = r;
-        BOOST_CHECK(cr.front() == 0);
+        BOOST_TEST(cr.front() == 0);
     }
 }
 
-    return 0;
+    return boost::report_errors();
 }

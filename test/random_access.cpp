@@ -7,10 +7,12 @@
 
 #include "ill_formed.hpp"
 
-#include <boost/test/minimal.hpp>
+#include <boost/core/lightweight_test.hpp>
 
+#include <algorithm>
 #include <array>
 #include <numeric>
+#include <tuple>
 #include <type_traits>
 
 
@@ -126,7 +128,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     adapted_random_access_iter<int const>,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
-    int const,
+    int,
     int const &,
     int const *,
     std::ptrdiff_t)
@@ -141,10 +143,9 @@ struct random_access_iter : boost::stl_interfaces::iterator_interface<
     random_access_iter(ValueType * it) : it_(it) {}
     template<
         typename ValueType2,
-        typename E = std::enable_if_t<std::is_convertible<
-            typename ValueType2::value_type *,
-            ValueType *>::value>>
-    random_access_iter(ValueType2 it) : it_(it.it_)
+        typename E = std::enable_if_t<
+            std::is_convertible<ValueType2 *, ValueType *>::value>>
+    random_access_iter(random_access_iter<ValueType2> it) : it_(it.it_)
     {}
 
     ValueType & operator*() const { return *it_; }
@@ -186,7 +187,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     const_random_access,
     std::random_access_iterator_tag,
     std::random_access_iterator_tag,
-    int const,
+    int,
     int const &,
     int const *,
     std::ptrdiff_t)
@@ -392,51 +393,51 @@ static_assert(
     "");
 
 
-int test_main(int, char * [])
+int main()
 {
 
 {
     basic_random_access_iter first(ints.data());
     basic_random_access_iter last(ints.data() + ints.size());
 
-    BOOST_CHECK(*first == 0);
-    BOOST_CHECK(*(first + 1) == 1);
-    BOOST_CHECK(*(first + 2) == 2);
-    BOOST_CHECK(*(1 + first) == 1);
-    BOOST_CHECK(*(2 + first) == 2);
+    BOOST_TEST(*first == 0);
+    BOOST_TEST(*(first + 1) == 1);
+    BOOST_TEST(*(first + 2) == 2);
+    BOOST_TEST(*(1 + first) == 1);
+    BOOST_TEST(*(2 + first) == 2);
 
-    BOOST_CHECK(first[0] == 0);
-    BOOST_CHECK(first[1] == 1);
-    BOOST_CHECK(first[2] == 2);
+    BOOST_TEST(first[0] == 0);
+    BOOST_TEST(first[1] == 1);
+    BOOST_TEST(first[2] == 2);
 
-    BOOST_CHECK(*(last - 1) == 9);
-    BOOST_CHECK(*(last - 2) == 8);
-    BOOST_CHECK(*(last - 3) == 7);
+    BOOST_TEST(*(last - 1) == 9);
+    BOOST_TEST(*(last - 2) == 8);
+    BOOST_TEST(*(last - 3) == 7);
 
-    BOOST_CHECK(last[-1] == 9);
-    BOOST_CHECK(last[-2] == 8);
-    BOOST_CHECK(last[-3] == 7);
+    BOOST_TEST(last[-1] == 9);
+    BOOST_TEST(last[-2] == 8);
+    BOOST_TEST(last[-3] == 7);
 
-    BOOST_CHECK(last - first == 10);
-    BOOST_CHECK(first == first);
-    BOOST_CHECK(first != last);
-    BOOST_CHECK(first < last);
-    BOOST_CHECK(first <= last);
-    BOOST_CHECK(first <= first);
-    BOOST_CHECK(last > first);
-    BOOST_CHECK(last >= first);
-    BOOST_CHECK(last >= last);
+    BOOST_TEST(last - first == 10);
+    BOOST_TEST(first == first);
+    BOOST_TEST(first != last);
+    BOOST_TEST(first < last);
+    BOOST_TEST(first <= last);
+    BOOST_TEST(first <= first);
+    BOOST_TEST(last > first);
+    BOOST_TEST(last >= first);
+    BOOST_TEST(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        BOOST_CHECK(first_copy == last);
+        BOOST_TEST(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        BOOST_CHECK(last_copy == first);
+        BOOST_TEST(last_copy == first);
     }
 }
 
@@ -447,7 +448,7 @@ int test_main(int, char * [])
         basic_random_access_iter first(ints.data());
         basic_random_access_iter last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -459,7 +460,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -467,7 +468,7 @@ int test_main(int, char * [])
         basic_random_access_iter first(iota_ints.data());
         basic_random_access_iter last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -479,7 +480,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -491,7 +492,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -500,44 +501,44 @@ int test_main(int, char * [])
     basic_adapted_random_access_iter first(ints.data());
     basic_adapted_random_access_iter last(ints.data() + ints.size());
 
-    BOOST_CHECK(*first == 0);
-    BOOST_CHECK(*(first + 1) == 1);
-    BOOST_CHECK(*(first + 2) == 2);
-    BOOST_CHECK(*(1 + first) == 1);
-    BOOST_CHECK(*(2 + first) == 2);
+    BOOST_TEST(*first == 0);
+    BOOST_TEST(*(first + 1) == 1);
+    BOOST_TEST(*(first + 2) == 2);
+    BOOST_TEST(*(1 + first) == 1);
+    BOOST_TEST(*(2 + first) == 2);
 
-    BOOST_CHECK(first[0] == 0);
-    BOOST_CHECK(first[1] == 1);
-    BOOST_CHECK(first[2] == 2);
+    BOOST_TEST(first[0] == 0);
+    BOOST_TEST(first[1] == 1);
+    BOOST_TEST(first[2] == 2);
 
-    BOOST_CHECK(*(last - 1) == 9);
-    BOOST_CHECK(*(last - 2) == 8);
-    BOOST_CHECK(*(last - 3) == 7);
+    BOOST_TEST(*(last - 1) == 9);
+    BOOST_TEST(*(last - 2) == 8);
+    BOOST_TEST(*(last - 3) == 7);
 
-    BOOST_CHECK(last[-1] == 9);
-    BOOST_CHECK(last[-2] == 8);
-    BOOST_CHECK(last[-3] == 7);
+    BOOST_TEST(last[-1] == 9);
+    BOOST_TEST(last[-2] == 8);
+    BOOST_TEST(last[-3] == 7);
 
-    BOOST_CHECK(last - first == 10);
-    BOOST_CHECK(first == first);
-    BOOST_CHECK(first != last);
-    BOOST_CHECK(first < last);
-    BOOST_CHECK(first <= last);
-    BOOST_CHECK(first <= first);
-    BOOST_CHECK(last > first);
-    BOOST_CHECK(last >= first);
-    BOOST_CHECK(last >= last);
+    BOOST_TEST(last - first == 10);
+    BOOST_TEST(first == first);
+    BOOST_TEST(first != last);
+    BOOST_TEST(first < last);
+    BOOST_TEST(first <= last);
+    BOOST_TEST(first <= first);
+    BOOST_TEST(last > first);
+    BOOST_TEST(last >= first);
+    BOOST_TEST(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        BOOST_CHECK(first_copy == last);
+        BOOST_TEST(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        BOOST_CHECK(last_copy == first);
+        BOOST_TEST(last_copy == first);
     }
 }
 
@@ -548,7 +549,7 @@ int test_main(int, char * [])
         basic_adapted_random_access_iter first(ints.data());
         basic_adapted_random_access_iter last(ints.data() + ints.size());
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -560,7 +561,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -569,7 +570,7 @@ int test_main(int, char * [])
         basic_adapted_random_access_iter last(
             iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -582,7 +583,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -595,7 +596,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -628,18 +629,18 @@ int test_main(int, char * [])
         const_random_access first_const(first);
         const_random_access last_const(last);
 
-        BOOST_CHECK(first == first_const);
-        BOOST_CHECK(first_const == first);
-        BOOST_CHECK(first != last_const);
-        BOOST_CHECK(last_const != first);
-        BOOST_CHECK(first <= first_const);
-        BOOST_CHECK(first_const <= first);
-        BOOST_CHECK(first >= first_const);
-        BOOST_CHECK(first_const >= first);
-        BOOST_CHECK(last_const > first);
-        BOOST_CHECK(last > first_const);
-        BOOST_CHECK(first_const < last);
-        BOOST_CHECK(first < last_const);
+        BOOST_TEST(first == first_const);
+        BOOST_TEST(first_const == first);
+        BOOST_TEST(first != last_const);
+        BOOST_TEST(last_const != first);
+        BOOST_TEST(first <= first_const);
+        BOOST_TEST(first_const <= first);
+        BOOST_TEST(first >= first_const);
+        BOOST_TEST(first_const >= first);
+        BOOST_TEST(last_const > first);
+        BOOST_TEST(last > first_const);
+        BOOST_TEST(first_const < last);
+        BOOST_TEST(first < last_const);
     }
 
     {
@@ -648,18 +649,18 @@ int test_main(int, char * [])
         adapted_random_access_iter<int const> first_const(first);
         adapted_random_access_iter<int const> last_const(last);
 
-        BOOST_CHECK(first == first_const);
-        BOOST_CHECK(first_const == first);
-        BOOST_CHECK(first != last_const);
-        BOOST_CHECK(last_const != first);
-        BOOST_CHECK(first <= first_const);
-        BOOST_CHECK(first_const <= first);
-        BOOST_CHECK(first >= first_const);
-        BOOST_CHECK(first_const >= first);
-        BOOST_CHECK(last_const > first);
-        BOOST_CHECK(last > first_const);
-        BOOST_CHECK(first_const < last);
-        BOOST_CHECK(first < last_const);
+        BOOST_TEST(first == first_const);
+        BOOST_TEST(first_const == first);
+        BOOST_TEST(first != last_const);
+        BOOST_TEST(last_const != first);
+        BOOST_TEST(first <= first_const);
+        BOOST_TEST(first_const <= first);
+        BOOST_TEST(first >= first_const);
+        BOOST_TEST(first_const >= first);
+        BOOST_TEST(last_const > first);
+        BOOST_TEST(last > first_const);
+        BOOST_TEST(first_const < last);
+        BOOST_TEST(first < last_const);
     }
 }
 
@@ -713,44 +714,44 @@ int test_main(int, char * [])
     random_access first(ints.data());
     random_access last(ints.data() + ints.size());
 
-    BOOST_CHECK(*first == 0);
-    BOOST_CHECK(*(first + 1) == 1);
-    BOOST_CHECK(*(first + 2) == 2);
-    BOOST_CHECK(*(1 + first) == 1);
-    BOOST_CHECK(*(2 + first) == 2);
+    BOOST_TEST(*first == 0);
+    BOOST_TEST(*(first + 1) == 1);
+    BOOST_TEST(*(first + 2) == 2);
+    BOOST_TEST(*(1 + first) == 1);
+    BOOST_TEST(*(2 + first) == 2);
 
-    BOOST_CHECK(first[0] == 0);
-    BOOST_CHECK(first[1] == 1);
-    BOOST_CHECK(first[2] == 2);
+    BOOST_TEST(first[0] == 0);
+    BOOST_TEST(first[1] == 1);
+    BOOST_TEST(first[2] == 2);
 
-    BOOST_CHECK(*(last - 1) == 9);
-    BOOST_CHECK(*(last - 2) == 8);
-    BOOST_CHECK(*(last - 3) == 7);
+    BOOST_TEST(*(last - 1) == 9);
+    BOOST_TEST(*(last - 2) == 8);
+    BOOST_TEST(*(last - 3) == 7);
 
-    BOOST_CHECK(last[-1] == 9);
-    BOOST_CHECK(last[-2] == 8);
-    BOOST_CHECK(last[-3] == 7);
+    BOOST_TEST(last[-1] == 9);
+    BOOST_TEST(last[-2] == 8);
+    BOOST_TEST(last[-3] == 7);
 
-    BOOST_CHECK(last - first == 10);
-    BOOST_CHECK(first == first);
-    BOOST_CHECK(first != last);
-    BOOST_CHECK(first < last);
-    BOOST_CHECK(first <= last);
-    BOOST_CHECK(first <= first);
-    BOOST_CHECK(last > first);
-    BOOST_CHECK(last >= first);
-    BOOST_CHECK(last >= last);
+    BOOST_TEST(last - first == 10);
+    BOOST_TEST(first == first);
+    BOOST_TEST(first != last);
+    BOOST_TEST(first < last);
+    BOOST_TEST(first <= last);
+    BOOST_TEST(first <= first);
+    BOOST_TEST(last > first);
+    BOOST_TEST(last >= first);
+    BOOST_TEST(last >= last);
 
     {
         auto first_copy = first;
         first_copy += 10;
-        BOOST_CHECK(first_copy == last);
+        BOOST_TEST(first_copy == last);
     }
 
     {
         auto last_copy = last;
         last_copy -= 10;
-        BOOST_CHECK(last_copy == first);
+        BOOST_TEST(last_copy == first);
     }
 }
 
@@ -762,7 +763,7 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -772,7 +773,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             ints_copy.begin());
         std::reverse(ints_copy.begin(), ints_copy.end());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
@@ -780,7 +781,7 @@ int test_main(int, char * [])
         random_access first(iota_ints.data());
         random_access last(iota_ints.data() + iota_ints.size());
         std::iota(first, last, 0);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -792,7 +793,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::reverse(iota_ints.begin(), iota_ints.end());
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 
     {
@@ -804,7 +805,7 @@ int test_main(int, char * [])
             std::make_reverse_iterator(first),
             0);
         std::sort(first, last);
-        BOOST_CHECK(iota_ints == ints);
+        BOOST_TEST(iota_ints == ints);
     }
 }
 
@@ -816,12 +817,12 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(first, last, ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
     }
 
     {
-        BOOST_CHECK(std::binary_search(first, last, 3));
-        BOOST_CHECK(std::binary_search(
+        BOOST_TEST(std::binary_search(first, last, 3));
+        BOOST_TEST(std::binary_search(
             std::make_reverse_iterator(last),
             std::make_reverse_iterator(first),
             3,
@@ -834,7 +835,7 @@ int test_main(int, char * [])
     {
         zip_iter first(ints.data(), ones.data());
         zip_iter last(ints.data() + ints.size(), ones.data() + ones.size());
-        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_TEST(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
@@ -845,15 +846,15 @@ int test_main(int, char * [])
         zip_iter last(
             ints_copy.data() + ints_copy.size(),
             ones_copy.data() + ones_copy.size());
-        BOOST_CHECK(!std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_TEST(!std::equal(first, last, tuples.begin(), tuples.end()));
         std::sort(first, last);
-        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_TEST(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     {
         udt_zip_iter first(udts.data(), ones.data());
         udt_zip_iter last(udts.data() + udts.size(), ones.data() + ones.size());
-        BOOST_CHECK(
+        BOOST_TEST(
             std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
 
@@ -865,10 +866,10 @@ int test_main(int, char * [])
         udt_zip_iter last(
             udts_copy.data() + udts_copy.size(),
             ones_copy.data() + ones_copy.size());
-        BOOST_CHECK(
+        BOOST_TEST(
             !std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
         std::sort(first, last);
-        BOOST_CHECK(
+        BOOST_TEST(
             std::equal(first, last, udt_tuples.begin(), udt_tuples.end()));
     }
 }
@@ -886,72 +887,72 @@ int test_main(int, char * [])
     {
         std::array<int, 10> ints_copy;
         std::copy(r.begin(), r.end(), ints_copy.begin());
-        BOOST_CHECK(ints_copy == ints);
+        BOOST_TEST(ints_copy == ints);
 
-        BOOST_CHECK(empty.begin() == empty.end());
+        BOOST_TEST(empty.begin() == empty.end());
     }
 
     // empty/op bool
     {
-        BOOST_CHECK(!r.empty());
-        BOOST_CHECK(r);
+        BOOST_TEST(!r.empty());
+        BOOST_TEST(r);
 
-        BOOST_CHECK(empty.empty());
-        BOOST_CHECK(!empty);
+        BOOST_TEST(empty.empty());
+        BOOST_TEST(!empty);
 
         auto const cr = r;
-        BOOST_CHECK(!cr.empty());
-        BOOST_CHECK(cr);
+        BOOST_TEST(!cr.empty());
+        BOOST_TEST(cr);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.empty());
-        BOOST_CHECK(!cempty);
+        BOOST_TEST(cempty.empty());
+        BOOST_TEST(!cempty);
     }
 
     // data
     {
-        BOOST_CHECK(r.data() != nullptr);
-        BOOST_CHECK(r.data()[2] == 2);
+        BOOST_TEST(r.data() != nullptr);
+        BOOST_TEST(r.data()[2] == 2);
 
-        BOOST_CHECK(empty.data() != nullptr);
+        BOOST_TEST(empty.data() != nullptr);
 
         auto const cr = r;
-        BOOST_CHECK(cr.data() != nullptr);
-        BOOST_CHECK(cr.data()[2] == 2);
+        BOOST_TEST(cr.data() != nullptr);
+        BOOST_TEST(cr.data()[2] == 2);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.data() != nullptr);
+        BOOST_TEST(cempty.data() != nullptr);
     }
 
     // size
     {
-        BOOST_CHECK(r.size() == 10u);
+        BOOST_TEST(r.size() == 10u);
 
-        BOOST_CHECK(empty.size() == 0u);
+        BOOST_TEST(empty.size() == 0u);
 
         auto const cr = r;
-        BOOST_CHECK(cr.size() == 10u);
+        BOOST_TEST(cr.size() == 10u);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.size() == 0u);
+        BOOST_TEST(cempty.size() == 0u);
     }
 
     // front/back
     {
-        BOOST_CHECK(r.front() == 0);
-        BOOST_CHECK(r.back() == 9);
+        BOOST_TEST(r.front() == 0);
+        BOOST_TEST(r.back() == 9);
 
         auto const cr = r;
-        BOOST_CHECK(cr.front() == 0);
-        BOOST_CHECK(cr.back() == 9);
+        BOOST_TEST(cr.front() == 0);
+        BOOST_TEST(cr.back() == 9);
     }
 
     // op[]
     {
-        BOOST_CHECK(r[2] == 2);
+        BOOST_TEST(r[2] == 2);
 
         auto const cr = r;
-        BOOST_CHECK(cr[2] == 2);
+        BOOST_TEST(cr[2] == 2);
     }
 }
 
@@ -968,57 +969,57 @@ int test_main(int, char * [])
 
     // range begin/end
     {
-        BOOST_CHECK(std::equal(first, last, tuples.begin(), tuples.end()));
+        BOOST_TEST(std::equal(first, last, tuples.begin(), tuples.end()));
     }
 
     // empty/op bool
     {
-        BOOST_CHECK(!r.empty());
-        BOOST_CHECK(r);
+        BOOST_TEST(!r.empty());
+        BOOST_TEST(r);
 
-        BOOST_CHECK(empty.empty());
-        BOOST_CHECK(!empty);
+        BOOST_TEST(empty.empty());
+        BOOST_TEST(!empty);
 
         auto const cr = r;
-        BOOST_CHECK(!cr.empty());
-        BOOST_CHECK(cr);
+        BOOST_TEST(!cr.empty());
+        BOOST_TEST(cr);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.empty());
-        BOOST_CHECK(!cempty);
+        BOOST_TEST(cempty.empty());
+        BOOST_TEST(!cempty);
     }
 
     // size
     {
-        BOOST_CHECK(r.size() == 10u);
+        BOOST_TEST(r.size() == 10u);
 
-        BOOST_CHECK(empty.size() == 0u);
+        BOOST_TEST(empty.size() == 0u);
 
         auto const cr = r;
-        BOOST_CHECK(cr.size() == 10u);
+        BOOST_TEST(cr.size() == 10u);
 
         auto const cempty = empty;
-        BOOST_CHECK(cempty.size() == 0u);
+        BOOST_TEST(cempty.size() == 0u);
     }
 
     // front/back
     {
-        BOOST_CHECK(r.front() == (std::tuple<int, int>(0, 1)));
-        BOOST_CHECK(r.back() == (std::tuple<int, int>(9, 1)));
+        BOOST_TEST(r.front() == (std::tuple<int, int>(0, 1)));
+        BOOST_TEST(r.back() == (std::tuple<int, int>(9, 1)));
 
         auto const cr = r;
-        BOOST_CHECK(cr.front() == (std::tuple<int, int>(0, 1)));
-        BOOST_CHECK(cr.back() == (std::tuple<int, int>(9, 1)));
+        BOOST_TEST(cr.front() == (std::tuple<int, int>(0, 1)));
+        BOOST_TEST(cr.back() == (std::tuple<int, int>(9, 1)));
     }
 
     // op[]
     {
-        BOOST_CHECK(r[2] == (std::tuple<int, int>(2, 1)));
+        BOOST_TEST(r[2] == (std::tuple<int, int>(2, 1)));
 
         auto const cr = r;
-        BOOST_CHECK(cr[2] == (std::tuple<int, int>(2, 1)));
+        BOOST_TEST(cr[2] == (std::tuple<int, int>(2, 1)));
     }
 }
 
-    return 0;
+    return boost::report_errors();
 }
