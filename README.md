@@ -195,5 +195,5 @@ the time of this writing.
 
 
 [![Build Status](https://travis-ci.org/boostorg/stl_interfaces.svg?branch=develop)](https://travis-ci.org/boostorg/stl_interfaces)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/stl_interfaces?branch=develop&svg=true)](https://ci.appveyor.com/project/tzlaine/stl_interfaces)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/tzlaine/stl-interfaces?branch=develop&svg=true)](https://ci.appveyor.com/project/tzlaine/stl-interfaces)
 [![License](https://img.shields.io/badge/license-boost-brightgreen.svg)](LICENSE_1_0.txt)
