@@ -6,11 +6,11 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.STLInterfaces">
-<link rel="prev" href="../boost/stl_interfaces/v2/view_interface.html" title="Type definition view_interface">
+<link rel="prev" href="../boost/stl_interfaces/operator___idm11338.html" title="Function template operator!=">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <div class="spirit-nav">
-<a accesskey="p" href="../boost/stl_interfaces/v2/view_interface.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a>
+<a accesskey="p" href="../boost/stl_interfaces/operator___idm11338.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
@@ -24,7 +24,7 @@
 <p>
       This is the constraint on the <code class="computeroutput"><span class="identifier">Derived</span></code>
       template parameter to <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code>, <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>
-      and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>:
+      and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>:
     </p>
 <pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_if_t</span><span class="special">&lt;</span>
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_class</span><span class="special">&lt;</span><span class="identifier">Derived</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&amp;&amp;</span>
@@ -69,7 +69,7 @@
       of the <code class="computeroutput"><span class="identifier">Derived</span></code> type anyway.
     </p>
 <p>
-      For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
+      For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
       it also does not make much sense. Consider how many container adaptors you've
       written. That's a use case that does not come up often.
     </p>
@@ -90,10 +90,10 @@
       opt into more template parameters, the rest are seldom necessary.
     </p>
 <p>
-      By contrast, the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
+      By contrast, the <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code> and <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
       templates have very few template parameters. For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/view_interface.html" title="Struct template view_interface">view_interface</a></code>, this is because
       there are no member typedefs in the <code class="computeroutput"><span class="identifier">view</span></code>
-      concept. For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>,
+      concept. For <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>,
       it was deemed ridiculous to create a template whose purpose is to reduce code
       size, which takes 14 template parameters.
     </p>
@@ -103,15 +103,15 @@
       Does not Deduce Nested Types Like <code class="computeroutput"><span class="identifier">iterator</span></code></a>
     </h4>
 <p>
-      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
       could deduce some of the nested types required for a standard sequence container.
       For instance, <code class="computeroutput"><span class="identifier">iterator</span></code> can
       be deduced as <code class="computeroutput"><span class="keyword">decltype</span><span class="special">(*</span><span class="identifier">begin</span><span class="special">())</span></code>.
       However, a type <code class="computeroutput"><span class="identifier">D</span></code> derived from
-      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
+      <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
       may need to use some of these nested types &#8212; like <code class="computeroutput"><span class="identifier">iterator</span></code>
       &#8212; in its interface or implementation. If this is the case, those nested
-      types are not available early enough in the parse to be used in <code class="computeroutput"><span class="identifier">D</span></code>, if they come from deductions in <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>.
+      types are not available early enough in the parse to be used in <code class="computeroutput"><span class="identifier">D</span></code>, if they come from deductions in <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>.
       This leaves the user in the awkward position of defining the same nested type
       with a different name that can be used within <code class="computeroutput"><span class="identifier">D</span></code>.
       It seems better to leave these types for the user to define.
@@ -134,7 +134,7 @@
       Does not Satisfy the Allocator-Aware Container Requirements</a>
     </h4>
 <p>
-      It may not be immediately obvious, but <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
+      It may not be immediately obvious, but <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
       simply cannot help with the allocator-aware requirements. All of the allocator-aware
       requirements but 3 are special members and constructors. A <a href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern" target="_top">CRTP</a>
       base template is unable to provide those, based on the language rules. That
@@ -145,7 +145,7 @@
     </p>
 <p>
       Most of the difficulty of dealing with allocators has to do with the implementation
-      details of their use within your container. <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm8493.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
+      details of their use within your container. <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/sequence_container_idm9968.html" title="Struct template sequence_container_interface">sequence_container_interface</a></code>
       provides missing elements of a sequence container's interface, by calling user-provided
       members of that same interface. It cannot help you with your container's implementation.
     </p>
@@ -160,7 +160,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../boost/stl_interfaces/v2/view_interface.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a>
+<a accesskey="p" href="../boost/stl_interfaces/operator___idm11338.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a>
 </div>
 </body>
 </html>

@@ -93,6 +93,32 @@
       the iterator's <code class="computeroutput"><span class="identifier">difference_type</span></code>.
       Don't be a weirdo; just leave this as the default type, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ptrdiff_t</span></code>.
     </p>
+<h4>
+<a name="boost_stlinterfaces.tutorial___iterator_interface_.h1"></a>
+      <span class="phrase"><a name="boost_stlinterfaces.tutorial___iterator_interface_.proxy_iterators"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces.tutorial___iterator_interface_.proxy_iterators">Proxy
+      Iterators</a>
+    </h4>
+<p>
+      Sometimes you need to create an iterator <code class="computeroutput"><span class="identifier">I</span></code>
+      such that <code class="computeroutput"><span class="identifier">I</span><span class="special">::</span><span class="identifier">reference_type</span></code> is not a (possibly <code class="computeroutput"><span class="keyword">const</span></code>) reference to <code class="computeroutput"><span class="identifier">I</span><span class="special">::</span><span class="identifier">value_type</span></code>.
+      For instance, let's say you want to make a zip-iterator that produces pairs
+      of values from two separate underlying sequences. For sequences <code class="computeroutput"><span class="identifier">A</span></code> and <code class="computeroutput"><span class="identifier">B</span></code>,
+      with respective <code class="computeroutput"><span class="identifier">value_type</span></code>s
+      <code class="computeroutput"><span class="identifier">T</span></code> and <code class="computeroutput"><span class="identifier">U</span></code>,
+      one possible <code class="computeroutput"><span class="identifier">reference_type</span></code>
+      for a zip iterator would be <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">T</span> <span class="special">&amp;,</span> <span class="identifier">U</span> <span class="special">&amp;&gt;</span></code>
+      (this is distinct from a reference to a pair, such as <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">,</span> <span class="identifier">U</span><span class="special">&gt;</span> <span class="special">&amp;</span></code>).
+      Each such pair would contain a reference to one element from <code class="computeroutput"><span class="identifier">A</span></code> and a reference to the corresponding element
+      from <code class="computeroutput"><span class="identifier">B</span></code>.
+    </p>
+<p>
+      As another example, if you wanted an iterator <code class="computeroutput"><span class="identifier">I</span></code>
+      that represents the infinite sequence 0, 1, 2, ..., you'd be unable to form
+      a reference to most or all of those values; you'd instead produce a temporary
+      for each value as it is needed. This implies that <code class="computeroutput"><span class="identifier">I</span><span class="special">::</span><span class="identifier">value_type</span></code>
+      does not involve references at all; it may instead by <code class="computeroutput"><span class="keyword">int</span></code>
+      or <code class="computeroutput"><span class="keyword">double</span></code>.
+    </p>
 <p>
       When defining a proxy iterator, you can use a template alias that provides
       reasonable defaults for <code class="computeroutput"><a class="link" href="../boost/stl_interfaces/v1/iterator_interface.html" title="Struct template iterator_interface">iterator_interface</a></code>'s parameters:
@@ -126,7 +152,7 @@
       </p></td></tr>
 </table></div>
 <h4>
-<a name="boost_stlinterfaces.tutorial___iterator_interface_.h1"></a>
+<a name="boost_stlinterfaces.tutorial___iterator_interface_.h2"></a>
       <span class="phrase"><a name="boost_stlinterfaces.tutorial___iterator_interface_.user_defined_iterator_operations"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces.tutorial___iterator_interface_.user_defined_iterator_operations">User-Defined
       Iterator Operations</a>
     </h4>
@@ -457,7 +483,7 @@
       </p></td></tr>
 </table></div>
 <h4>
-<a name="boost_stlinterfaces.tutorial___iterator_interface_.h2"></a>
+<a name="boost_stlinterfaces.tutorial___iterator_interface_.h3"></a>
       <span class="phrase"><a name="boost_stlinterfaces.tutorial___iterator_interface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces.tutorial___iterator_interface_.an_important_note_about__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code__and__code__phrase_role__keyword__operator__phrase__phrase_role__special________phrase___code_">An
       Important Note About <code class="computeroutput"><span class="keyword">operator</span><span class="special">++()</span></code> and <code class="computeroutput"><span class="keyword">operator</span><span class="special">--()</span></code></a>
     </h4>
@@ -507,7 +533,7 @@
       </p></td></tr>
 </table></div>
 <h4>
-<a name="boost_stlinterfaces.tutorial___iterator_interface_.h3"></a>
+<a name="boost_stlinterfaces.tutorial___iterator_interface_.h4"></a>
       <span class="phrase"><a name="boost_stlinterfaces.tutorial___iterator_interface_.putting_it_all_together"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces.tutorial___iterator_interface_.putting_it_all_together">Putting
       it All Together</a>
     </h4>
@@ -659,7 +685,7 @@
 <p>
     </p>
 <h4>
-<a name="boost_stlinterfaces.tutorial___iterator_interface_.h4"></a>
+<a name="boost_stlinterfaces.tutorial___iterator_interface_.h5"></a>
       <span class="phrase"><a name="boost_stlinterfaces.tutorial___iterator_interface_.what_about_adapting_an_existing_iterator_"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces.tutorial___iterator_interface_.what_about_adapting_an_existing_iterator_">What
       About Adapting an Existing Iterator?</a>
     </h4>
@@ -767,7 +793,7 @@
 <p>
     </p>
 <h4>
-<a name="boost_stlinterfaces.tutorial___iterator_interface_.h5"></a>
+<a name="boost_stlinterfaces.tutorial___iterator_interface_.h6"></a>
       <span class="phrase"><a name="boost_stlinterfaces.tutorial___iterator_interface_.checking_your_work"></a></span><a class="link" href="tutorial___iterator_interface_.html#boost_stlinterfaces.tutorial___iterator_interface_.checking_your_work">Checking
       Your Work</a>
     </h4>
@@ -807,7 +833,7 @@
     </p>
 <p>
       There's also a macro that can help you check that <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">iterator_traits</span></code>
-      is well-formed and provides the correct types. See <code class="computeroutput"><a class="link" href="../BOOST_STL_INTERFAC_idm8319.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
+      is well-formed and provides the correct types. See <code class="computeroutput"><a class="link" href="../BOOST_STL_INTERFAC_idm8971.html" title="Macro BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS">BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS</a></code>.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
