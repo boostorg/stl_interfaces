@@ -1,8 +1,8 @@
 {
-    "key": "iterator_facade",
-    "name": "iterator_facade",
+    "key": "stl_interfaces",
+    "name": "stl_interfaces",
     "authors": [ "T. Zachary Laine" ],
     "maintainers": [ "Zach Laine <whatwasthataddress -at- gmail.com>" ],
-    "description": "A C++14 and later CRTP template for defining iterators.",
+    "description": "C++14 and later CRTP templates for defining iterators, views, and containers.",
     "category": [ "Generic" ]
 }
