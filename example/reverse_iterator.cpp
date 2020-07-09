@@ -23,7 +23,7 @@ struct reverse_iterator
     : boost::stl_interfaces::iterator_interface<
           reverse_iterator<BidiIter>,
 #if 201703L < __cplusplus && defined(__cpp_lib_ranges)
-          typename std::iterator_traits<BidiIter>::iterator_concept,
+          boost::stl_interfaces::v2::detail::iter_concept_t<BidiIter>,
 #else
           typename std::iterator_traits<BidiIter>::iterator_category,
 #endif
