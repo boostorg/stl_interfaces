@@ -77,16 +77,16 @@ matrix:
               sources:
                 - ubuntu-toolchain-r-test
 
-        - env: GCC_VERSION=10 ASAN=off
-          os: linux
-          compiler: gcc-10
-          addons: &gcc10
-            apt:
-              packages:
-                - g++-10
-                - valgrind
-              sources:
-                - ubuntu-toolchain-r-test
+       # - env: GCC_VERSION=10 ASAN=off
+       #   os: linux
+       #   compiler: gcc-10
+       #   addons: &gcc10
+       #     apt:
+       #       packages:
+       #         - g++-10
+       #         - valgrind
+       #       sources:
+       #         - ubuntu-toolchain-r-test
 
 install:
     - export CHECKOUT_PATH=`pwd`;
