@@ -16,10 +16,10 @@ rule run_doxygen ( files * : name : expand ? )
 
     expand ?= <doxygen:param>EXPAND_ONLY_PREDEF=YES ;
 
-doxygen stl_interfaces_reference
-  :
-    $(files)
-  :
+    doxygen stl_interfaces_reference
+      :
+        $(files)
+      :
         <doxygen:param>EXTRACT_ALL=YES
         # note that there is no detail::unspecified -- this is a hack to get all
         # the SFINAE code out of the API docs.
@@ -37,7 +37,7 @@ doxygen stl_interfaces_reference
 
 }
 
-run_doxygen [ glob ../include/boost/stl_interfaces/*.hpp ] : "Reference" ;
+run_doxygen [ glob $(here)/../../../boost/stl_interfaces/*.hpp ] : "Reference" ;
 
 xml stl_interfaces
     :
