@@ -11,6 +11,8 @@ using doxygen ;
 using quickbook ;
 using boostbook ;
 
+path-constant here : . ;
+
 rule run_doxygen ( files * : name : expand ? )
 {
 
