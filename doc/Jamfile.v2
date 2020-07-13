@@ -6,7 +6,7 @@ import path ;
 import doxygen ;
 import quickbook ;
 
-using auto-index ;
+# using auto-index ;
 using doxygen ;
 using quickbook ;
 using boostbook ;
