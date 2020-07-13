@@ -107,3 +107,8 @@ install images : [ glob $(BOOST_ROOT)/doc/src/images/*.png ]
     : <location>html/images ;
 explicit css ;
 explicit images ;
+
+alias boostdoc : stl_interfaces ;
+explicit boostdoc ;
+alias boostrelease ;
+explicit boostrelease ;
