@@ -41,6 +41,12 @@ rule run_doxygen ( files * : name : expand ? )
 
 run_doxygen [ glob $(here)/../../../boost/stl_interfaces/*.hpp ] : "Reference" ;
 
+install images_standalone : [ glob *.png ] : <location>html/stl_interfaces/img ;
+explicit images_standalone ;
+
+install images_boostdoc : [ glob *.png ] : <location>../../../doc/html/stl_interfaces/img ;
+explicit images_boostdoc ;
+
 xml stl_interfaces
     :
         stl_interfaces.qbk
@@ -108,7 +114,7 @@ install images : [ glob $(BOOST_ROOT)/doc/src/images/*.png ]
 explicit css ;
 explicit images ;
 
-alias boostdoc : stl_interfaces ;
+alias boostdoc : stl_interfaces : : : <dependency>images_boostdoc ;
 explicit boostdoc ;
 alias boostrelease ;
 explicit boostrelease ;
