@@ -82,6 +82,8 @@ _IFaces_ should work with any conforming C++14 compiler.  It has been tested wit
 
 [endsect]
 
+[section Reference]
 [xinclude stl_interfaces_reference.xml]
+[endsect]
 
 [include rationale.qbk]
