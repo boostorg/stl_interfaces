@@ -19,7 +19,7 @@
 template<typename T, std::size_t N>
 struct array : boost::stl_interfaces::sequence_container_interface<
                    array<T, N>,
-                   boost::stl_interfaces::v1::element_layout::contiguous>
+                   boost::stl_interfaces::element_layout::contiguous>
 {
     using value_type = T;
     using pointer = T *;
@@ -52,7 +52,7 @@ struct array : boost::stl_interfaces::sequence_container_interface<
 
     using base_type = boost::stl_interfaces::sequence_container_interface<
         array<T, N>,
-        boost::stl_interfaces::v1::element_layout::contiguous>;
+        boost::stl_interfaces::element_layout::contiguous>;
     using base_type::begin;
     using base_type::end;
 
@@ -525,10 +525,7 @@ using insert_il_t = decltype(std::declval<Container &>().insert(
 static_assert(ill_formed<lvalue_insert_t, arr_type>::value, "");
 static_assert(ill_formed<rvalue_insert_t, arr_type>::value, "");
 
-// TODO: Broken in v1.  Adding the proper constraint ICE's GCC 8, or
-// infinitely recurses within the compiler for GCC and Clang, depending on the
-// constraint technique used.
-#if 0
+#if defined(__cpp_lib_concepts)
 static_assert(ill_formed<insert_n_t, arr_type>::value, "");
 #endif
 

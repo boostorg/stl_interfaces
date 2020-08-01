@@ -185,7 +185,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
+            boost::stl_interfaces::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -193,7 +193,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+            boost::stl_interfaces::element_layout::discontiguous> const>::
         value,
     "");
 
@@ -206,7 +206,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
+            boost::stl_interfaces::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -214,7 +214,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+            boost::stl_interfaces::element_layout::discontiguous> const>::
         value,
     "");
 
@@ -227,7 +227,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
+            boost::stl_interfaces::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -235,7 +235,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+            boost::stl_interfaces::element_layout::discontiguous> const>::
         value,
     "");
 
@@ -248,7 +248,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous>>::value,
+            boost::stl_interfaces::element_layout::discontiguous>>::value,
     "");
 static_assert(
     ill_formed<
@@ -256,7 +256,7 @@ static_assert(
         subrange<
             basic_input_iter,
             basic_input_iter,
-            boost::stl_interfaces::v1::element_layout::discontiguous> const>::
+            boost::stl_interfaces::element_layout::discontiguous> const>::
         value,
     "");
 
@@ -375,10 +375,10 @@ int main()
     basic_input_iter first(ints.data());
     basic_input_iter last(ints.data() + ints.size());
 
-    auto r = range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+    auto r = range<boost::stl_interfaces::element_layout::discontiguous>(
         first, last);
     auto empty =
-        range<boost::stl_interfaces::v1::element_layout::discontiguous>(
+        range<boost::stl_interfaces::element_layout::discontiguous>(
             first, first);
 
     // range begin/end
@@ -388,31 +388,6 @@ int main()
         BOOST_TEST(ints_copy == ints);
 
         BOOST_TEST(empty.begin() == empty.end());
-    }
-
-    // empty/op bool
-    {
-        BOOST_TEST(!r.empty());
-        BOOST_TEST(r);
-
-        BOOST_TEST(empty.empty());
-        BOOST_TEST(!empty);
-
-        auto const cr = r;
-        BOOST_TEST(!cr.empty());
-        BOOST_TEST(cr);
-
-        auto const cempty = empty;
-        BOOST_TEST(cempty.empty());
-        BOOST_TEST(!cempty);
-    }
-
-    // front/back
-    {
-        BOOST_TEST(r.front() == 0);
-
-        auto const cr = r;
-        BOOST_TEST(cr.front() == 0);
     }
 }
 
