@@ -914,7 +914,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
       template<typename C = D>
         constexpr void erase(C::const_iterator position)
           requires requires { derived().erase(position, std::ranges::next(position)); } {
-            return derived().erase(position, std::ranges::next(position));
+            derived().erase(position, std::ranges::next(position));
           }
 
       template<std::input_iterator Iter, typename C = D>
@@ -987,13 +987,36 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
           requires { std::ranges::equal(lhs, rhs); } {
             return lhs.size() == rhs.size() && std::ranges::equal(lhs, rhs);
           }
-      template<typename C = D>
-        friend constexpr std::compare_three_way_result_t<std::ranges::range_reference_t<const C>>
-          operator<=>(const C& lhs, const C& rhs)
-          requires std::three_way_comparable<std::ranges::range_reference_t<const C>> {
-            return std::lexicographical_compare_three_way(lhs.begin(), lhs.end(),
-                                                          rhs.begin(), rhs.end());
+#if 0 // TODO: This appears to work, but as of this writing (and using GCC
+      // 10), op<=> is not yet being used to evaluate op==, op<, etc.
+      friend constexpr std::compare_three_way_result_t<std::ranges::range_reference_t<const D>>
+        operator<=>(const D& lhs, const D& rhs)
+        requires std::three_way_comparable<std::ranges::range_reference_t<const D>> {
+          return std::lexicographical_compare_three_way(lhs.begin(), lhs.end(),
+                                                        rhs.begin(), rhs.end());
+        }
+#else
+      friend constexpr bool operator!=(const D& lhs, const D& rhs)
+        requires requires { lhs == rhs; } {
+          return !(lhs == rhs);
+        }
+      friend constexpr bool operator<(D lhs, D rhs)
+        requires std::totally_ordered<std::ranges::range_reference_t<D>> {
+          return std::ranges::lexicographical_compare(lhs, rhs);
+        }
+      friend constexpr bool operator<=(D lhs, D rhs)
+        requires std::totally_ordered<std::ranges::range_reference_t<D>> {
+            return lhs == rhs || lhs < rhs;
           }
+      friend constexpr bool operator>(D lhs, D rhs)
+        requires std::totally_ordered<std::ranges::range_reference_t<D>> {
+          return !(lhs <= rhs);
+        }
+      friend constexpr bool operator>=(D lhs, D rhs)
+        requires std::totally_ordered<std::ranges::range_reference_t<D>> {
+            return rhs <= lhs;
+          }
+#endif
     };
 
     // clang-format on
