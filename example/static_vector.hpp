@@ -59,10 +59,9 @@ struct static_vector : sequence_container_interface<
     // construct/copy/destroy (9 members, skipped 2)
     //
     // Constructors and special member functions all must be user-provided.
-    // Were they provided by sequence_container_interface, everything would break, due
-    // to the language rules related to them.  However, assignment from
-    // std::initializer_list and the destructor can come from
-    // sequence_container_interface.
+    // Were they provided by sequence_container_interface, everything would
+    // break, due to the language rules related to them.  However, assignment
+    // from std::initializer_list can come from sequence_container_interface.
     static_vector() noexcept : size_(0) {}
     explicit static_vector(size_type n) : size_(0) { resize(n); }
     explicit static_vector(size_type n, T const & x) : size_(0)
