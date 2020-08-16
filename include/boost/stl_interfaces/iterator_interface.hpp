@@ -46,7 +46,7 @@ namespace boost { namespace stl_interfaces {
         this template implies a copy or move of the underlying object of type
         `T`. */
     template<typename T>
-#if defined(BOOST_STL_INTERFACES_DOXYGEN) || defined(__cpp_lib_concepts)
+#if defined(BOOST_STL_INTERFACES_DOXYGEN) || BOOST_STL_INTERFACES_USE_CONCEPTS
     // clang-format off
         requires std::is_object_v<T>
 #endif
@@ -546,7 +546,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V1 {
 
 }}}
 
-#if defined(BOOST_STL_INTERFACES_DOXYGEN) || defined(__cpp_lib_concepts)
+#if defined(BOOST_STL_INTERFACES_DOXYGEN) || BOOST_STL_INTERFACES_USE_CONCEPTS
 
 namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
 
@@ -893,7 +893,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
             diff_t>::value,                                                    \
         "");
 
-#if defined(__cpp_lib_concepts)
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
 #define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(                    \
     iter, category, concept, value_type, reference, pointer, difference_type)  \
     static_assert(                                                             \

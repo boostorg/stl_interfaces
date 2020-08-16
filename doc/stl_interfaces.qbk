@@ -61,6 +61,7 @@
 
 [def _concept_m_           [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT]]
 [def _traits_m_            [macroref BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS]]
+[def _disable_concepts_m_  [macroref BOOST_STL_INTERFACES_DISABLE_CONCEPTS]]
 
 [def _CRTP_                [@https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern CRTP]]
 [def _Iterator_            [@https://www.boost.org/doc/libs/release/libs/iterator Boost.Iterator]]

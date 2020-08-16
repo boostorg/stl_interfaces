@@ -63,7 +63,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V1 {
     struct reverse_iterator
         : iterator_interface<
               reverse_iterator<BidiIter>,
-#if defined(__cpp_lib_concepts)
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
               typename boost::stl_interfaces::v2::v2_dtl::iter_concept_t<
                   BidiIter>,
 #else
@@ -170,7 +170,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V1 {
 }}}
 
 
-#if defined(BOOST_STL_INTERFACES_DOXYGEN) || defined(__cpp_lib_concepts)
+#if defined(BOOST_STL_INTERFACES_DOXYGEN) || BOOST_STL_INTERFACES_USE_CONCEPTS
 
 namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
 
