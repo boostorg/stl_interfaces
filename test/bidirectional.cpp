@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <numeric>
 #include <list>
 #include <type_traits>
