@@ -4,5 +4,6 @@
     "authors": [ "T. Zachary Laine" ],
     "maintainers": [ "Zach Laine <whatwasthataddress -at- gmail.com>" ],
     "description": "C++14 and later CRTP templates for defining iterators, views, and containers.",
-    "category": [ "Generic" ]
+    "category": [ "Generic" ],
+    "cxxstd": "14"
 }
