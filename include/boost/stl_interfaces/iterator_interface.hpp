@@ -865,7 +865,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
     type, concept_name)                                                        \
     static_assert(concept_name<type>, "");
 
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
+#define BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(iter, concept_name)         \
+    BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_CONCEPT_IMPL(iter, concept_name)
+#else
 #define BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(iter, concept_name)
+#endif
 
 #define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(               \
     iter, category, value_t, ref, ptr, diff_t)                                 \

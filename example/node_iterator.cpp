@@ -60,7 +60,8 @@ private:
 //[ node_iterator_concept_check Equivalent to
 // static_assert(std::forward_iterator<node_iterator>, ""), or nothing in
 // C++17 and earlier.
-BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(node_iterator, std::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    node_iterator<int>, std::forward_iterator)
 //]
 
 
