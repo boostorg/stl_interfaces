@@ -297,7 +297,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V1 {
         template<typename D = Derived>
         constexpr auto pop_back() noexcept -> decltype(
             std::declval<D &>().emplace_back(
-                std::declval<typename D::value_type &>()),
+                std::declval<typename D::value_type>()),
             (void)std::declval<D &>().erase(
                 std::prev(std::declval<D &>().end())))
         {
@@ -806,8 +806,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
           }
       constexpr void pop_back() noexcept
         requires std::ranges::bidirectional_range<D> && std::ranges::common_range<D> &&
-          requires (const std::ranges::range_value_t<D>& x, std::ranges::iterator_t<D> position) {
-            derived().emplace_back(x);
+          requires (std::ranges::range_value_t<D> x, std::ranges::iterator_t<D> position) {
+          derived().emplace_back(std::move(x));
             derived().erase(position);
           } {
             return derived().erase(std::ranges::prev(std::ranges::end(derived())));

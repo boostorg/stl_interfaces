@@ -43,3 +43,13 @@ add_test_executable(detail)
 add_test_executable(static_vec)
 add_test_executable(static_vec_noncopyable)
 add_test_executable(array)
+
+add_executable(
+    compile_tests
+    compile_tests_main.cpp
+    compile_seq_cont_rvalue_constrained_pop_back.cpp
+)
+target_link_libraries(compile_tests stl_interfaces)
+if (clang_on_linux)
+    target_link_libraries(compile_tests c++)
+endif ()
