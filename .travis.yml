@@ -40,7 +40,6 @@ matrix:
             apt:
               packages:
                 - g++-6
-                - valgrind
               sources:
                 - ubuntu-toolchain-r-test
 
@@ -51,7 +50,6 @@ matrix:
             apt:
               packages:
                 - g++-7
-                - valgrind
               sources:
                 - ubuntu-toolchain-r-test
 
@@ -62,7 +60,6 @@ matrix:
             apt:
               packages:
                 - g++-8
-                - valgrind
               sources:
                 - ubuntu-toolchain-r-test
 
@@ -73,20 +70,18 @@ matrix:
             apt:
               packages:
                 - g++-9
-                - valgrind
               sources:
                 - ubuntu-toolchain-r-test
 
-       # - env: GCC_VERSION=10 ASAN=off
-       #   os: linux
-       #   compiler: gcc-10
-       #   addons: &gcc10
-       #     apt:
-       #       packages:
-       #         - g++-10
-       #         - valgrind
-       #       sources:
-       #         - ubuntu-toolchain-r-test
+        - env: GCC_VERSION=10 ASAN=off
+          os: linux
+          compiler: gcc-10
+          addons: &gcc10
+            apt:
+              packages:
+                - g++-10
+              sources:
+                - ubuntu-toolchain-r-test
 
 install:
     - export CHECKOUT_PATH=`pwd`;
