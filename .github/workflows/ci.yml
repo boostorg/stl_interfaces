@@ -21,7 +21,7 @@ jobs:
             buildtype: "boost"
             packages: "g++-6 valgrind"
             packages_to_remove: ""
-            os: "ubuntu-16.04"
+            os: "ubuntu-20.04"
             container: "ubuntu:14.04"
             cxx: "gcc-6"
             sources: ""
@@ -33,7 +33,8 @@ jobs:
             buildtype: "boost"
             packages: "g++-7 valgrind"
             packages_to_remove: ""
-            os: "ubuntu-16.04"
+            os: "ubuntu-20.04"
+            container: "ubuntu:16.04"
             cxx: "gcc-7"
             sources: ""
             llvm_os: ""
@@ -44,7 +45,8 @@ jobs:
             buildtype: "boost"
             packages: "g++-8 valgrind"
             packages_to_remove: ""
-            os: "ubuntu-16.04"
+            os: "ubuntu-20.04"
+            container: "ubuntu:16.04"
             cxx: "gcc-8"
             sources: ""
             llvm_os: ""
@@ -55,7 +57,8 @@ jobs:
             buildtype: "boost"
             packages: "g++-9 valgrind"
             packages_to_remove: ""
-            os: "ubuntu-16.04"
+            os: "ubuntu-20.04"
+            container: "ubuntu:16.04"
             cxx: "gcc-9"
             sources: ""
             llvm_os: ""
@@ -73,10 +76,12 @@ jobs:
       - name: If running in container, upgrade packages
         if: matrix.container != ''
         run: |
-            sudo apt-get -o Acquire::Retries=3 update && DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata && apt-get -o Acquire::Retries=3 install -y sudo software-properties-common wget curl apt-transport-https make apt-file sudo unzip libssl-dev build-essential autotools-dev autoconf automake g++ libc++-helpers python python-pip ruby cpio gcc-multilib g++-multilib pkgconf python3 python3-pip ccache libpython-dev
+            apt-get -o Acquire::Retries=3 update && DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata && apt-get -o Acquire::Retries=3 install -y sudo software-properties-common wget curl apt-transport-https make apt-file sudo unzip libssl-dev build-essential autotools-dev autoconf automake g++ libc++-helpers python ruby cpio gcc-multilib g++-multilib pkgconf python3 ccache libpython-dev
             sudo apt-add-repository ppa:git-core/ppa
             sudo apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 -y install git
-            sudo python -m pip install --upgrade pip==20.3.4
+            python_version=$(python3 -c 'import sys; print("{0.major}.{0.minor}".format(sys.version_info))')
+            sudo wget https://bootstrap.pypa.io/pip/$python_version/get-pip.py
+            sudo python3 get-pip.py
             sudo /usr/local/bin/pip install cmake
 
       - uses: actions/checkout@v2
@@ -173,10 +178,11 @@ jobs:
               build_dir="build-$build_type-asan-$asan_type"
               mkdir $build_dir
               cd $build_dir
-              if [[ "$asan_type" == "true" ]]; then 
-                CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
+              BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
+              if [[ "$asan_type" == "true" ]]; then
+                CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_BRANCH=$BOOST_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
               else
-                cmake -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
+                cmake -DBOOST_BRANCH=$BOOST_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
               fi
               VERBOSE=1 make -j4 && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=4 ASAN_OPTIONS=alloc_dealloc_mismatch=0 make check
               if [ $? -ne 0 ]
@@ -326,10 +332,11 @@ jobs:
               build_dir="build-$build_type-asan-$asan_type"
               mkdir $build_dir
               cd $build_dir
-              if [[ "$asan_type" == "true" ]]; then 
-                CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
+              BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
+              if [[ "$asan_type" == "true" ]]; then
+                CXXFLAGS="$CXXFLAGS" cmake -DUSE_ASAN=true -DBOOST_BRANCH=$BOOST_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
               else
-                cmake -DBOOST_BRANCH=$TRAVIS_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
+                cmake -DBOOST_BRANCH=$BOOST_BRANCH -DCMAKE_BUILD_TYPE=$build_type ..
               fi
               VERBOSE=1 make -j4 && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=4 ASAN_OPTIONS=alloc_dealloc_mismatch=0 make check
               if [ $? -ne 0 ]
