@@ -914,10 +914,11 @@ int main()
         BOOST_TEST(!cempty);
     }
 
-    // TODO: Disabled for now, because std::to_address() appears to be broken
-    // in GCC10, which breaks the contiguous_iterator concept.
+    // Before LWG 3545 (Reimplement pointer_traits to be SFINAE-friendly),
+    // GCC's std::to_address() breaks the contiguous_iterator concept.
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96416
-#if !defined(__cpp_lib_concepts)
+#if !defined(__cpp_lib_concepts) ||                                            \
+    defined(__GNUC__) && __GNUC__ >= 11 && __GNUC_MINOR__ >= 3
     // data
     {
         BOOST_TEST(r.data() != nullptr);
