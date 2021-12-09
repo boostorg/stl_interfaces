@@ -912,7 +912,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
             }
 
       template<typename C = D>
-        constexpr void erase(C::const_iterator position)
+        constexpr void erase(typename C::const_iterator position)
           requires requires { derived().erase(position, std::ranges::next(position)); } {
             derived().erase(position, std::ranges::next(position));
           }
