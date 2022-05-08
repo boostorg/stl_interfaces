@@ -857,7 +857,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
     `iterator_interface` has the correct iterator traits.
 
     For example: `BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(my_iter,
-    std::input_iterator_tag, std::input_iterator_tag, int, int &, int *, std::ptrdiff_t)`.
+    std::input_iterator_tag, std::input_iterator, int, int &, int *, std::ptrdiff_t)`.
 
     \note This macro ignores the `concept` parameter when `__cpp_lib_concepts`
     is not defined. */
