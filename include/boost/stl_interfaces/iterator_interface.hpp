@@ -703,13 +703,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         ++derived();
         return retval;
       }
-      constexpr auto operator++(int)
-	requires
-	  requires (D d) { ++access::base(d); } && (!requires (D d) { ++d; }) {
-            D retval = derived();
-            ++access::base(derived());
-            return retval;
-          }
       constexpr decltype(auto) operator+=(difference_type n)
         requires requires (D d) { access::base(d) += n; } {
           access::base(derived()) += n;
@@ -739,13 +732,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         --derived();
         return retval;
       }
-      constexpr auto operator--(int)
-	requires
-	  requires (D d) { --access::base(d); } && (!requires (D d) { --d; }) {
-            D retval = derived();
-            --access::base(derived());
-            return retval;
-          }
       constexpr decltype(auto) operator-=(difference_type n)
         requires requires (D d) { d += -n; } {
           return derived() += -n;
