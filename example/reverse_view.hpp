@@ -10,7 +10,7 @@
 namespace detail {
     //[ reverse_view_defn
     // We need to treat iterator/sentinel pairs differently from iterator
-    // pairs (a.k.a. "common ranges").  If the iterator and sentinel are
+    // pairs (a.k.a. common_ranges).  If the iterator and sentinel are
     // different types, we need to advance the iterator to the end of the
     // range before we can move through the range in reverse.
     template<bool CommonRange>
@@ -118,11 +118,9 @@ namespace detail {
 
 #if defined(__cpp_deduction_guides)
 //[ reverse_defn
-
-// Just as with all_view, we can use the closure template to make it easier to
-// adapt detail::reverse_view.  Here, we want to condition how we construct
-// our view based on whether or not R is already a reverse_view.  If R is a
-// reverse_view, just return the view it's reversing.
+// We want to condition how we construct our view based on whether or not R is
+// already a reverse_view.  If R is a reverse_view, just return the view it's
+// reversing.
 //
 // In C++20 and later, you might want to constrain this lambda to require that
 // R is a std::ranges::view, since that's what reverse_view requires.

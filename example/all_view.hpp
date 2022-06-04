@@ -32,7 +32,7 @@ namespace detail {
     //[ all_view_defn
     // This type allows us to implement a simplified version of the
     // std::views::all range adaptor for pre-C++20 builds.  Instead of
-    // producing differernt kinds of ranges based on whether R is a
+    // producing different kinds of ranges based on whether R is a
     // std::ranges::view, or would be better represented as a
     // std::ranges::ref_view or std::ranges::owning_view, it just grabs
     // begin() and end() out of R.  It also uses member-begin() and -end(), so
@@ -47,7 +47,7 @@ namespace detail {
     // We're putting the view in a detail namespace, because we don't expect
     // users to use our view directly; they should use the associated view
     // adaptor instead.  If you also want users to directly construct your
-    // view-type, don't do this.
+    // view-type, you would move it out of detail::.
     //
     // If you want to make views and view adaptors that will work with
     // pre-C++20 code, and then provide concept constraints in C++20 and
@@ -71,8 +71,8 @@ namespace detail {
 
         // Here, we want a constructor that takes a forwarding reference, so
         // we introduce a new template parameter R2, and constrain it to be
-        // the same as R.  The int parameter is there to prevent gettin in the
-        // way of the special member functions like the copy constructor.
+        // the same as R.  The int parameter is there to prevent getting in
+        // the way of the special member functions like the copy constructor.
         // Since we don't want users directly constructing this type anyway,
         // the un-ideal ergonomics of this extra int don't matter.
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
@@ -103,8 +103,8 @@ namespace detail {
 
     //[all_impl_defn
     // For C++20 views, there is usually some type like this.  This type
-    // implements the functions that construct our view.  A CPO will follow
-    // that uses this implementation.  We need to inherit from
+    // implements the functions that construct our view.  An invocable object
+    // will follow that uses this implementation.  We need to inherit from
     // range_adaptor_closure to make our view adaptor compatible with other
     // view adaptors using the operator| "pipe" syntax.
     struct all_impl : boost::stl_interfaces::range_adaptor_closure<all_impl>
@@ -126,7 +126,7 @@ namespace detail {
 }
 
 //[ old_all_defn
-// Here we create the actual CPO that the user will call.  It is just a
+// Here we create the actual invocable that the user will call.  It is just a
 // constexpr all_impl variable.  Before C++17, you need to put it in an
 // anonymous namespace to avoid violating the ODR. With this in scope, the
 // user has everything necessary to use all().  I called it old_all(), because

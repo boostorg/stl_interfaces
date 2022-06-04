@@ -951,3 +951,128 @@ There's nothing much to document about it; it works just like
 `std::reverse_iterator`.
 
 [endsect]
+
+[section Tutorial: View Adaptors]
+
+C++20 introduced views and view adaptors.  The adaptors have a nice "pipe"
+syntax, like:
+
+    for (auto x : range | std::views::reverse | std::views::take(10)) {
+        // Here, we get the last 10 values of range, in reverse order.
+    }
+
+However, the C++20 standard provides you no help in making your own views and
+view adaptors that work this way.  C++23 introduces
+`std::range_adaptor_closure`, a base type that allows your view adaptors and
+`std` view adaptors to interoperate in pipe expressions.
+
+_IFaces_ provides a type `boost::stl_interfaces::range_adaptor_closure` that
+is defined to be a work-alike of `std::range_adaptor_closure` in pre-C++23
+builds, and is an alias for `std::range_adaptor_closure` in C++23 and later.
+
+[note For GCC 12, it was necessary to make
+`boost::stl_interfaces::range_adaptor_closure` an alias for
+`std::views::__adaptor::_RangeAdaptorClosure`.  This is necessary because all
+the `std` views will only combine with views derived from
+`std::views::__adaptor::_RangeAdaptorClosure`.  Even naming a namespace that
+contains `__` is technically UB.  I do not expect you to encounter any real
+problems if you use `boost::stl_interfaces::range_adaptor_closure` with GCC
+12, but I thought you should know. ]
+
+[heading Example: `all()`]
+
+Let's take a look at a very simple view adaptor, `all()`.  `all()` is a
+simplified version of `std::views::all()` that only works with lvalues.
+
+First, we need a small amount of C++20 backported for use in earlier build
+modes:
+
+[iterator_sentinel_t_defn]
+
+Here is the view type itself:
+
+[all_view_defn]
+
+If we want to make our view adaptor in the style of the standard library, we
+need an impl-`struct`:
+
+[all_impl_defn]
+
+... followed by an invocable object:
+
+[old_all_defn]
+
+With these definitions, we can use `all()` with the standard range adaptors:
+
+    for (auto x : old_all(range) | std::views::reverse) {
+        // etc.
+    }
+
+However, _IFaces_ provides a simpler facility, based on the example in _P2387_:
+
+[all_defn]
+
+This does everything that `all_impl` and `old_all` (combined) do above, but
+with a lot less typing.  From here on, we'll use
+`boost::stl_interfaces::closure` instead of the more verbose technique.
+
+Finally, we should make sure `all_view` is treated as a borrowed range:
+
+[all_enable_borrowed_range]
+
+[heading Example: `reverse()`]
+
+`reverse()` is more interesting than `all()`, in that it does something more
+useful than simple adaptation.  It is still very simple; all it does is
+provide a reversed view of a given view.  Here is its definition:
+
+[reverse_view_defn]
+
+As with `all()`, we define a `closure` object `reverse` that we can invoke:
+
+[reverse_defn]
+
+And again, we do this:
+
+[reverse_enable_borrowed_range]
+
+Now that we have `all()` and `reverse()`, we can write this:
+
+    for (auto x : all(range) | reverse) {
+        // etc.
+    }
+
+Since everythinge is `std`-compatible, we can also write:
+
+    for (auto x : all(range) | reverse | std::views::reverse) {
+        // etc.
+    }
+
+Unfortunately, `reverse` and `std::views::reverse` know nothing about one
+another, so `all(range) | reverse | std::views::reverse` does not reduce to
+`all(range)` as both `all(range) | reverse | reverse` and `all(range) |
+std::views::reverse | std::views::reverse` do.
+
+[heading Example: `take()`]
+
+`take_view` is a little different from the previous two views, in that it
+takes more than just a range to construct it.  Any time a view takes more than
+just a range to construct, it is usually nice to use it with all the
+parameters besides the view itself.  For instance, you might want to use take
+as `v | take(42)`, or as `take(v, 42)` (more on this below).  Here is our
+definition of `take_view`:
+
+[take_view_defn]
+
+Now we need an invocable for users to call.  Instead of using `closure`, we
+use `adaptor`:
+
+[take_defn]
+
+[endsect]
+
+[section Tutorial: More Complicated View Adaptors]
+
+TODO: Discuss when/why you might need to use `closure(bind_back(...)`.
+
+[endsect]

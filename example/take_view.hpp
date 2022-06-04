@@ -50,7 +50,7 @@ namespace detail {
     };
 
     // This sentinel compares equal to any take_iterator whose count has
-    // reached zero.
+    // reached zero, or the end of the underlying range if that comes first.
     template<typename Sentinel>
     struct take_sentinel
     {
@@ -75,7 +75,7 @@ namespace detail {
     };
 
     // The take_iterator and take_sentinel templates do all the hard work,
-    // which keeps take_view quie simple.
+    // which leaves take_view quite simple.
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
     template<std::ranges::view View>
     requires std::is_object_v<View>
@@ -113,7 +113,6 @@ namespace detail {
         sentinel last_;
     };
 
-    // This just makes out implementations below a bit easier to write.
 #if defined(__cpp_deduction_guides)
     template<typename R>
     take_view(R &&, int)->detail::take_view<std::remove_reference_t<R>>;
@@ -123,7 +122,6 @@ namespace detail {
 
 #if defined(__cpp_deduction_guides)
 //[ take_defn
-
 // Use the adaptor template to support calling the given lambda with either
 // all the parameters or all the parameters after the first.
 inline constexpr boost::stl_interfaces::adaptor take =
