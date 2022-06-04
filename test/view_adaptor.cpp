@@ -70,6 +70,117 @@
             }
         };
 
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
+        template<typename R>
+        requires std::is_object_v<R>
+#else
+        template<
+            typename R,
+            typename Enable = std::enable_if_t<std::is_object<R>::value>>
+#endif
+        struct take_view : boost::stl_interfaces::view_interface<take_view<R>>
+        {
+            template<typename Iter>
+            struct counted_iterator
+                : boost::stl_interfaces::iterator_interface<
+                      counted_iterator<Iter>,
+                      std::forward_iterator_tag,
+                      typename std::iterator_traits<Iter>::value_type,
+                      typename std::iterator_traits<Iter>::reference,
+                      typename std::iterator_traits<Iter>::pointer,
+                      typename std::iterator_traits<Iter>::difference_type>
+            {
+                constexpr counted_iterator() = default;
+                constexpr explicit counted_iterator(Iter it, int n) :
+                    it_(std::move(it)), n_(n)
+                {}
+
+                constexpr Iter base() const { return it_; }
+                constexpr int count() const { return n_; }
+
+                constexpr counted_iterator & operator++()
+                {
+                    ++it_;
+                    --n_;
+                    return *this;
+                }
+
+            private:
+                friend boost::stl_interfaces::access;
+                constexpr Iter & base_reference() { return it_; }
+                constexpr Iter const & base_reference() const { return it_; }
+
+                template<typename Iter2>
+                friend struct counted_iterator;
+
+                Iter it_;
+                int n_;
+            };
+
+            template<typename Sentinel>
+            struct counted_sentinel
+            {
+                counted_sentinel() = default;
+                explicit counted_sentinel(Sentinel sent) : sent_(sent) {}
+
+                template<typename Iter>
+                friend constexpr bool
+                operator==(counted_iterator<Iter> it, counted_sentinel s)
+                {
+                    return !it.count() || it.base() == s.sent_;
+                }
+                template<typename Iter>
+                friend constexpr bool
+                operator!=(counted_iterator<Iter> it, counted_sentinel s)
+                {
+                    return !(it == s);
+                }
+
+            private:
+                Sentinel sent_;
+            };
+
+            using iterator = counted_iterator<iterator_t<R>>;
+            using sentinel = counted_sentinel<sentinel_t<R>>;
+
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
+            template<typename R2>
+            requires std::is_same_v<std::remove_reference_t<R2>, R>
+#else
+            template<
+                typename R2,
+                typename E = std::enable_if_t<
+                    std::is_same<std::remove_reference_t<R2>, R>::value>>
+#endif
+            explicit take_view(R2 && r, int n) :
+                first_(r.begin(), n), last_(r.end())
+            {}
+
+            iterator begin() const { return first_; }
+            sentinel end() const { return last_; }
+
+        private:
+            iterator first_;
+            sentinel last_;
+        };
+
+        struct take_impl
+        {
+            template<typename R>
+            constexpr auto operator()(R && r, int n) const
+            {
+                return take_view<std::remove_reference_t<R>>((R &&) r, n);
+            }
+
+            constexpr auto operator()(int n) const
+            {
+                using closure_func_type =
+                    decltype(boost::stl_interfaces::bind_back(*this, n));
+                return boost::stl_interfaces::closure<closure_func_type>(
+                    boost::stl_interfaces::bind_back(*this, n));
+            }
+        };
+
         template<bool CommonRange>
         struct set_rev_rng_first
         {
@@ -181,26 +292,6 @@
         };
     }
 
-#if defined(__cpp_inline_variables)
-    /** A simplified version of the `std::views::all` range adaptor for
-        pre-C++20 builds.  Prefer `std::views::all` if you have it. */
-    inline constexpr detail::all_impl all;
-#else
-    namespace {
-        constexpr detail::all_impl all;
-    }
-#endif
-
-#if defined(__cpp_inline_variables)
-    /** A simplified version of the `std::views::reverse` range adaptor for
-        pre-C++20 builds.  Prefer `std::views::reverse` if you have it. */
-    inline constexpr detail::reverse_impl reverse;
-#else
-    namespace {
-        constexpr detail::reverse_impl reverse;
-    }
-#endif
-
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
 
 namespace std::ranges {
@@ -214,9 +305,55 @@ namespace std::ranges {
 
 #endif
 
+#if defined(__cpp_inline_variables)
+/** A simplified version of the `std::views::all` range adaptor for
+    pre-C++20 builds.  Prefer `std::views::all` if you have it. */
+inline constexpr detail::all_impl all;
+#else
+namespace {
+    constexpr detail::all_impl all;
+}
+#endif
+
+#if defined(__cpp_inline_variables)
+/** A simplified version of the `std::views::reverse` range adaptor for
+    pre-C++20 builds.  Prefer `std::views::reverse` if you have it. */
+inline constexpr detail::reverse_impl reverse;
+#else
+namespace {
+    constexpr detail::reverse_impl reverse;
+}
+#endif
+
+#if defined(__cpp_inline_variables)
+/** A simplified version of the `std::views::take` range adaptor for
+    pre-C++20 builds.  Prefer `std::views::take` if you have it. */
+inline constexpr detail::take_impl take;
+#else
+namespace {
+    constexpr detail::take_impl take;
+}
+#endif
+
+#if 201703L <= __cplusplus
+inline constexpr boost::stl_interfaces::closure all2 = []<typename R>(R && r) {
+    return detail::all_view<std::remove_reference_t<R>>(0, (R &&) r);
+};
+
+inline constexpr boost::stl_interfaces::closure reverse2 =
+    []<typename R>(R && r) {
+        return detail::reverse_view<std::remove_reference_t<R>>(0, (R &&) r);
+    };
+
+inline constexpr boost::stl_interfaces::adaptor take2 =
+    []<typename R>(R && r, int n) {
+        return detail::take_view<std::remove_reference_t<R>>((R &&) r, n);
+    };
+#endif
 
 int main()
 {
+    // non-closures
     {
         std::vector<int> vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
@@ -251,6 +388,91 @@ int main()
 
         BOOST_TEST(vec1 == vec2);
     }
+
+    // Mismatched begin and end; only test this in C++17 and later.
+#if 201703L <= __cplusplus
+    {
+        std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all(vec1) | take(3)) {
+            vec2.push_back(x);
+        }
+
+        BOOST_TEST(vec2 == (std::vector<int>{0, 1, 2}));
+    }
+
+    {
+        std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all(vec1) | reverse | take(3)) {
+            vec2.push_back(x);
+        }
+
+        BOOST_TEST(vec2 == (std::vector<int>{7, 6, 5}));
+    }
+#endif
+
+#if 201703L <= __cplusplus
+    // closures
+    {
+        std::vector<int> vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all2(vec1) | reverse2) {
+            vec2.push_back(x);
+        }
+
+        std::reverse(vec2.begin(), vec2.end());
+        BOOST_TEST(vec1 == vec2);
+    }
+
+    {
+        std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all2(vec1) | reverse2) {
+            vec2.push_back(x);
+        }
+
+        std::reverse(vec2.begin(), vec2.end());
+        BOOST_TEST(vec1 == vec2);
+    }
+
+    {
+        std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all2(vec1) | reverse2 | reverse2) {
+            vec2.push_back(x);
+        }
+
+        BOOST_TEST(vec1 == vec2);
+    }
+
+    {
+        std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all2(vec1) | take2(3)) {
+            vec2.push_back(x);
+        }
+
+        BOOST_TEST(vec2 == (std::vector<int>{0, 1, 2}));
+    }
+
+    {
+        std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all2(vec1) | reverse2 | take2(3)) {
+            vec2.push_back(x);
+        }
+
+        BOOST_TEST(vec2 == (std::vector<int>{7, 6, 5}));
+    }
+#endif
 
     return boost::report_errors();
 }

@@ -286,12 +286,7 @@ namespace boost { namespace stl_interfaces {
         constexpr adaptor(F f) : f_(f) {}
 
         // clang-format off
-#if BOOST_STL_INTERFACES_USE_CONCEPTS
         template<typename... Args>
-        requires std::invocable<F const &, Args...>
-#else
-        template<typename... Args>
-#endif
         constexpr auto operator()(Args &&... args) const
         // clang-format on
         {
