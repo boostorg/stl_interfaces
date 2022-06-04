@@ -351,7 +351,7 @@ std::array<std::tuple<int_t, int>, 10> udt_tuples = {{
 ////////////////////
 #include "view_tests.hpp"
 
-#if !defined(__cpp_lib_concepts)
+#if !BOOST_STL_INTERFACES_USE_CONCEPTS
 
 template<typename T>
 using data_t = decltype(std::declval<T>().data());
@@ -917,7 +917,7 @@ int main()
     // Before LWG 3545 (Reimplement pointer_traits to be SFINAE-friendly),
     // GCC's std::to_address() breaks the contiguous_iterator concept.
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96416
-#if !defined(__cpp_lib_concepts) ||                                            \
+#if !BOOST_STL_INTERFACES_USE_CONCEPTS ||                                      \
     defined(__GNUC__) && __GNUC__ >= 11 && __GNUC_MINOR__ >= 3
     // data
     {
