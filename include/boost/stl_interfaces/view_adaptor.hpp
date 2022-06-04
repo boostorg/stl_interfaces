@@ -223,6 +223,7 @@ namespace boost { namespace stl_interfaces {
 
 #endif
 
+    //[closure_defn
     /** An invocable consisting of a contained invocable `f`.  Calling
         `operator()` with some argument `t` calls `f(t)` and returns the
         result.  This type is typically used to capture a the result of a call
@@ -249,6 +250,7 @@ namespace boost { namespace stl_interfaces {
     private:
         F f_;
     };
+    //]
 
     namespace detail {
 #if !BOOST_STL_INTERFACES_USE_CONCEPTS
@@ -276,6 +278,7 @@ namespace boost { namespace stl_interfaces {
 #endif
     }
 
+    //[adaptor_defn
     /** Adapts an invocable `f` as a view adaptor.  Calling
         `operator(args...)` will either: call `f(args...)` and return the
         result, if `f(args...)` is well-formed; or return
@@ -308,6 +311,7 @@ namespace boost { namespace stl_interfaces {
     private:
         F f_;
     };
+    //]
 
 }}
 

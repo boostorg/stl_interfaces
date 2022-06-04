@@ -36,13 +36,16 @@
 
 [/ View Examples ]
 [import ../example/drop_while_view.cpp]
+[import ../example/all_view.hpp]
+[import ../example/reverse_view.hpp]
+[import ../example/take_view.hpp]
 
 [/ Container Examples ]
 [import ../example/static_vector.hpp]
 [import ../example/static_vector.cpp]
-[import ../example/all_view.hpp]
-[import ../example/reverse_view.hpp]
-[import ../example/take_view.hpp]
+
+[/ Structs ]
+[import ../include/boost/stl_interfaces/view_adaptor.hpp]
 
 [/ Images ]
 

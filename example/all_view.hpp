@@ -145,8 +145,8 @@ namespace {
 // This is the preferred way to make a view adaptor.  We can use a simple
 // template called closure that already inherits from
 // boost::stl_interfaces::range_adaptor_closure, and takes any function that
-// can construct a closure.  In this case, our closure is just an all_view.
-// Later we'll see other kinds of closures.
+// can construct a closure from a given range.  In this case, our closure is
+// just an all_view.  Later we'll see other kinds of closures.
 inline constexpr boost::stl_interfaces::closure all = []<typename R>(R && r) {
     return detail::all_view(0, (R &&) r);
 };
