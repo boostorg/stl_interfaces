@@ -13,6 +13,9 @@
 
 namespace boost { namespace stl_interfaces { namespace detail {
 
+    template<typename T>
+    using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
+
     struct pipeable_base;
 
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
@@ -47,8 +50,8 @@ namespace boost { namespace stl_interfaces { namespace detail {
             typename U,
             typename Enable = std::enable_if_t<
                 pipeable_<T> && pipeable_<U> &&
-                std::is_constructible<remove_cv_ref_t<T>, T>::value &&
-                std::is_constructible<remove_cv_ref_t<U>, U>::value>>
+                std::is_constructible<remove_cvref_t<T>, T>::value &&
+                std::is_constructible<remove_cvref_t<U>, U>::value>>
 #endif
         friend constexpr auto operator|(T && t, U && u)
         {

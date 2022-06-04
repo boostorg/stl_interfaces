@@ -8,6 +8,8 @@
 
 #include <boost/stl_interfaces/detail/pipeable_view.hpp>
 
+#include <utility>
+
 
 namespace boost { namespace stl_interfaces { namespace detail {
 

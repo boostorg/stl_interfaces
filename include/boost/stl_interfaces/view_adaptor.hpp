@@ -9,13 +9,47 @@
 #include <boost/stl_interfaces/config.hpp>
 #include <boost/stl_interfaces/detail/view_closure.hpp>
 
+#include <boost/type_traits/is_detected.hpp>
+
 #include <tuple>
 #include <type_traits>
 
 
+#if !defined(BOOST_STL_INTERFACES_DOXYGEN)
+
+#if defined(__cpp_lib_ranges) && 202202L <= __cpp_lib_ranges
+#define BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE 1
+#else
+#define BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE 0
+#endif
+
+#if !BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE &&               \
+    BOOST_STL_INTERFACES_USE_CONCEPTS && defined(__GNUC__) && 12 <= __GNUC__
+#define BOOST_STL_INTERFACES_USE_LIBSTDCPP_GCC12_RANGE_ADAPTOR_CLOSURE 1
+#else
+#define BOOST_STL_INTERFACES_USE_LIBSTDCPP_GCC12_RANGE_ADAPTOR_CLOSURE 0
+#endif
+
+#if !BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE &&               \
+    defined(_MSC_VER) && _MSC_VER <= 1929
+#define BOOST_STL_INTERFACES_NEED_VS_COMPATIBLE_RANGE_ADAPTOR_CLOSURE 1
+#else
+#define BOOST_STL_INTERFACES_NEED_VS_COMPATIBLE_RANGE_ADAPTOR_CLOSURE 0
+#endif
+
+#if !BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE &&               \
+    !BOOST_STL_INTERFACES_USE_LIBSTDCPP_GCC12_RANGE_ADAPTOR_CLOSURE &&         \
+    !BOOST_STL_INTERFACES_NEED_VS_COMPATIBLE_RANGE_ADAPTOR_CLOSURE
+#define BOOST_STL_INTERFACES_DEFINE_CUSTOM_RANGE_ADAPTOR_CLOSURE 1
+#else
+#define BOOST_STL_INTERFACES_DEFINE_CUSTOM_RANGE_ADAPTOR_CLOSURE 0
+#endif
+
+#endif
+
+
 namespace boost { namespace stl_interfaces {
     namespace detail {
-
         template<typename F, typename... Args>
         using invocable_expr =
             decltype(std::declval<F>()(std::declval<Args>()...));
@@ -94,38 +128,6 @@ namespace boost { namespace stl_interfaces {
             0, (Func &&) f, (Args &&) args...);
     }
 
-#if !defined(BOOST_STL_INTERFACES_DOXYGEN)
-
-#if defined(__cpp_lib_ranges) && 202202L <= __cpp_lib_ranges
-#define BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE 1
-#else
-#define BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE 0
-#endif
-
-#if !BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE &&               \
-    defined(__GNUC__) && 12 <= __GNUC__
-#define BOOST_STL_INTERFACES_USE_LIBSTDCPP_GCC12_RANGE_ADAPTOR_CLOSURE 1
-#else
-#define BOOST_STL_INTERFACES_USE_LIBSTDCPP_GCC12_RANGE_ADAPTOR_CLOSURE 0
-#endif
-
-#if !BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE &&               \
-    defined(_MSC_VER) && _MSC_VER <= 1929
-#define BOOST_STL_INTERFACES_NEED_VS_COMPATIBLE_RANGE_ADAPTOR_CLOSURE 1
-#else
-#define BOOST_STL_INTERFACES_NEED_VS_COMPATIBLE_RANGE_ADAPTOR_CLOSURE 0
-#endif
-
-#if !BOOST_STL_INTERFACES_USE_CPP23_STD_RANGE_ADAPTOR_CLOSURE &&               \
-    !BOOST_STL_INTERFACES_USE_LIBSTDCPP_GCC12_RANGE_ADAPTOR_CLOSURE &&         \
-    !BOOST_STL_INTERFACES_NEED_VS_COMPATIBLE_RANGE_ADAPTOR_CLOSURE
-#define BOOST_STL_INTERFACES_DEFINE_CUSTOM_RANGE_ADAPTOR_CLOSURE 1
-#else
-#define BOOST_STL_INTERFACES_DEFINE_CUSTOM_RANGE_ADAPTOR_CLOSURE 0
-#endif
-
-#endif
-
 #if BOOST_STL_INTERFACES_DEFINE_CUSTOM_RANGE_ADAPTOR_CLOSURE ||                \
     defined(BOOST_STL_INTERFACES_DOXYGEN)
 
@@ -157,7 +159,7 @@ namespace boost { namespace stl_interfaces {
             T>::inheritance_tag_with_an_unlikely_name_;
         template<typename T>
         constexpr bool range_adaptor_closure_ =
-            is_detected_v<range_adaptor_closure_tag_expr, remove_cv_ref_t<T>>;
+            is_detected_v<range_adaptor_closure_tag_expr, remove_cvref_t<T>>;
 #endif
     }
 
