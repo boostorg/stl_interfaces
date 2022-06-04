@@ -9,6 +9,7 @@
 
 #include "ill_formed.hpp"
 #include "../example/all_view.hpp"
+#include "../example/reverse_view.hpp"
 
 #include <boost/core/lightweight_test.hpp>
 
@@ -129,90 +130,6 @@
             }
         };
 
-        template<bool CommonRange>
-        struct set_rev_rng_first
-        {
-            template<typename V>
-            static auto call(V const & v)
-            {
-                return boost::stl_interfaces::make_reverse_iterator(v.end());
-            }
-        };
-
-        template<>
-        struct set_rev_rng_first<false>
-        {
-            template<typename V>
-            static auto call(V const & v)
-            {
-                auto v_f = v.begin();
-                auto const v_l = v.end();
-                while (v_f != v_l) {
-                    ++v_f;
-                }
-                return boost::stl_interfaces::make_reverse_iterator(v_f);
-            }
-        };
-
-#if BOOST_STL_INTERFACES_USE_CONCEPTS
-        template<std::ranges::view View>
-        requires std::is_object_v<View>
-#else
-        template<
-            typename View,
-            typename Enable = std::enable_if_t<std::is_object<View>::value>>
-#endif
-        struct reverse_view : boost::stl_interfaces::view_interface<reverse_view<View>>
-        {
-            using v_iter = iterator_t<View>;
-            using v_sent = sentinel_t<View>;
-
-            static_assert(
-                std::is_base_of<
-                    std::bidirectional_iterator_tag,
-                    typename std::iterator_traits<v_iter>::iterator_category>::
-                    value,
-                "A reversed view must have bidirectional iterators.");
-
-            using iterator = boost::stl_interfaces::reverse_iterator<v_iter>;
-
-            constexpr reverse_view() = default;
-
-#if BOOST_STL_INTERFACES_USE_CONCEPTS
-            template<typename V>
-            requires std::is_same_v<std::remove_reference_t<V>, View>
-#else
-            template<
-                typename V,
-                typename E = std::enable_if_t<
-                    std::is_same<std::remove_reference_t<V>, View>::value>>
-#endif
-            constexpr reverse_view(int, V && v) : v_{(V &&) v}
-            {
-                first_ = set_rev_rng_first<
-                    std::is_same<v_iter, v_sent>::value>::call(v_);
-            }
-
-            constexpr iterator begin() const { return first_; }
-            constexpr iterator end() const
-            {
-                return boost::stl_interfaces::make_reverse_iterator(v_.begin());
-            }
-
-            constexpr View base() const { return v_; }
-
-        private:
-            View v_ = View();
-            iterator first_;
-        };
-
-        template<typename T>
-        struct is_reverse_view : std::false_type
-        {};
-        template<typename T>
-        struct is_reverse_view<reverse_view<T>> : std::true_type
-        {};
-
         template<
             typename R,
             bool ReverseView = is_reverse_view<std::decay_t<R>>::value>
@@ -245,41 +162,28 @@
 namespace std::ranges {
     template<typename View>
     inline constexpr bool enable_borrowed_range<detail::take_view<View>> = true;
-
-    template<typename View>
-    inline constexpr bool enable_borrowed_range<detail::reverse_view<View>> =
-        true;
 }
 
 #endif
 
 #if defined(__cpp_inline_variables)
-/** A simplified version of the `std::views::reverse` range adaptor for
-    pre-C++20 builds.  Prefer `std::views::reverse` if you have it. */
-inline constexpr detail::reverse_impl reverse;
+inline constexpr detail::reverse_impl old_reverse;
 #else
 namespace {
-    constexpr detail::reverse_impl reverse;
+    constexpr detail::reverse_impl old_reverse;
 }
 #endif
 
 #if defined(__cpp_inline_variables)
-/** A simplified version of the `std::views::take` range adaptor for
-    pre-C++20 builds.  Prefer `std::views::take` if you have it. */
-inline constexpr detail::take_impl take;
+inline constexpr detail::take_impl old_take;
 #else
 namespace {
-    constexpr detail::take_impl take;
+    constexpr detail::take_impl old_take;
 }
 #endif
 
 #if 201703L <= __cplusplus
-inline constexpr boost::stl_interfaces::closure reverse2 =
-    []<typename R>(R && r) {
-        return detail::reverse_view<std::remove_reference_t<R>>(0, (R &&) r);
-    };
-
-inline constexpr boost::stl_interfaces::adaptor take2 =
+inline constexpr boost::stl_interfaces::adaptor take =
     []<typename R>(R && r, int n) {
         return detail::take_view<std::remove_reference_t<R>>((R &&) r, n);
     };
@@ -292,7 +196,7 @@ int main()
         std::vector<int> vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : old_all(vec1) | reverse) {
+        for (auto x : old_all(vec1) | old_reverse) {
             vec2.push_back(x);
         }
 
@@ -304,7 +208,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : old_all(vec1) | reverse) {
+        for (auto x : old_all(vec1) | old_reverse) {
             vec2.push_back(x);
         }
 
@@ -316,7 +220,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : old_all(vec1) | reverse | reverse) {
+        for (auto x : old_all(vec1) | old_reverse | old_reverse) {
             vec2.push_back(x);
         }
 
@@ -329,7 +233,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : old_all(vec1) | take(3)) {
+        for (auto x : old_all(vec1) | old_take(3)) {
             vec2.push_back(x);
         }
 
@@ -340,7 +244,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : old_all(vec1) | reverse | take(3)) {
+        for (auto x : old_all(vec1) | old_reverse | old_take(3)) {
             vec2.push_back(x);
         }
 
@@ -354,7 +258,7 @@ int main()
         std::vector<int> vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse2) {
+        for (auto x : all(vec1) | reverse) {
             vec2.push_back(x);
         }
 
@@ -366,7 +270,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse2) {
+        for (auto x : all(vec1) | reverse) {
             vec2.push_back(x);
         }
 
@@ -378,7 +282,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse2 | reverse2) {
+        for (auto x : all(vec1) | reverse | reverse) {
             vec2.push_back(x);
         }
 
@@ -389,7 +293,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | take2(3)) {
+        for (auto x : all(vec1) | take(3)) {
             vec2.push_back(x);
         }
 
@@ -400,7 +304,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse2 | take2(3)) {
+        for (auto x : all(vec1) | reverse | take(3)) {
             vec2.push_back(x);
         }
 
