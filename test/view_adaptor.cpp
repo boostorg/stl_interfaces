@@ -8,6 +8,7 @@
 #include <boost/stl_interfaces/view_adaptor.hpp>
 
 #include "ill_formed.hpp"
+#include "../example/all_view.hpp"
 
 #include <boost/core/lightweight_test.hpp>
 
@@ -16,60 +17,6 @@
 
 
     namespace detail {
-#if BOOST_STL_INTERFACES_USE_CONCEPTS
-        template<typename T>
-        using iterator_t = std::ranges::iterator_t<T>;
-        template<typename T>
-        using sentinel_t = std::ranges::sentinel_t<T>;
-#else
-        template<typename T>
-        using iterator_t = decltype(std::declval<T &>().begin());
-        template<typename T>
-        using sentinel_t = decltype(std::declval<T &>().end());
-#endif
-
-#if BOOST_STL_INTERFACES_USE_CONCEPTS
-        template<typename R>
-        requires std::is_object_v<R>
-#else
-        template<
-            typename R,
-            typename Enable = std::enable_if_t<std::is_object<R>::value>>
-#endif
-        struct all_view : boost::stl_interfaces::view_interface<all_view<R>>
-        {
-            using iterator = iterator_t<R>;
-            using sentinel = sentinel_t<R>;
-
-#if BOOST_STL_INTERFACES_USE_CONCEPTS
-            template<typename R2>
-            requires std::is_same_v<std::remove_reference_t<R2>, R>
-#else
-            template<
-                typename R2,
-                typename E = std::enable_if_t<
-                    std::is_same<std::remove_reference_t<R2>, R>::value>>
-#endif
-            explicit all_view(int, R2 && r) : first_(r.begin()), last_(r.end())
-            {}
-
-            iterator begin() const { return first_; }
-            sentinel end() const { return last_; }
-
-        private:
-            iterator first_;
-            sentinel last_;
-        };
-
-        struct all_impl : boost::stl_interfaces::range_adaptor_closure<all_impl>
-        {
-            template<typename R>
-            constexpr auto operator()(R && r) const
-            {
-                return all_view<std::remove_reference_t<R>>(0, (R &&) r);
-            }
-        };
-
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
         template<std::ranges::view View>
         requires std::is_object_v<View>
@@ -297,23 +244,13 @@
 
 namespace std::ranges {
     template<typename View>
-    inline constexpr bool enable_borrowed_range<detail::all_view<View>> = true;
+    inline constexpr bool enable_borrowed_range<detail::take_view<View>> = true;
 
     template<typename View>
     inline constexpr bool enable_borrowed_range<detail::reverse_view<View>> =
         true;
 }
 
-#endif
-
-#if defined(__cpp_inline_variables)
-/** A simplified version of the `std::views::all` range adaptor for
-    pre-C++20 builds.  Prefer `std::views::all` if you have it. */
-inline constexpr detail::all_impl all;
-#else
-namespace {
-    constexpr detail::all_impl all;
-}
 #endif
 
 #if defined(__cpp_inline_variables)
@@ -337,10 +274,6 @@ namespace {
 #endif
 
 #if 201703L <= __cplusplus
-inline constexpr boost::stl_interfaces::closure all2 = []<typename R>(R && r) {
-    return detail::all_view<std::remove_reference_t<R>>(0, (R &&) r);
-};
-
 inline constexpr boost::stl_interfaces::closure reverse2 =
     []<typename R>(R && r) {
         return detail::reverse_view<std::remove_reference_t<R>>(0, (R &&) r);
@@ -359,7 +292,7 @@ int main()
         std::vector<int> vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse) {
+        for (auto x : old_all(vec1) | reverse) {
             vec2.push_back(x);
         }
 
@@ -371,7 +304,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse) {
+        for (auto x : old_all(vec1) | reverse) {
             vec2.push_back(x);
         }
 
@@ -383,7 +316,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse | reverse) {
+        for (auto x : old_all(vec1) | reverse | reverse) {
             vec2.push_back(x);
         }
 
@@ -396,7 +329,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | take(3)) {
+        for (auto x : old_all(vec1) | take(3)) {
             vec2.push_back(x);
         }
 
@@ -407,7 +340,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all(vec1) | reverse | take(3)) {
+        for (auto x : old_all(vec1) | reverse | take(3)) {
             vec2.push_back(x);
         }
 
@@ -421,7 +354,7 @@ int main()
         std::vector<int> vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all2(vec1) | reverse2) {
+        for (auto x : all(vec1) | reverse2) {
             vec2.push_back(x);
         }
 
@@ -433,7 +366,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all2(vec1) | reverse2) {
+        for (auto x : all(vec1) | reverse2) {
             vec2.push_back(x);
         }
 
@@ -445,7 +378,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all2(vec1) | reverse2 | reverse2) {
+        for (auto x : all(vec1) | reverse2 | reverse2) {
             vec2.push_back(x);
         }
 
@@ -456,7 +389,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all2(vec1) | take2(3)) {
+        for (auto x : all(vec1) | take2(3)) {
             vec2.push_back(x);
         }
 
@@ -467,7 +400,7 @@ int main()
         std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
 
         std::vector<int> vec2;
-        for (auto x : all2(vec1) | reverse2 | take2(3)) {
+        for (auto x : all(vec1) | reverse2 | take2(3)) {
             vec2.push_back(x);
         }
 
