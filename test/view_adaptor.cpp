@@ -71,14 +71,15 @@
         };
 
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
-        template<typename R>
-        requires std::is_object_v<R>
+        template<std::ranges::view View>
+        requires std::is_object_v<View>
 #else
         template<
-            typename R,
-            typename Enable = std::enable_if_t<std::is_object<R>::value>>
+            typename View,
+            typename Enable = std::enable_if_t<std::is_object<View>::value>>
 #endif
-        struct take_view : boost::stl_interfaces::view_interface<take_view<R>>
+        struct take_view
+            : boost::stl_interfaces::view_interface<take_view<View>>
         {
             template<typename Iter>
             struct counted_iterator
@@ -140,19 +141,19 @@
                 Sentinel sent_;
             };
 
-            using iterator = counted_iterator<iterator_t<R>>;
-            using sentinel = counted_sentinel<sentinel_t<R>>;
+            using iterator = counted_iterator<iterator_t<View>>;
+            using sentinel = counted_sentinel<sentinel_t<View>>;
 
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
-            template<typename R2>
-            requires std::is_same_v<std::remove_reference_t<R2>, R>
+            template<typename View2>
+            requires std::is_same_v<std::remove_reference_t<View2>, View>
 #else
             template<
-                typename R2,
+                typename View2,
                 typename E = std::enable_if_t<
-                    std::is_same<std::remove_reference_t<R2>, R>::value>>
+                    std::is_same<std::remove_reference_t<View2>, View>::value>>
 #endif
-            explicit take_view(R2 && r, int n) :
+            explicit take_view(View2 && r, int n) :
                 first_(r.begin(), n), last_(r.end())
             {}
 
@@ -207,7 +208,7 @@
         };
 
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
-        template<typename View>
+        template<std::ranges::view View>
         requires std::is_object_v<View>
 #else
         template<
