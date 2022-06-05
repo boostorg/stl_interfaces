@@ -1002,7 +1002,8 @@ need an impl-`struct`:
 
 [old_all_defn]
 
-With these definitions, we can use `all()` with the standard range adaptors:
+With these definitions, we can use `old_all()` with the standard range
+adaptors:
 
     for (auto x : old_all(range) | std::views::reverse) {
         // etc.
@@ -1056,11 +1057,11 @@ std::views::reverse | std::views::reverse` do.
 [heading Example: `take()`]
 
 `take_view` is a little different from the previous two views, in that it
-takes more than just a range to construct it.  Any time a view takes more than
-just a range to construct, it is usually nice to use it with all the
-parameters besides the view itself.  For instance, you might want to use take
-as `v | take(42)`, or as `take(v, 42)` (more on this below).  Here is our
-definition of `take_view`:
+takes more than just a range to construct it _emdash_ it is constructed from a
+range and a count.  Any time a view takes more than just a range to construct,
+it is usually nice to use it with all the parameters besides the view itself.
+For instance, you might want to use take as `v | take(42)`, or as `take(v,
+42)` (more on this below).  Here is our definition of `take_view`:
 
 [take_view_defn]
 
@@ -1078,10 +1079,10 @@ Here is `boost::stl_interfaces::closure`:
 [closure_defn]
 
 As you can see, it inherits from
-`boost::stl_interfaces::range_adaptor_closure`, and its only API is a call
-operator that forwards to the function it is constructed with.  It exists
-simply to adapt some function that constructs a particular view to use in pipe
-expressions.
+`boost::stl_interfaces::range_adaptor_closure`, and its only member function
+is a call operator that forwards to the function `F` it is constructed from.
+It exists simply to adapt some function that constructs a particular view to
+use in pipe expressions.
 
 `adaptor` is slightly different; it operates essentially just like `closure`
 if you call its `operator()` with all arguments necessary to invoke its
@@ -1093,6 +1094,11 @@ bound into it:
 
 This allows you to use it both as a view-constructor (e.g. `take(range, 3)`),
 and as a closure-constructor (e.g. `range | take(3)`).
+
+[important Due to the way `adaptor` works, your views's constructors should
+always take their view parameter before any other parameters.  Otherwise, the
+combination of `bind_back()` and `closure` will probably not do anything very
+useful.]
 
 [endsect]
 

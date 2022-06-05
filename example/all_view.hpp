@@ -51,7 +51,7 @@ namespace detail {
     //
     // If you want to make views and view adaptors that will work with
     // pre-C++20 code, and then provide concept constraints in C++20 and
-    // later, this is a reasonable pattern -- write the tempalte-head twice:
+    // later, this is a reasonable pattern -- write the template-head twice:
     // once for C++20 concepts, and one for SFINAE.  Note that
     // BOOST_STL_INTERFACES_USE_CONCEPTS includes defined(__cpp_lib_concepts)
     // && defined(__cpp_lib_ranges), and any preprocessor predicate you use
@@ -74,7 +74,7 @@ namespace detail {
         // the same as R.  The int parameter is there to prevent getting in
         // the way of the special member functions like the copy constructor.
         // Since we don't want users directly constructing this type anyway,
-        // the un-ideal ergonomics of this extra int don't matter.
+        // the non-ideal ergonomics of this extra int don't matter.
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
         template<typename R2>
         requires std::is_same_v<std::remove_reference_t<R2>, R>
@@ -104,7 +104,7 @@ namespace detail {
     //[all_impl_defn
     // For C++20 views, there is usually some type like this.  This type
     // implements the functions that construct our view.  An invocable object
-    // will follow that uses this implementation.  We need to inherit from
+    // that uses this implementation will follow.  We need to inherit from
     // range_adaptor_closure to make our view adaptor compatible with other
     // view adaptors using the operator| "pipe" syntax.
     struct all_impl : boost::stl_interfaces::range_adaptor_closure<all_impl>
@@ -129,8 +129,8 @@ namespace detail {
 // Here we create the actual invocable that the user will call.  It is just a
 // constexpr all_impl variable.  Before C++17, you need to put it in an
 // anonymous namespace to avoid violating the ODR. With this in scope, the
-// user has everything necessary to use all().  I called it old_all(), because
-// there's an even easier way to do this, as shown with all() below.
+// user has everything necessary to use old_all().  I called it old_all(),
+// because there's an even easier way to do this, as shown with all() below.
 #if defined(__cpp_inline_variables)
 inline constexpr detail::all_impl old_all;
 #else

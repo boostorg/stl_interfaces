@@ -9,8 +9,8 @@
 
 namespace detail {
     //[ reverse_view_defn
-    // We need to treat iterator/sentinel pairs differently from iterator
-    // pairs (a.k.a. common_ranges).  If the iterator and sentinel are
+    // We need to treat iterator/sentinel ranges differently from iterator
+    // ranges (a.k.a. common_ranges).  If the iterator and sentinel are
     // different types, we need to advance the iterator to the end of the
     // range before we can move through the range in reverse.
     template<bool CommonRange>
@@ -118,8 +118,8 @@ namespace detail {
 
 #if defined(__cpp_deduction_guides)
 //[ reverse_defn
-// We want to condition how we construct our view based on whether or not R is
-// already a reverse_view.  If R is a reverse_view, just return the view it's
+// We want to condition how we construct our view based on whether R is itself
+// a reverse_view.  If R is a reverse_view, just return the view it's
 // reversing.
 //
 // In C++20 and later, you might want to constrain this lambda to require that
