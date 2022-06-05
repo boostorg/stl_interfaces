@@ -196,5 +196,32 @@ int main()
     }
 #endif
 
+    // User views mixed with std views.
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
+    {
+        std::vector<int> vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all(vec1) | std::views::reverse | old_reverse |
+                          std::views::reverse) {
+            vec2.push_back(x);
+        }
+
+        std::reverse(vec2.begin(), vec2.end());
+        BOOST_TEST(vec1 == vec2);
+    }
+
+    {
+        std::vector<int> const vec1 = {0, 1, 2, 3, 4, 5, 6, 7};
+
+        std::vector<int> vec2;
+        for (auto x : all(vec1) | reverse | std::views::take(3)) {
+            vec2.push_back(x);
+        }
+
+        BOOST_TEST(vec2 == (std::vector<int>{7, 6, 5}));
+    }
+#endif
+
     return boost::report_errors();
 }
