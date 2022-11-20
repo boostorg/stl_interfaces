@@ -87,15 +87,6 @@ namespace boost { namespace stl_interfaces {
             return Pointer(std::forward<T>(value));
         }
 
-        template<typename IteratorConcept>
-        struct concept_category
-        {
-            using type = IteratorConcept;
-        };
-        template<typename IteratorConcept>
-        using concept_category_t =
-            typename concept_category<IteratorConcept>::type;
-
         template<typename Pointer, typename IteratorConcept>
         struct pointer
         {
@@ -277,7 +268,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V1 {
 
     public:
         using iterator_concept = IteratorConcept;
-        using iterator_category = detail::concept_category_t<iterator_concept>;
+        using iterator_category = iterator_concept;
         using value_type = std::remove_const_t<ValueType>;
         using reference = Reference;
         using pointer = detail::pointer_t<Pointer, iterator_concept>;
@@ -672,7 +663,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
 
     public:
       using iterator_concept = IteratorConcept;
-      using iterator_category = detail::concept_category_t<iterator_concept>;
+      using iterator_category = iterator_concept;
       using value_type = std::remove_const_t<ValueType>;
       using reference = Reference;
       using pointer = detail::pointer_t<Pointer, iterator_concept>;
@@ -760,22 +751,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
           return it += -n;
         }
 
-#if 0 // TODO: This appears to work, but as of this writing (and using GCC
-      // 10), op<=> is not yet being used to evaluate op==, op<, etc.
-      friend constexpr std::strong_ordering operator<=>(D lhs, D rhs)
-        requires v2_dtl::base_3way<D> || v2_dtl::sub<D> {
-            if constexpr (requires { access::base(lhs) <=> access::base(rhs); }) {
-              return access::base(lhs) <=> access::base(rhs);
-            } else {
-              auto delta = lhs - rhs;
-              if (delta < 0)
-                  return std::strong_ordering::less;
-              if (0 < delta)
-                  return std::strong_ordering::greater;
-              return  std::strong_ordering::equal;
-            }
-          }
-#else
       friend constexpr bool operator<(D lhs, D rhs)
         requires std::equality_comparable<D> {
           return (lhs - rhs) < typename D::difference_type(0);
@@ -792,7 +767,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         requires std::equality_comparable<D> {
           return (lhs - rhs) >= typename D::difference_type(0);
         }
-#endif
     };
 
     namespace v2_dtl {
