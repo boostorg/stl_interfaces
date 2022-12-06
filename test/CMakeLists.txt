@@ -49,6 +49,7 @@ add_executable(
     compile_tests
     compile_tests_main.cpp
     compile_seq_cont_rvalue_constrained_pop_back.cpp
+    compile_sfinae_path_mutable_iterator.cpp
 )
 target_link_libraries(compile_tests stl_interfaces)
 if (clang_on_linux)

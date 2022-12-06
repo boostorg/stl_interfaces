@@ -4,8 +4,10 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 void compile_seq_cont_constrained_pop_back();
+void compile_sfinae_path_mutable_iterator();
 
 int main()
 {
     compile_seq_cont_constrained_pop_back();
+    compile_sfinae_path_mutable_iterator();
 }

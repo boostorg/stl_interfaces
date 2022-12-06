@@ -26,3 +26,4 @@ run random_access.cpp ;
 run static_vec.cpp ;
 
 compile compile_seq_cont_rvalue_constrained_pop_back.cpp ;
+compile compile_sfinae_path_mutable_iterator.cpp ;
