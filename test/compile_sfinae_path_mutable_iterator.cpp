@@ -16,10 +16,9 @@ struct node
 };
 
 template<typename Node>
-struct iterator : boost::stl_interfaces::iterator_interface<
-                      iterator<Node>,
-                      std::forward_iterator_tag,
-                      Node>
+struct iterator
+    : boost::stl_interfaces::
+          iterator_interface<iterator<Node>, std::forward_iterator_tag, Node>
 {
     using value_type = typename Node::value_type;
 
@@ -29,8 +28,8 @@ struct iterator : boost::stl_interfaces::iterator_interface<
     template<
         typename Node2,
         typename Enable = std::enable_if_t<
-            std::is_convertible_v<Node2 *, Node *> &&
-            !std::is_const_v<Node2> && std::is_const_v<Node>>>
+            std::is_convertible<Node2 *, Node *>{} && !std::is_const<Node2>{} &&
+            std::is_const<Node>{}>>
     constexpr iterator(iterator<Node2> other) noexcept : it_{other.it_}
     {}
 
@@ -38,7 +37,7 @@ struct iterator : boost::stl_interfaces::iterator_interface<
 
     template<
         typename T = Node,
-        typename std::enable_if_t<!std::is_const_v<T>, bool> = true>
+        typename std::enable_if_t<!std::is_const<T>{}, bool> = true>
     constexpr value_type & operator*() noexcept
     {
         return it_->kv_;
@@ -50,10 +49,8 @@ struct iterator : boost::stl_interfaces::iterator_interface<
         return *this;
     }
 
-    using base_type = boost::stl_interfaces::iterator_interface<
-        iterator<Node>,
-        std::forward_iterator_tag,
-        Node>;
+    using base_type = boost::stl_interfaces::
+        iterator_interface<iterator<Node>, std::forward_iterator_tag, Node>;
     using base_type::operator++;
 
     friend constexpr bool operator==(iterator lhs, iterator rhs) noexcept
