@@ -52,6 +52,7 @@ add_executable(
     compile_sfinae_path_mutable_iterator.cpp
 )
 target_link_libraries(compile_tests stl_interfaces)
+set_property(TARGET compile_tests PROPERTY CXX_STANDARD ${CXX_STD})
 if (clang_on_linux)
     target_link_libraries(compile_tests c++)
 endif ()
