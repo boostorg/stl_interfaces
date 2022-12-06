@@ -11,6 +11,7 @@ if (NOT BOOST_BRANCH)
   set(BOOST_BRANCH master)
 endif()
 if (NOT EXISTS ${CMAKE_BINARY_DIR}/boost_root)
+  message("Dir \"${CMAKE_BINARY_DIR}/boost_root\" does not exist!  Cloning Boost from sources.")
   add_custom_target(
     boost_root_clone
     git clone --depth 100 -b ${BOOST_BRANCH}
