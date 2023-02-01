@@ -57,6 +57,50 @@ static_assert(
         plus_eq<basic_random_access_iter, std::ptrdiff_t>::value,
     "");
 
+// This is here explicitly to check that the nested typedefs make it into the
+// derived iterator type when boost::stl_interfaces::iterator_interface<...>
+// is a dependent type.
+template<typename ValueType>
+struct basic_random_access_iter_dependent
+    : boost::stl_interfaces::iterator_interface<
+          basic_random_access_iter_dependent<ValueType>,
+          std::random_access_iterator_tag,
+          ValueType>
+{
+    basic_random_access_iter_dependent() {}
+    basic_random_access_iter_dependent(ValueType * it) : it_(it) {}
+
+    ValueType & operator*() const { return *it_; }
+    basic_random_access_iter_dependent & operator+=(std::ptrdiff_t i)
+    {
+        it_ += i;
+        return *this;
+    }
+    friend std::ptrdiff_t operator-(
+        basic_random_access_iter_dependent lhs,
+        basic_random_access_iter_dependent rhs) noexcept
+    {
+        return lhs.it_ - rhs.it_;
+    }
+
+private:
+    ValueType * it_;
+};
+
+using basic_random_access_iter_dependent_category =
+    basic_random_access_iter_dependent<int>::iterator_category;
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    basic_random_access_iter_dependent<int>, std::random_access_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    basic_random_access_iter_dependent<int>,
+    std::random_access_iterator_tag,
+    std::random_access_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
 struct basic_adapted_random_access_iter
     : boost::stl_interfaces::iterator_interface<
           basic_adapted_random_access_iter,
