@@ -3,6 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+#include "ill_formed.hpp"
+
 #include <boost/stl_interfaces/iterator_interface.hpp>
 #include <boost/stl_interfaces/view_interface.hpp>
 #include <boost/stl_interfaces/sequence_container_interface.hpp>
@@ -69,6 +71,59 @@ static_assert(std::is_same<
 static_assert(v1_dtl::common_range<std::vector<double>>::value, "");
 static_assert(v1_dtl::common_range<std::list<double>>::value, "");
 static_assert(!v1_dtl::common_range<ridiculous_range>::value, "");
+
+// iterator_category_base
+
+template<typename T>
+using nested_iterator_category = typename T::iterator_category;
+
+static_assert(
+    ill_formed<
+        nested_iterator_category,
+        detail::iterator_category_base<std::input_iterator_tag, int &>>{});
+static_assert(ill_formed<
+              nested_iterator_category,
+              detail::iterator_category_base<std::input_iterator_tag, int>>{});
+static_assert(
+    ill_formed<
+        nested_iterator_category,
+        detail::iterator_category_base<std::output_iterator_tag, int &>>{});
+static_assert(ill_formed<
+              nested_iterator_category,
+              detail::iterator_category_base<std::output_iterator_tag, int>>{});
+
+static_assert(std::is_same<
+              nested_iterator_category<detail::iterator_category_base<
+                  std::random_access_iterator_tag,
+                  int &>>,
+              std::random_access_iterator_tag>::value);
+static_assert(std::is_same<
+              nested_iterator_category<detail::iterator_category_base<
+                  std::random_access_iterator_tag,
+                  int>>,
+              std::input_iterator_tag>::value);
+
+static_assert(std::is_same<
+              nested_iterator_category<detail::iterator_category_base<
+                  std::bidirectional_iterator_tag,
+                  int &>>,
+              std::bidirectional_iterator_tag>::value);
+static_assert(std::is_same<
+              nested_iterator_category<detail::iterator_category_base<
+                  std::bidirectional_iterator_tag,
+                  int>>,
+              std::input_iterator_tag>::value);
+
+static_assert(
+    std::is_same<
+        nested_iterator_category<
+            detail::iterator_category_base<std::forward_iterator_tag, int &>>,
+        std::forward_iterator_tag>::value);
+static_assert(
+    std::is_same<
+        nested_iterator_category<
+            detail::iterator_category_base<std::forward_iterator_tag, int>>,
+        std::input_iterator_tag>::value);
 
 
 struct no_clear

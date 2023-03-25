@@ -162,6 +162,85 @@ namespace boost { namespace stl_interfaces {
             return static_cast<common_t<T, U>>(lhs) -
                    static_cast<common_t<T, U>>(rhs);
         }
+
+        // This iterator concept -> category mapping scheme follows the one
+        // from zip_transform_view; see
+        // https://eel.is/c++draft/range.zip.transform.iterator#1.
+
+        template<
+            typename IteratorConcept,
+            typename ReferenceType,
+            bool IsLanguageReference = std::is_reference<ReferenceType>::value,
+            bool IsDerivedFromRAIter = std::is_base_of<
+                std::random_access_iterator_tag,
+                IteratorConcept>::value,
+            bool IsDerivedFromBidiIter = std::is_base_of<
+                std::bidirectional_iterator_tag,
+                IteratorConcept>::value>
+        struct iterator_category_of
+        {
+        };
+        template<
+            typename IteratorConcept,
+            typename ReferenceType,
+            bool B1,
+            bool B2>
+        struct iterator_category_of<
+            IteratorConcept,
+            ReferenceType,
+            false,
+            B1,
+            B2>
+        {
+            using type = std::input_iterator_tag;
+        };
+        template<typename IteratorConcept, typename ReferenceType, bool B>
+        struct iterator_category_of<
+            IteratorConcept,
+            ReferenceType,
+            true,
+            true,
+            B>
+        {
+            using type = std::random_access_iterator_tag;
+        };
+        template<typename IteratorConcept, typename ReferenceType>
+        struct iterator_category_of<
+            IteratorConcept,
+            ReferenceType,
+            true,
+            false,
+            true>
+        {
+            using type = std::bidirectional_iterator_tag;
+        };
+        template<typename IteratorConcept, typename ReferenceType>
+        struct iterator_category_of<
+            IteratorConcept,
+            ReferenceType,
+            true,
+            false,
+            false>
+        {
+            using type = std::forward_iterator_tag;
+        };
+
+        template<
+            typename IteratorConcept,
+            typename ReferenceType,
+            bool IsDerivedFromFwdIter = std::
+                is_base_of<std::forward_iterator_tag, IteratorConcept>::value>
+        struct iterator_category_base
+        {
+        };
+
+        template<typename IteratorConcept, typename ReferenceType>
+        struct iterator_category_base<IteratorConcept, ReferenceType, true>
+        {
+            using iterator_category =
+                typename iterator_category_of<IteratorConcept, ReferenceType>::
+                    type;
+        };
     }
 
 }}
