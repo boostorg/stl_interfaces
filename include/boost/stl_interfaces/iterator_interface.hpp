@@ -231,8 +231,7 @@ namespace boost { namespace stl_interfaces {
             bool IsDerivedFromFwdIter = std::
                 is_base_of<std::forward_iterator_tag, IteratorConcept>::value>
         struct iterator_category_base
-        {
-        };
+        {};
 
         template<typename IteratorConcept, typename ReferenceType>
         struct iterator_category_base<IteratorConcept, ReferenceType, true>
@@ -731,6 +730,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
       typename DifferenceType = std::ptrdiff_t>
       requires std::is_class_v<D> && std::same_as<D, std::remove_cv_t<D>>
     struct iterator_interface
+        : detail::iterator_category_base<IteratorConcept, Reference>
     {
     private:
       constexpr D& derived() noexcept {
@@ -742,7 +742,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
 
     public:
       using iterator_concept = IteratorConcept;
-      using iterator_category = iterator_concept;
       using value_type = std::remove_const_t<ValueType>;
       using reference = Reference;
       using pointer = detail::pointer_t<Pointer, iterator_concept>;
@@ -951,11 +950,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
     iter, category, value_t, ref, ptr, diff_t)                                 \
     static_assert(                                                             \
         std::is_same<                                                          \
-            typename std::iterator_traits<iter>::iterator_category,            \
-            category>::value,                                                  \
-        "");                                                                   \
-    static_assert(                                                             \
-        std::is_same<                                                          \
             typename std::iterator_traits<iter>::value_type,                   \
             value_t>::value,                                                   \
         "");                                                                   \
@@ -973,23 +967,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
             diff_t>::value,                                                    \
         "");
 
-#if BOOST_STL_INTERFACES_USE_CONCEPTS
-#define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(                    \
-    iter, category, concept, value_type, reference, pointer, difference_type)  \
-    static_assert(                                                             \
-        std::is_same_v<                                                        \
-            boost::stl_interfaces::v2::v2_dtl::iter_concept_t<iter>,           \
-            concept>,                                                          \
-        "");                                                                   \
-    BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                   \
-        iter, category, value_type, reference, pointer, difference_type)
-#else
 #define BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(                    \
     iter, category, concept, value_type, reference, pointer, difference_type)  \
     BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS_IMPL(                   \
         iter, category, value_type, reference, pointer, difference_type)
-#endif
-
 #endif
 
 #endif
