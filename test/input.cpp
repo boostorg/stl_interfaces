@@ -315,7 +315,7 @@ int main()
         pair_input first(pairs.data());
         pair_input last(pairs.data() + pairs.size());
         for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
+            *out++ = (*first).first;
         }
         BOOST_TEST(firsts_copy == ints);
     }
@@ -325,7 +325,7 @@ int main()
         proxy_input_iter<std::pair<int, int>> first(pairs.data());
         proxy_input_iter<std::pair<int, int>> last(pairs.data() + pairs.size());
         for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
+            *out++ = (*first).first;
         }
         BOOST_TEST(firsts_copy == ints);
     }
@@ -354,7 +354,7 @@ int main()
         const_pair_input first(pairs.data());
         const_pair_input last(pairs.data() + pairs.size());
         for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
+            *out++ = (*first).first;
         }
         BOOST_TEST(firsts_copy == ints);
     }
@@ -365,7 +365,7 @@ int main()
         proxy_input_iter<std::pair<int, int> const> last(
             pairs.data() + pairs.size());
         for (auto out = firsts_copy.begin(); first != last; ++first) {
-            *out++ = first->first;
+            *out++ = (*first).first;
         }
         BOOST_TEST(firsts_copy == ints);
     }

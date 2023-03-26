@@ -70,19 +70,25 @@ namespace boost { namespace stl_interfaces {
     };
 
     namespace detail {
-        template<typename Pointer, typename T>
+        template<typename Pointer, typename Reference, typename T>
         auto make_pointer(
             T && value,
-            std::enable_if_t<std::is_pointer<Pointer>::value, int> = 0)
-            -> decltype(std::addressof(value))
+            std::enable_if_t<
+                std::is_pointer<Pointer>::value &&
+                    std::is_reference<Reference>::value,
+                int> = 0) -> decltype(std::addressof(value))
         {
             return std::addressof(value);
         }
 
-        template<typename Pointer, typename T>
+        template<typename Pointer, typename Reference, typename T>
         auto make_pointer(
             T && value,
-            std::enable_if_t<!std::is_pointer<Pointer>::value, int> = 0)
+            std::enable_if_t<
+                !std::is_pointer<Pointer>::value &&
+                    !std::is_same<Pointer, void>::value &&
+                    std::is_reference<Reference>::value,
+                int> = 0)
         {
             return Pointer(std::forward<T>(value));
         }
@@ -368,20 +374,22 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V1 {
         }
 
         template<typename D = Derived>
-        constexpr auto operator-> () noexcept(
-            noexcept(detail::make_pointer<pointer>(*std::declval<D &>())))
+        constexpr auto operator->() noexcept(noexcept(
+            detail::make_pointer<pointer, reference>(*std::declval<D &>())))
             -> decltype(
-                detail::make_pointer<pointer>(*std::declval<D &>()))
+                detail::make_pointer<pointer, reference>(*std::declval<D &>()))
         {
-            return detail::make_pointer<pointer>(*derived());
+            return detail::make_pointer<pointer, reference>(*derived());
         }
         template<typename D = Derived>
-        constexpr auto operator-> () const noexcept(
-            noexcept(detail::make_pointer<pointer>(*std::declval<D const &>())))
+        constexpr auto operator->() const noexcept(noexcept(
+            detail::make_pointer<pointer, reference>(
+                *std::declval<D const &>())))
             -> decltype(
-                detail::make_pointer<pointer>(*std::declval<D const &>()))
+                detail::make_pointer<pointer, reference>(
+                    *std::declval<D const &>()))
         {
-            return detail::make_pointer<pointer>(*derived());
+            return detail::make_pointer<pointer, reference>(*derived());
         }
 
         template<typename D = Derived>
@@ -757,11 +765,13 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         }
 
       constexpr auto operator->()
-        requires requires (D d) { *d; } {
+        requires (!std::same_as<pointer, void> && std::is_reference_v<reference> &&
+                  requires (D d) { *d; }) {
           return detail::make_pointer<pointer>(*derived());
         }
       constexpr auto operator->() const
-        requires requires (D const d) { *d; } {
+        requires (!std::same_as<pointer, void> && std::is_reference_v<reference> &&
+                  requires (D const d) { *d; }) {
           return detail::make_pointer<pointer>(*derived());
         }
 

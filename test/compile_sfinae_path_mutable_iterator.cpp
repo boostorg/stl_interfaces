@@ -68,7 +68,7 @@ private:
 void compile_sfinae_path_mutable_iterator()
 {
     auto it = iterator<node>{};
-    if (it->first == 42) {
-        it->second = 13;
+    if ((*it).first == 42) {
+        (*it).second = 13;
     }
 }
