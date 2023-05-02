@@ -18,6 +18,9 @@
 
 namespace detail = boost::stl_interfaces::detail;
 namespace v1_dtl = boost::stl_interfaces::v1::v1_dtl;
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
+namespace v2_dtl = boost::stl_interfaces::v2::v2_dtl;
+#endif
 
 
 // iter_difference_t
@@ -77,39 +80,40 @@ static_assert(!v1_dtl::common_range<ridiculous_range>::value, "");
 template<typename T>
 using nested_iterator_category = typename T::iterator_category;
 
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
 static_assert(
     ill_formed<
         nested_iterator_category,
-        detail::iterator_category_base<std::input_iterator_tag, int &>>{});
+        v2_dtl::iterator_category_base<std::input_iterator_tag, int &>>{});
 static_assert(ill_formed<
               nested_iterator_category,
-              detail::iterator_category_base<std::input_iterator_tag, int>>{});
+              v2_dtl::iterator_category_base<std::input_iterator_tag, int>>{});
 static_assert(
     ill_formed<
         nested_iterator_category,
-        detail::iterator_category_base<std::output_iterator_tag, int &>>{});
+        v2_dtl::iterator_category_base<std::output_iterator_tag, int &>>{});
 static_assert(ill_formed<
               nested_iterator_category,
-              detail::iterator_category_base<std::output_iterator_tag, int>>{});
+              v2_dtl::iterator_category_base<std::output_iterator_tag, int>>{});
 
 static_assert(std::is_same<
-              nested_iterator_category<detail::iterator_category_base<
+              nested_iterator_category<v2_dtl::iterator_category_base<
                   std::random_access_iterator_tag,
                   int &>>,
               std::random_access_iterator_tag>::value);
 static_assert(std::is_same<
-              nested_iterator_category<detail::iterator_category_base<
+              nested_iterator_category<v2_dtl::iterator_category_base<
                   std::random_access_iterator_tag,
                   int>>,
               std::input_iterator_tag>::value);
 
 static_assert(std::is_same<
-              nested_iterator_category<detail::iterator_category_base<
+              nested_iterator_category<v2_dtl::iterator_category_base<
                   std::bidirectional_iterator_tag,
                   int &>>,
               std::bidirectional_iterator_tag>::value);
 static_assert(std::is_same<
-              nested_iterator_category<detail::iterator_category_base<
+              nested_iterator_category<v2_dtl::iterator_category_base<
                   std::bidirectional_iterator_tag,
                   int>>,
               std::input_iterator_tag>::value);
@@ -117,13 +121,14 @@ static_assert(std::is_same<
 static_assert(
     std::is_same<
         nested_iterator_category<
-            detail::iterator_category_base<std::forward_iterator_tag, int &>>,
+            v2_dtl::iterator_category_base<std::forward_iterator_tag, int &>>,
         std::forward_iterator_tag>::value);
 static_assert(
     std::is_same<
         nested_iterator_category<
-            detail::iterator_category_base<std::forward_iterator_tag, int>>,
+            v2_dtl::iterator_category_base<std::forward_iterator_tag, int>>,
         std::input_iterator_tag>::value);
+#endif
 
 
 struct no_clear

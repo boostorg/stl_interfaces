@@ -286,14 +286,6 @@ int main()
 
 
 {
-    int_input first(ints.data());
-    int_input last(ints.data() + ints.size());
-    while (first != last)
-        first++;
-}
-
-
-{
     {
         std::array<int, 10> ints_copy;
         int_input first(ints.data());

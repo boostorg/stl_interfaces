@@ -168,84 +168,6 @@ namespace boost { namespace stl_interfaces {
             return static_cast<common_t<T, U>>(lhs) -
                    static_cast<common_t<T, U>>(rhs);
         }
-
-        // This iterator concept -> category mapping scheme follows the one
-        // from zip_transform_view; see
-        // https://eel.is/c++draft/range.zip.transform.iterator#1.
-
-        template<
-            typename IteratorConcept,
-            typename ReferenceType,
-            bool IsLanguageReference = std::is_reference<ReferenceType>::value,
-            bool IsDerivedFromRAIter = std::is_base_of<
-                std::random_access_iterator_tag,
-                IteratorConcept>::value,
-            bool IsDerivedFromBidiIter = std::is_base_of<
-                std::bidirectional_iterator_tag,
-                IteratorConcept>::value>
-        struct iterator_category_of
-        {
-        };
-        template<
-            typename IteratorConcept,
-            typename ReferenceType,
-            bool B1,
-            bool B2>
-        struct iterator_category_of<
-            IteratorConcept,
-            ReferenceType,
-            false,
-            B1,
-            B2>
-        {
-            using type = std::input_iterator_tag;
-        };
-        template<typename IteratorConcept, typename ReferenceType, bool B>
-        struct iterator_category_of<
-            IteratorConcept,
-            ReferenceType,
-            true,
-            true,
-            B>
-        {
-            using type = std::random_access_iterator_tag;
-        };
-        template<typename IteratorConcept, typename ReferenceType>
-        struct iterator_category_of<
-            IteratorConcept,
-            ReferenceType,
-            true,
-            false,
-            true>
-        {
-            using type = std::bidirectional_iterator_tag;
-        };
-        template<typename IteratorConcept, typename ReferenceType>
-        struct iterator_category_of<
-            IteratorConcept,
-            ReferenceType,
-            true,
-            false,
-            false>
-        {
-            using type = std::forward_iterator_tag;
-        };
-
-        template<
-            typename IteratorConcept,
-            typename ReferenceType,
-            bool IsDerivedFromFwdIter = std::
-                is_base_of<std::forward_iterator_tag, IteratorConcept>::value>
-        struct iterator_category_base
-        {};
-
-        template<typename IteratorConcept, typename ReferenceType>
-        struct iterator_category_base<IteratorConcept, ReferenceType, true>
-        {
-            using iterator_category =
-                typename iterator_category_of<IteratorConcept, ReferenceType>::
-                    type;
-        };
     }
 
 }}
@@ -723,6 +645,59 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
             {d - d} -> std::convertible_to<DifferenceType>;
         };
         // clang-format on
+
+        // This iterator concept -> category mapping scheme follows the one
+        // from zip_transform_view; see
+        // https://eel.is/c++draft/range.zip.transform.iterator#1.
+
+        template<typename IteratorConcept, typename ReferenceType>
+        constexpr auto category_tag()
+        {
+            if constexpr (std::is_base_of_v<
+                              std::forward_iterator_tag,
+                              IteratorConcept>) {
+                if constexpr (!std::is_reference_v<ReferenceType>) {
+                    return std::input_iterator_tag{};
+                } else if constexpr (std::is_base_of_v<
+                                         std::random_access_iterator_tag,
+                                         IteratorConcept>) {
+                    return std::random_access_iterator_tag{};
+                } else if constexpr (std::is_base_of_v<
+                                         std::bidirectional_iterator_tag,
+                                         IteratorConcept>) {
+                    return std::bidirectional_iterator_tag{};
+                } else {
+                    return std::forward_iterator_tag{};
+                }
+            } else {
+                return 0; // int means "no tag"
+            }
+        }
+        template<
+            typename IteratorConcept,
+            typename ReferenceType,
+            typename IteratorCategory =
+                decltype(v2_dtl::
+                             category_tag<IteratorConcept, ReferenceType>())>
+        struct iterator_category_base
+        {
+            using iterator_category = IteratorCategory;
+        };
+
+        template<typename IteratorConcept, typename ReferenceType>
+        struct iterator_category_base<IteratorConcept, ReferenceType, int>
+        {};
+
+        template<typename IteratorConcept, typename ReferenceType>
+        constexpr bool non_input_tag()
+        {
+            if (std::same_as<IteratorConcept, std::input_iterator_tag>)
+                return false;
+            using tag_t =
+                decltype(v2_dtl::
+                             category_tag<IteratorConcept, ReferenceType>());
+            return !std::same_as<tag_t, std::input_iterator_tag>;
+        }
     }
 
     // clang-format off
@@ -744,7 +719,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
       typename DifferenceType = std::ptrdiff_t>
       requires std::is_class_v<D> && std::same_as<D, std::remove_cv_t<D>>
     struct iterator_interface
-        : detail::iterator_category_base<IteratorConcept, Reference>
+        : v2_dtl::iterator_category_base<IteratorConcept, Reference>
     {
     private:
       constexpr D& derived() noexcept {
@@ -798,6 +773,14 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         requires requires (D d) { d += difference_type(1); } {
           return derived() += difference_type(1);
         }
+#if 0 // TODO: This was requested by Tomas K. via LEWG review, but it breaks a
+      // check somewhere in GCC that this iterator is a CPP17InputIterator,
+      // which must support *it++.
+      constexpr auto operator++(int)
+        requires std::input_iterator<D> && requires (D d) { ++d; } {
+          ++derived();
+        }
+#endif
       constexpr auto operator++(int) requires requires (D d) { ++d; } {
         D retval = derived();
         ++derived();

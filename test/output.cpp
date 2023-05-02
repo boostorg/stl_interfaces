@@ -137,13 +137,5 @@ int main()
     BOOST_TEST(ints_copy == ints);
 }
 
-
-{
-    std::vector<int> ints_copy;
-    back_insert out(ints_copy);
-    for (int i = 0; i < 10; ++i)
-        out++;
-}
-
     return boost::report_errors();
 }
