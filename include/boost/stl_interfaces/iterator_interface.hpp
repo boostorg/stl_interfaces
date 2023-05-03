@@ -773,18 +773,14 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         requires requires (D d) { d += difference_type(1); } {
           return derived() += difference_type(1);
         }
-#if 0 // TODO: This was requested by Tomas K. via LEWG review, but it breaks a
-      // check somewhere in GCC that this iterator is a CPP17InputIterator,
-      // which must support *it++.
-      constexpr auto operator++(int)
-        requires std::input_iterator<D> && requires (D d) { ++d; } {
-          ++derived();
-        }
-#endif
       constexpr auto operator++(int) requires requires (D d) { ++d; } {
-        D retval = derived();
-        ++derived();
-        return retval;
+        if constexpr (std::is_same_v<IteratorConcept, std::input_iterator_tag>){
+          ++derived();
+        } else {
+          D retval = derived();
+          ++derived();
+          return retval;
+        }
       }
       constexpr decltype(auto) operator+=(difference_type n)
         requires requires (D d) { access::base(d) += n; } {

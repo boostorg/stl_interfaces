@@ -9,6 +9,7 @@
 
 #include <boost/core/lightweight_test.hpp>
 
+#include <algorithm>
 #include <array>
 #include <numeric>
 #include <type_traits>
@@ -42,6 +43,7 @@ private:
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_input_iter, std::input_iterator)
+#if __cplusplus < 202002L
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     basic_input_iter,
     std::input_iterator_tag,
@@ -50,6 +52,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int &,
     int *,
     std::ptrdiff_t)
+#endif
 
 template<typename ValueType>
 struct input_iter : boost::stl_interfaces::iterator_interface<
@@ -91,6 +94,7 @@ private:
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(input_iter<int>, std::input_iterator)
+#if __cplusplus < 202002L
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     input_iter<int>,
     std::input_iterator_tag,
@@ -99,6 +103,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int &,
     int *,
     std::ptrdiff_t)
+#endif
 
 using int_input = input_iter<int>;
 using const_int_input = input_iter<int const>;
@@ -147,6 +152,7 @@ private:
 using int_pair = std::pair<int, int>;
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     proxy_input_iter<int_pair>, std::input_iterator)
+#if __cplusplus < 202002L
 BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     proxy_input_iter<int_pair>,
     std::input_iterator_tag,
@@ -155,6 +161,7 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int_pair,
     boost::stl_interfaces::proxy_arrow_result<int_pair>,
     std::ptrdiff_t)
+#endif
 
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 std::array<std::pair<int, int>, 10> pairs = {{
@@ -270,7 +277,11 @@ int main()
 
     {
         std::array<int, 10> ints_copy;
+#if __cplusplus < 202002L
         std::copy(first, last, ints_copy.begin());
+#else
+        std::ranges::copy(first, last, ints_copy.begin());
+#endif
         BOOST_TEST(ints_copy == ints);
     }
 }
@@ -281,7 +292,11 @@ int main()
     int_input last(ints.data() + ints.size());
     const_int_input first_copy(first);
     const_int_input last_copy(last);
+#if __cplusplus < 202002L
     std::equal(first, last, first_copy, last_copy);
+#else
+    std::ranges::equal(first, last, first_copy, last_copy);
+#endif
 }
 
 
@@ -290,7 +305,11 @@ int main()
         std::array<int, 10> ints_copy;
         int_input first(ints.data());
         int_input last(ints.data() + ints.size());
+#if __cplusplus < 202002L
         std::copy(first, last, ints_copy.begin());
+#else
+        std::ranges::copy(first, last, ints_copy.begin());
+#endif
         BOOST_TEST(ints_copy == ints);
     }
 
@@ -298,7 +317,11 @@ int main()
         std::array<std::pair<int, int>, 10> pairs_copy;
         pair_input first(pairs.data());
         pair_input last(pairs.data() + pairs.size());
+#if __cplusplus < 202002L
         std::copy(first, last, pairs_copy.begin());
+#else
+        std::ranges::copy(first, last, pairs_copy.begin());
+#endif
         BOOST_TEST(pairs_copy == pairs);
     }
 
@@ -329,7 +352,11 @@ int main()
         std::array<int, 10> ints_copy;
         const_int_input first(ints.data());
         const_int_input last(ints.data() + ints.size());
+#if __cplusplus < 202002L
         std::copy(first, last, ints_copy.begin());
+#else
+        std::ranges::copy(first, last, ints_copy.begin());
+#endif
         BOOST_TEST(ints_copy == ints);
     }
 
@@ -337,7 +364,11 @@ int main()
         std::array<std::pair<int, int>, 10> pairs_copy;
         const_pair_input first(pairs.data());
         const_pair_input last(pairs.data() + pairs.size());
+#if __cplusplus < 202002L
         std::copy(first, last, pairs_copy.begin());
+#else
+        std::ranges::copy(first, last, pairs_copy.begin());
+#endif
         BOOST_TEST(pairs_copy == pairs);
     }
 
@@ -376,7 +407,11 @@ int main()
     // range begin/end
     {
         std::array<int, 10> ints_copy;
+#if __cplusplus < 202002L
         std::copy(r.begin(), r.end(), ints_copy.begin());
+#else
+        std::ranges::copy(r.begin(), r.end(), ints_copy.begin());
+#endif
         BOOST_TEST(ints_copy == ints);
 
         BOOST_TEST(empty.begin() == empty.end());
