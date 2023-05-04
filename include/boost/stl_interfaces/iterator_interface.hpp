@@ -830,7 +830,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
           if constexpr (v2_dtl::base_3way<D>) {
             return access::base(lhs) <=> access::base(rhs);
           } else {
-            difference_type const diff = lhs - rhs;
+            difference_type const diff = rhs - lhs;
             return diff < difference_type(0) ? std::strong_ordering::less :
               difference_type(0) < diff ? std::strong_ordering::greater :
               std::strong_ordering::equal;
