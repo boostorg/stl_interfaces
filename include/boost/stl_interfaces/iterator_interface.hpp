@@ -639,10 +639,11 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
             requires (D1 d1, D2 d2) { access::base(d1) == access::base(d2); };
         // clang-format on
 
-        template<typename D, typename DifferenceType>
+        template<typename D>
         // clang-format off
-        concept sub = requires (D d) {
-            {d - d} -> std::convertible_to<DifferenceType>;
+        concept iter_sub = requires (D d) {
+            typename D::difference_type;
+            {d - d} -> std::convertible_to<typename D::difference_type>;
         };
         // clang-format on
 
@@ -826,7 +827,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
 
 #if defined(__cpp_lib_three_way_comparison)
       friend constexpr auto operator<=>(D lhs, D rhs)
-        requires v2_dtl::base_3way<D> || v2_dtl::sub<D, difference_type> {
+        requires v2_dtl::base_3way<D> || v2_dtl::iter_sub<D> {
           if constexpr (v2_dtl::base_3way<D>) {
             return access::base(lhs) <=> access::base(rhs);
           } else {
@@ -838,19 +839,19 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         }
 #endif
       friend constexpr bool operator<(D lhs, D rhs)
-        requires v2_dtl::sub<D, difference_type> {
+        requires v2_dtl::iter_sub<D> {
           return (lhs - rhs) < difference_type(0);
         }
       friend constexpr bool operator<=(D lhs, D rhs)
-        requires v2_dtl::sub<D, difference_type> {
+        requires v2_dtl::iter_sub<D> {
           return (lhs - rhs) <= difference_type(0);
         }
       friend constexpr bool operator>(D lhs, D rhs)
-        requires v2_dtl::sub<D, difference_type> {
+        requires v2_dtl::iter_sub<D> {
           return (lhs - rhs) > difference_type(0);
         }
       friend constexpr bool operator>=(D lhs, D rhs)
-        requires v2_dtl::sub<D, difference_type> {
+        requires v2_dtl::iter_sub<D> {
           return (lhs - rhs) >= difference_type(0);
         }
     };
@@ -879,10 +880,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
     constexpr bool operator==(D1 lhs, D2 rhs)
       requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> &&
                detail::interoperable<D1, D2>::value &&
-               (v2_dtl::base_eq<D1, D2> || v2_dtl::sub<D1, typename D1::difference_type>) {
+               (v2_dtl::base_eq<D1, D2> || v2_dtl::iter_sub<D1>) {
       if constexpr (v2_dtl::base_eq<D1, D2>) {
         return (access::base(lhs) == access::base(rhs));
-      } else if constexpr (v2_dtl::sub<D1, typename D1::difference_type>) {
+      } else if constexpr (v2_dtl::iter_sub<D1>) {
         return (lhs - rhs) == typename D1::difference_type(0);
       }
     }
