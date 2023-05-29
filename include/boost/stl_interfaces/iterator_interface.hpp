@@ -623,11 +623,11 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         concept plus_eq = requires (D d) { d += DifferenceType(1); };
         // clang-format on
 
-        template<typename D>
+        template<typename D, typename D2 = D>
         // clang-format off
         concept base_3way =
 #if defined(__cpp_impl_three_way_comparison)
-            requires (D d) { access::base(d) <=> access::base(d); };
+            requires (D d, D2 d2) { access::base(d) <=> access::base(d2); };
 #else
             false;
 #endif
@@ -639,11 +639,11 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
             requires (D1 d1, D2 d2) { access::base(d1) == access::base(d2); };
         // clang-format on
 
-        template<typename D>
+        template<typename D, typename D2 = D>
         // clang-format off
-        concept iter_sub = requires (D d) {
+        concept iter_sub = requires (D d, D2 d2) {
             typename D::difference_type;
-            {d - d} -> std::convertible_to<typename D::difference_type>;
+            {d - d2} -> std::convertible_to<typename D::difference_type>;
         };
         // clang-format on
 
@@ -788,14 +788,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
           access::base(derived()) += n;
           return derived();
         }
-      friend constexpr auto operator+(D it, difference_type n)
-        requires requires { it += n; } {
-          return it += n;
-        }
-      friend constexpr auto operator+(difference_type n, D it)
-        requires requires { it += n; } {
-          return it += n;
-        }
 
       constexpr decltype(auto) operator--()
         requires requires (D d) { --access::base(d); } &&
@@ -815,44 +807,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
       constexpr decltype(auto) operator-=(difference_type n)
         requires requires (D d) { d += -n; } {
           return derived() += -n;
-        }
-      friend constexpr auto operator-(D lhs, D rhs)
-        requires requires { access::base(lhs) - access::base(rhs); } {
-          return access::base(lhs) - access::base(rhs);
-        }
-      friend constexpr auto operator-(D it, difference_type n)
-        requires requires { it += -n; } {
-          return it += -n;
-        }
-
-#if defined(__cpp_lib_three_way_comparison)
-      friend constexpr auto operator<=>(D lhs, D rhs)
-        requires v2_dtl::base_3way<D> || v2_dtl::iter_sub<D> {
-          if constexpr (v2_dtl::base_3way<D>) {
-            return access::base(lhs) <=> access::base(rhs);
-          } else {
-            difference_type const diff = rhs - lhs;
-            return diff < difference_type(0) ? std::strong_ordering::less :
-              difference_type(0) < diff ? std::strong_ordering::greater :
-              std::strong_ordering::equal;
-          }
-        }
-#endif
-      friend constexpr bool operator<(D lhs, D rhs)
-        requires v2_dtl::iter_sub<D> {
-          return (lhs - rhs) < difference_type(0);
-        }
-      friend constexpr bool operator<=(D lhs, D rhs)
-        requires v2_dtl::iter_sub<D> {
-          return (lhs - rhs) <= difference_type(0);
-        }
-      friend constexpr bool operator>(D lhs, D rhs)
-        requires v2_dtl::iter_sub<D> {
-          return (lhs - rhs) > difference_type(0);
-        }
-      friend constexpr bool operator>=(D lhs, D rhs)
-        requires v2_dtl::iter_sub<D> {
-          return (lhs - rhs) >= difference_type(0);
         }
     };
 
@@ -876,17 +830,69 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
         concept derived_iter = requires (D d) { v2_dtl::derived_iterator(d); };
     }
 
+    template<typename D>
+      constexpr auto operator+(D it, typename D::difference_type n)
+        requires v2_dtl::derived_iter<D> && requires { it += n; }
+          { return it += n; }
+    template<typename D>
+      constexpr auto operator+(typename D::difference_type n, D it)
+        requires v2_dtl::derived_iter<D> && requires { it += n; }
+          { return it += n; }
+
     template<typename D1, typename D2>
-    constexpr bool operator==(D1 lhs, D2 rhs)
-      requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> &&
-               detail::interoperable<D1, D2>::value &&
-               (v2_dtl::base_eq<D1, D2> || v2_dtl::iter_sub<D1>) {
-      if constexpr (v2_dtl::base_eq<D1, D2>) {
-        return (access::base(lhs) == access::base(rhs));
-      } else if constexpr (v2_dtl::iter_sub<D1>) {
-        return (lhs - rhs) == typename D1::difference_type(0);
+      constexpr auto operator-(D1 lhs, D2 rhs)
+        requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> &&
+                 requires { access::base(lhs) - access::base(rhs); }
+          { return access::base(lhs) - access::base(rhs); }
+    template<typename D>
+      constexpr auto operator-(D it, typename D::difference_type n)
+        requires v2_dtl::derived_iter<D> && requires { it += -n; }
+          { return it += -n; }
+
+#if defined(__cpp_lib_three_way_comparison)
+    template<typename D1, typename D2>
+      constexpr auto operator<=>(D1 lhs, D2 rhs)
+        requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> &&
+        (v2_dtl::base_3way<D1, D2> || v2_dtl::iter_sub<D1, D2>) {
+        if constexpr (v2_dtl::base_3way<D1, D2>) {
+            return access::base(lhs) <=> access::base(rhs);
+          } else {
+            using diff_type = typename D1::difference_type;
+            diff_type const diff = rhs - lhs;
+            return diff < diff_type(0) ? std::strong_ordering::less :
+              diff_type(0) < diff ? std::strong_ordering::greater :
+              std::strong_ordering::equal;
+          }
+        }
+#endif
+    template<typename D1, typename D2>
+      constexpr bool operator<(D1 lhs, D2 rhs)
+        requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> && v2_dtl::iter_sub<D1, D2>
+          { return (lhs - rhs) < typename D1::difference_type(0); }
+    template<typename D1, typename D2>
+      constexpr bool operator<=(D1 lhs, D2 rhs)
+        requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> && v2_dtl::iter_sub<D1, D2>
+          { return (lhs - rhs) <= typename D1::difference_type(0); }
+    template<typename D1, typename D2>
+      constexpr bool operator>(D1 lhs, D2 rhs)
+        requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> && v2_dtl::iter_sub<D1, D2>
+          { return (lhs - rhs) > typename D1::difference_type(0); }
+    template<typename D1, typename D2>
+      constexpr bool operator>=(D1 lhs, D2 rhs)
+        requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> && v2_dtl::iter_sub<D1, D2>
+          { return (lhs - rhs) >= typename D1::difference_type(0); }
+
+    template<typename D1, typename D2>
+      constexpr bool operator==(D1 lhs, D2 rhs)
+        requires v2_dtl::derived_iter<D1> && v2_dtl::derived_iter<D2> &&
+                 detail::interoperable<D1, D2>::value &&
+        (v2_dtl::base_eq<D1, D2> || v2_dtl::iter_sub<D1, D2>) {
+        if constexpr (v2_dtl::base_eq<D1, D2>) {
+          return (access::base(lhs) == access::base(rhs));
+        } else if constexpr (v2_dtl::iter_sub<D1, D2>) {
+          return (lhs - rhs) == typename D1::difference_type(0);
+        }
       }
-    }
 
     template<typename D1, typename D2>
       constexpr auto operator!=(D1 lhs, D2 rhs) -> decltype(!(lhs == rhs))
