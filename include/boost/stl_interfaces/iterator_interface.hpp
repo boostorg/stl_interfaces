@@ -749,12 +749,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
       constexpr auto operator->()
         requires (!std::same_as<pointer, void> && std::is_reference_v<reference> &&
                   requires (D d) { *d; }) {
-          return detail::make_pointer<pointer>(*derived());
+          return detail::make_pointer<pointer, reference>(*derived());
         }
       constexpr auto operator->() const
         requires (!std::same_as<pointer, void> && std::is_reference_v<reference> &&
                   requires (D const d) { *d; }) {
-          return detail::make_pointer<pointer>(*derived());
+          return detail::make_pointer<pointer, reference>(*derived());
         }
 
       constexpr decltype(auto) operator[](difference_type n) const

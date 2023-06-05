@@ -40,6 +40,9 @@ project(stl_interfaces)
 set(CXX_STD 14 CACHE STRING "Set to X to enable C++X builds.")
 message("-- Using -std=c++${CXX_STD}")
 
+if (MSVC)
+  add_compile_options(/Zc:__cplusplus)
+endif()
 
 ##################################################
 # Sanitizers
