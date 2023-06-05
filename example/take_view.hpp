@@ -15,7 +15,9 @@ namespace detail {
     template<typename Iter>
     struct take_iterator
         : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
               take_iterator<Iter>,
+#endif
               std::forward_iterator_tag,
               typename std::iterator_traits<Iter>::value_type,
               typename std::iterator_traits<Iter>::reference,

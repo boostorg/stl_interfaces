@@ -15,7 +15,9 @@
 //[ filtered_int_iterator_defn
 template<typename Pred>
 struct filtered_int_iterator : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                                    filtered_int_iterator<Pred>,
+#endif
                                    std::bidirectional_iterator_tag,
                                    int>
 {

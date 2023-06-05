@@ -19,7 +19,9 @@
 // reference -- the reference type is a pair of references, std::tuple<int &,
 // int &>.
 struct zip_iterator : boost::stl_interfaces::proxy_iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                       zip_iterator,
+#endif
                       std::random_access_iterator_tag,
                       std::tuple<int, int>,
                       std::tuple<int &, int &>>

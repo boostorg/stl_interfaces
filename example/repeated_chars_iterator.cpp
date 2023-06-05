@@ -12,7 +12,9 @@
 
 //[ repeated_chars_iterator
 struct repeated_chars_iterator : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                                      repeated_chars_iterator,
+#endif
                                      std::random_access_iterator_tag,
                                      char,
                                      char>

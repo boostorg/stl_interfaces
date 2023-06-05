@@ -17,8 +17,11 @@ struct node
 
 template<typename Node>
 struct iterator
-    : boost::stl_interfaces::
-          iterator_interface<iterator<Node>, std::forward_iterator_tag, Node>
+    : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
+          iterator<Node>,
+#endif
+          std::forward_iterator_tag, Node>
 {
     using value_type = typename Node::value_type;
 

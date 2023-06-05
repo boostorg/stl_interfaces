@@ -18,7 +18,9 @@
 // from the same template.
 template<typename ValueType>
 struct random_access_iterator : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                                     random_access_iterator<ValueType>,
+#endif
                                     std::random_access_iterator_tag,
                                     ValueType>
 {

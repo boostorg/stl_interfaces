@@ -19,8 +19,9 @@ the full set of operations it supports can be defined in terms of that much
 smaller basis.
 
 It is possible to define any iterator `Iter` in terms of a subset of
-user-defined operations.  By deriving `Iter` from _iter_iface_ using _CRTP_,
-we can generate the full set of operations.  Here is the declaration of
+user-defined operations.  By deriving `Iter` from _iter_iface_, we can
+generate the full set of operations.  _iter_iface_ uses _CRTP_ in C++20 and
+earlier, and deducing `this` in C++23 and later.  Here is the declaration of
 _iter_iface_:
 
     template<
@@ -32,9 +33,23 @@ _iter_iface_:
         typename DifferenceType = std::ptrdiff_t>
     struct iterator_interface;
 
+Or, for C++23 and later:
+
+    template<
+        typename IteratorConcept,
+        typename ValueType,
+        typename Reference = ValueType &,
+        typename Pointer = ValueType *,
+        typename DifferenceType = std::ptrdiff_t>
+    struct iterator_interface;
+
 Let's break that down.
 
 `Derived` is the type that you're deriving _iter_iface_ from.
+
+[important In C++23 and later, as long as you have not defined
+`BOOST_STL_INTERFACES_DISABLE_DEDUCED_THIS`, you do not pass the derived type
+to _iter_iface_; it has no `Derived` template parameter.]
 
 `IteratorConcept` defines the iterator category/concept.  This must be one of
 the C++ standard iterator tag types, like `std::forward_iterator_tag`.  In
@@ -85,11 +100,29 @@ reasonable defaults for _iter_iface_'s parameters:
         proxy_arrow_result<Reference>,
         DifferenceType>;
 
+Or, for C++23 and later:
+
+    template<
+        typename IteratorConcept,
+        typename ValueType,
+        typename Reference = ValueType,
+        typename DifferenceType = std::ptrdiff_t>
+    using proxy_iterator_interface = iterator_interface<
+        IteratorConcept,
+        ValueType,
+        Reference,
+        proxy_arrow_result<Reference>,
+        DifferenceType>;
+
 [note As shown above, _proxy_iter_iface_ uses a template called
 `proxy_arrow_result` as its pointer-type.  This template makes a copy of
 whatever value is obtained by `operator*`, and then returns a pointer to the
 copy in its `operator->`.  You may want to use something else if this is a
 performance concern. ]
+
+[important If you are using C++23 or later and have not defined
+`BOOST_STL_INTERFACES_DISABLE_DEDUCED_THIS`, the `Derived` template parameter
+above will not be present.]
 
 
 [heading User-Defined Iterator Operations]
@@ -231,8 +264,9 @@ will get us there.
 [node_iterator_class_head]
 
 We are deriving `node_iterator` from _iter_iface_, and because we're using
-_CRTP_, we first have to pass `node_iterator` for the `Derived` template
-parameter, so that _iter_iface_ knows what derived type to cast to in order to
+_CRTP_ in C++20 and earlier, we first have to pass `node_iterator` for the
+`Derived` template parameter if `BOOST_STL_INTERFACES_USE_DEDUCED_THIS` is not
+defined, so that _iter_iface_ knows what derived type to cast to in order to
 get at the user-defined operations.  Then, we pass `std::forward_iterator_tag`
 for `IteratorConcept`, since that's appropriate for a singly-linked list.
 Finally, we pass `T` to let _iter_iface_ know what the `value_type` is for our

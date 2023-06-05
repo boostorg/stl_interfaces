@@ -16,7 +16,9 @@
 // parameters for most stl_interfaces template parameters.
 struct simple_random_access_iterator
     : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           simple_random_access_iterator,
+#endif
           std::random_access_iterator_tag,
           int>
 {

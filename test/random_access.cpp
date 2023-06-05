@@ -18,7 +18,9 @@
 
 
 struct basic_random_access_iter : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                                       basic_random_access_iter,
+#endif
                                       std::random_access_iterator_tag,
                                       int>
 {
@@ -63,7 +65,9 @@ static_assert(
 template<typename ValueType>
 struct basic_random_access_iter_dependent
     : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           basic_random_access_iter_dependent<ValueType>,
+#endif
           std::random_access_iterator_tag,
           ValueType>
 {
@@ -103,7 +107,9 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 
 struct basic_adapted_random_access_iter
     : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           basic_adapted_random_access_iter,
+#endif
           std::random_access_iterator_tag,
           int>
 {
@@ -131,7 +137,9 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 
 template<typename ValueType>
 struct adapted_random_access_iter : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                                         adapted_random_access_iter<ValueType>,
+#endif
                                         std::random_access_iterator_tag,
                                         ValueType>
 {
@@ -180,7 +188,9 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 
 template<typename ValueType>
 struct random_access_iter : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                                 random_access_iter<ValueType>,
+#endif
                                 std::random_access_iterator_tag,
                                 ValueType>
 {
@@ -238,7 +248,9 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 struct zip_iter : boost::stl_interfaces::proxy_iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                       zip_iter,
+#endif
                       std::random_access_iterator_tag,
                       std::tuple<int, int>,
                       std::tuple<int &, int &>>
@@ -298,7 +310,9 @@ struct int_t
 };
 
 struct udt_zip_iter : boost::stl_interfaces::proxy_iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                           udt_zip_iter,
+#endif
                           std::random_access_iterator_tag,
                           std::tuple<int_t, int>,
                           std::tuple<int_t &, int &>>

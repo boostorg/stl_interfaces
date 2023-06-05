@@ -16,8 +16,11 @@
 
 
 struct basic_input_iter
-    : boost::stl_interfaces::
-          iterator_interface<basic_input_iter, std::input_iterator_tag, int>
+    : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
+          basic_input_iter,
+#endif
+          std::input_iterator_tag, int>
 {
     basic_input_iter() : it_(nullptr) {}
     basic_input_iter(int * it) : it_(it) {}
@@ -33,8 +36,11 @@ struct basic_input_iter
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::
-        iterator_interface<basic_input_iter, std::input_iterator_tag, int>;
+    using base_type = boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
+        basic_input_iter,
+#endif
+        std::input_iterator_tag, int>;
     using base_type::operator++;
 
 private:
@@ -56,7 +62,9 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 
 template<typename ValueType>
 struct input_iter : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                         input_iter<ValueType>,
+#endif
                         std::input_iterator_tag,
                         ValueType>
 {
@@ -81,7 +89,9 @@ struct input_iter : boost::stl_interfaces::iterator_interface<
     }
 
     using base_type = boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         input_iter<ValueType>,
+#endif
         std::input_iterator_tag,
         ValueType>;
     using base_type::operator++;
@@ -112,7 +122,9 @@ using const_pair_input = input_iter<std::pair<int, int> const>;
 
 template<typename ValueType>
 struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                               proxy_input_iter<ValueType>,
+#endif
                               std::input_iterator_tag,
                               ValueType>
 {
@@ -137,7 +149,9 @@ struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
     }
 
     using base_type = boost::stl_interfaces::proxy_iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         proxy_input_iter<ValueType>,
+#endif
         std::input_iterator_tag,
         ValueType>;
     using base_type::operator++;

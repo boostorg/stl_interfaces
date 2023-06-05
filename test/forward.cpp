@@ -19,8 +19,11 @@ template<typename T>
 using decrementable_t = decltype(--std::declval<T &>());
 
 struct basic_forward_iter
-    : boost::stl_interfaces::
-          iterator_interface<basic_forward_iter, std::forward_iterator_tag, int>
+    : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
+          basic_forward_iter,
+#endif
+          std::forward_iterator_tag, int>
 {
     basic_forward_iter() : it_(nullptr) {}
     basic_forward_iter(int * it) : it_(it) {}
@@ -37,8 +40,11 @@ struct basic_forward_iter
         return lhs.it_ == rhs.it_;
     }
 
-    using base_type = boost::stl_interfaces::
-        iterator_interface<basic_forward_iter, std::forward_iterator_tag, int>;
+    using base_type = boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
+        basic_forward_iter,
+#endif
+        std::forward_iterator_tag, int>;
     using base_type::operator++;
 
 private:
@@ -60,7 +66,9 @@ static_assert(ill_formed<decrementable_t, basic_forward_iter>::value, "");
 
 template<typename ValueType>
 struct forward_iter : boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
                           forward_iter<ValueType>,
+#endif
                           std::forward_iterator_tag,
                           ValueType>
 {
@@ -85,7 +93,9 @@ struct forward_iter : boost::stl_interfaces::iterator_interface<
     }
 
     using base_type = boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         forward_iter<ValueType>,
+#endif
         std::forward_iterator_tag,
         ValueType>;
     using base_type::operator++;

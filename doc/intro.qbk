@@ -37,7 +37,10 @@ dramatically.
 
 [note C++20 versions of _iter_iface_ and _cont_iface_ are provided (C++20
 provides `std::view_interface`).  These are constrained templates using C++20
-concepts.  These are in the `boost::stl_interfaces::v2` namespace. ]
+concepts.  These are in the `boost::stl_interfaces::v2` namespace.  There is
+also a C++23 version of _iter_iface_ that uses deducing `this` instead of
+_CRTP_.  If you do nothing, you'll get the latest `vN` namespace inlined,
+depending on your compiler's language support. ]
 
 [heading A Quick Example]
 
