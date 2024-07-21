@@ -12,7 +12,7 @@ import config : requires ;
 
 project :
     requirements
-        <source>/boost/core//boost_core
+        <library>/boost/core//boost_core
         [ requires cxx14_constexpr ]
 ;
 
