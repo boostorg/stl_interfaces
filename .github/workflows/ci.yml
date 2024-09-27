@@ -84,7 +84,7 @@ jobs:
             sudo python3 get-pip.py
             sudo /usr/local/bin/pip install cmake
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: linux
         shell: bash
