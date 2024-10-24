@@ -6,6 +6,9 @@
 #ifndef BOOST_STL_INTERFACES_CONFIG_HPP
 #define BOOST_STL_INTERFACES_CONFIG_HPP
 
+// Included for BOOST_CLANG_VERSION
+#include <boost/config.hpp>
+
 // Included for definition of __cpp_lib_concepts.
 #include <iterator>
 
@@ -17,7 +20,9 @@
 #define BOOST_STL_INTERFACES_USE_CONCEPTS 0
 #endif
 
-#if defined(__cpp_explicit_this_parameter) &&                                  \
+#if (defined(__cpp_explicit_this_parameter) ||                                 \
+     (defined(_MSC_VER) && _MSC_VER >= 1941) ||                                \
+     (defined(BOOST_CLANG_VERSION) && BOOST_CLANG_VERSION >= 190000)) &&       \
     BOOST_STL_INTERFACES_USE_CONCEPTS &&                                       \
     !defined(BOOST_STL_INTERFACES_DISABLE_DEDUCED_THIS)
 #define BOOST_STL_INTERFACES_USE_DEDUCED_THIS 1
