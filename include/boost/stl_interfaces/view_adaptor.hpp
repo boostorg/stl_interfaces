@@ -134,7 +134,7 @@ namespace boost { namespace stl_interfaces {
     /** A backwards-compatible implementation of C++23's
         `std::ranges::range_adaptor_closure`.  `range_adaptor_closure` may be
         a struct template or may be an alias, as required to maintain
-        compatability with the standard library's view adaptors. */
+        compatibility with the standard library's view adaptors. */
 #if BOOST_STL_INTERFACES_USE_CONCEPTS
     template<typename D>
     requires std::is_class_v<D> && std::same_as<D, std::remove_cv_t<D>>
