@@ -173,7 +173,7 @@ namespace boost { namespace stl_interfaces {
 #elif BOOST_STL_INTERFACES_USE_LIBSTDCPP_GCC12_RANGE_ADAPTOR_CLOSURE
 
     template<typename D>
-    using range_adaptor_closure = std::views::__adaptor::_RangeAdaptorClosure;
+    using range_adaptor_closure = std::views::__adaptor::_RangeAdaptorClosure<D>;
 
 #elif BOOST_STL_INTERFACES_NEED_VS_COMPATIBLE_RANGE_ADAPTOR_CLOSURE
 
