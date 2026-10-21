@@ -15,14 +15,20 @@
 #include <vector>
 
 
-struct zip_iter : boost::stl_interfaces::proxy_iterator_interface<
+struct zip_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    : boost::stl_interfaces::proxy_iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                      zip_iter,
+          zip_iter,
 #endif
-                      std::random_access_iterator_tag,
-                      std::tuple<int, int>,
-                      std::tuple<int &, int &>>
+          std::random_access_iterator_tag,
+          std::tuple<int, int>,
+          std::tuple<int &, int &>>
+#endif
 {
+    using reference = std::tuple<int &, int &>;
+    using value_type = std::tuple<int, int>;
+
     zip_iter() : it1_(nullptr), it2_(nullptr) {}
     zip_iter(int * it1, int * it2) : it1_(it1), it2_(it2) {}
 
@@ -40,6 +46,14 @@ struct zip_iter : boost::stl_interfaces::proxy_iterator_interface<
     {
         return lhs.it1_ - rhs.it1_;
     }
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::random_access_iterator_tag{}, ^^zip_iter);
+    }
+#endif
 
 private:
     int * it1_;

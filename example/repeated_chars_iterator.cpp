@@ -11,14 +11,19 @@
 
 
 //[ repeated_chars_iterator
-struct repeated_chars_iterator : boost::stl_interfaces::iterator_interface<
+struct repeated_chars_iterator
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                                     repeated_chars_iterator,
+          repeated_chars_iterator,
 #endif
-                                     std::random_access_iterator_tag,
-                                     char,
-                                     char>
+          std::random_access_iterator_tag,
+          char,
+          char>
+#endif
 {
+    using difference_type = std::ptrdiff_t;
+
     constexpr repeated_chars_iterator() noexcept :
         first_(nullptr),
         size_(0),
@@ -26,9 +31,7 @@ struct repeated_chars_iterator : boost::stl_interfaces::iterator_interface<
     {}
     constexpr repeated_chars_iterator(
         char const * first, difference_type size, difference_type n) noexcept :
-        first_(first),
-        size_(size),
-        n_(n)
+        first_(first), size_(size), n_(n)
     {}
 
     constexpr char operator*() const noexcept { return first_[n_ % size_]; }
@@ -37,10 +40,19 @@ struct repeated_chars_iterator : boost::stl_interfaces::iterator_interface<
         n_ += i;
         return *this;
     }
-    constexpr auto operator-(repeated_chars_iterator other) const noexcept
+    constexpr difference_type // TODO: auto
+    operator-(repeated_chars_iterator other) const noexcept
     {
         return n_ - other.n_;
     }
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::random_access_iterator_tag{}, ^^repeated_chars_iterator);
+    }
+#endif
 
 private:
     char const * first_;

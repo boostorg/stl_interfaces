@@ -18,13 +18,16 @@
 // implementation of std::back_insert_iterator, but it demonstrates that
 // iterator_interface is flexible enough to handle this odd kind of iterator.
 template<typename Container>
-struct back_insert_iterator : boost::stl_interfaces::iterator_interface<
+struct back_insert_iterator
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                                  back_insert_iterator<Container>,
+          back_insert_iterator<Container>,
 #endif
-                                  std::output_iterator_tag,
-                                  typename Container::value_type,
-                                  back_insert_iterator<Container> &>
+          std::output_iterator_tag,
+          typename Container::value_type,
+          back_insert_iterator<Container> &>
+#endif
 {
     // For concept requirements.
     back_insert_iterator() : c_(nullptr) {}
@@ -52,6 +55,7 @@ struct back_insert_iterator : boost::stl_interfaces::iterator_interface<
     // nowhere to go in next().  Do nothing.
     back_insert_iterator & operator++() { return *this; }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         back_insert_iterator<Container>,
@@ -60,6 +64,15 @@ struct back_insert_iterator : boost::stl_interfaces::iterator_interface<
         typename Container::value_type,
         back_insert_iterator<Container> &>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::output_iterator_tag{}, ^^back_insert_iterator);
+    }
+#endif
 
 private:
     Container * c_;

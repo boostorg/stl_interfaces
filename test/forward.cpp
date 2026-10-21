@@ -19,11 +19,14 @@ template<typename T>
 using decrementable_t = decltype(--std::declval<T &>());
 
 struct basic_forward_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           basic_forward_iter,
 #endif
-          std::forward_iterator_tag, int>
+          std::forward_iterator_tag,
+          int>
+#endif
 {
     basic_forward_iter() : it_(nullptr) {}
     basic_forward_iter(int * it) : it_(it) {}
@@ -40,12 +43,23 @@ struct basic_forward_iter
         return lhs.it_ == rhs.it_;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         basic_forward_iter,
 #endif
-        std::forward_iterator_tag, int>;
+        std::forward_iterator_tag,
+        int>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::forward_iterator_tag{}, ^^basic_forward_iter);
+    }
+#endif
 
 private:
     int * it_;
@@ -65,12 +79,15 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 static_assert(ill_formed<decrementable_t, basic_forward_iter>::value, "");
 
 template<typename ValueType>
-struct forward_iter : boost::stl_interfaces::iterator_interface<
+struct forward_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                          forward_iter<ValueType>,
+          forward_iter<ValueType>,
 #endif
-                          std::forward_iterator_tag,
-                          ValueType>
+          std::forward_iterator_tag,
+          ValueType>
+#endif
 {
     forward_iter() : it_(nullptr) {}
     forward_iter(ValueType * it) : it_(it) {}
@@ -92,6 +109,7 @@ struct forward_iter : boost::stl_interfaces::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         forward_iter<ValueType>,
@@ -99,6 +117,15 @@ struct forward_iter : boost::stl_interfaces::iterator_interface<
         std::forward_iterator_tag,
         ValueType>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::forward_iterator_tag{}, ^^forward_iter);
+    }
+#endif
 
 private:
     ValueType * it_;
@@ -256,7 +283,7 @@ int main()
     forward last(ints.data() + ints.size());
     const_forward first_copy(first);
     const_forward last_copy(last);
-    std::equal(first, last, first_copy, last_copy);
+    [[maybe_unused]] auto _ = std::equal(first, last, first_copy, last_copy);
 }
 
 

@@ -24,11 +24,14 @@ struct node
 //[ node_iterator_class_head
 template<typename T>
 struct node_iterator
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           node_iterator<T>,
 #endif
-          std::forward_iterator_tag, T>
+          std::forward_iterator_tag,
+          T>
+#endif
 //]
 {
     //[ node_iterator_ctors
@@ -51,13 +54,24 @@ struct node_iterator
     //]
 
     //[ node_iterator_using_declaration
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         node_iterator<T>,
 #endif
-        std::forward_iterator_tag, T>;
+        std::forward_iterator_tag,
+        T>;
     using base_type::operator++;
+#endif
     //]
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::forward_iterator_tag{}, ^^node_iterator);
+    }
+#endif
 
 private:
     node<T> * it_;
@@ -78,7 +92,7 @@ int main()
         static int i = 0;
         return node<int>{i++};
     });
-    std::adjacent_find(
+    [[maybe_unused]] auto _ = std::adjacent_find(
         nodes.begin(), nodes.end(), [](node<int> & a, node<int> & b) {
             a.next_ = &b;
             return false;

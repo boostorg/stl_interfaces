@@ -14,11 +14,14 @@
 
 
 struct basic_output_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           basic_output_iter,
 #endif
-          std::output_iterator_tag, int>
+          std::output_iterator_tag,
+          int>
+#endif
 {
     basic_output_iter() : it_(nullptr) {}
     basic_output_iter(int * it) : it_(it) {}
@@ -30,12 +33,23 @@ struct basic_output_iter
         return *this;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         basic_output_iter,
 #endif
-        std::output_iterator_tag, int>;
+        std::output_iterator_tag,
+        int>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::output_iterator_tag{}, ^^basic_output_iter);
+    }
+#endif
 
 private:
     int * it_;
@@ -66,13 +80,16 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 
 
 template<typename Container>
-struct back_insert_iter : boost::stl_interfaces::iterator_interface<
+struct back_insert_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                              back_insert_iter<Container>,
+          back_insert_iter<Container>,
 #endif
-                              std::output_iterator_tag,
-                              typename Container::value_type,
-                              back_insert_iter<Container> &>
+          std::output_iterator_tag,
+          typename Container::value_type,
+          back_insert_iter<Container> &>
+#endif
 {
     back_insert_iter() : c_(nullptr) {}
     back_insert_iter(Container & c) : c_(std::addressof(c)) {}
@@ -91,6 +108,7 @@ struct back_insert_iter : boost::stl_interfaces::iterator_interface<
         return *this;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         back_insert_iter<Container>,
@@ -99,6 +117,15 @@ struct back_insert_iter : boost::stl_interfaces::iterator_interface<
         typename Container::value_type,
         back_insert_iter<Container> &>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::output_iterator_tag{}, ^^back_insert_iter);
+    }
+#endif
 
 private:
     Container * c_;

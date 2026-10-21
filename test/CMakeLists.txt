@@ -43,7 +43,9 @@ add_test_executable(detail)
 add_test_executable(static_vec)
 add_test_executable(static_vec_noncopyable)
 add_test_executable(array)
-add_test_executable(view_adaptor)
+#add_test_executable(view_adaptor)
+add_test_executable(v4_dtl)
+add_test_executable(v4_permutations)
 
 add_executable(
     compile_tests

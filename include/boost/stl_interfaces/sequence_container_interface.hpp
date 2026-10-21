@@ -20,12 +20,15 @@
 namespace boost { namespace stl_interfaces { namespace detail {
 
     template<typename T, typename SizeType>
-    struct n_iter : iterator_interface<
+    struct n_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+        : iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                        n_iter<T, SizeType>,
+              n_iter<T, SizeType>,
 #endif
-                        std::random_access_iterator_tag,
-                        T>
+              std::random_access_iterator_tag,
+              T>
+#endif
     {
         n_iter() : x_(nullptr), n_(0) {}
         n_iter(T const & x, SizeType n) : x_(&x), n_(n) {}
@@ -40,6 +43,14 @@ namespace boost { namespace stl_interfaces { namespace detail {
             n_ += offset;
             return *this;
         }
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+        consteval
+        {
+            boost::stl_interfaces::iterator_interface(
+                std::random_access_iterator_tag{}, ^^n_iter);
+        }
+#endif
 
     private:
         T const * x_;
@@ -1033,6 +1044,19 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V2 {
 namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V3 {
 
     // TODO: Reimplement using deduced this.
+    template<typename D,
+             element_layout Contiguity = element_layout::discontiguous>
+    using sequence_container_interface = v2::sequence_container_interface<D, Contiguity>;
+
+}}}
+
+#endif
+
+#if defined(BOOST_STL_INTERFACES_DOXYGEN) || BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+
+namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
+
+    // TODO: Reimplement using token injection.
     template<typename D,
              element_layout Contiguity = element_layout::discontiguous>
     using sequence_container_interface = v2::sequence_container_interface<D, Contiguity>;

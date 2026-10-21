@@ -14,6 +14,16 @@
 #include <compare>
 #endif
 
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+#define BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION 0
+#include <algorithm>
+#include <exception>
+#include <meta>
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+#include <debugging>
+#endif
+#endif
+
 
 namespace boost { namespace stl_interfaces {
 
@@ -1109,6 +1119,794 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V3 {
         Reference,
         proxy_arrow_result<Reference>,
         DifferenceType>;
+
+}}}
+
+#endif
+
+#if defined(BOOST_STL_INTERFACES_DOXYGEN) || BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+
+namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
+
+    // clang-format off
+
+    namespace v4_dtl {
+      struct post_t {};
+      constexpr post_t post;
+
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+      constexpr std::array<std::string_view, 44> op_names = {{
+        "hidden op_new",
+        "hidden op_delete",
+        "hidden op_array_new",
+        "hidden op_array_delete",
+        "hidden op_co_await",
+        "hidden op_parentheses",
+        "hidden op_square_brackets",
+        "hidden op_arrow",
+        "hidden op_arrow_star",
+        "hidden op_tilde",
+        "hidden op_exclamation",
+        "hidden op_plus",
+        "hidden op_minus",
+        "hidden op_star",
+        "hidden op_slash",
+        "hidden op_percent",
+        "hidden op_caret",
+        "hidden op_ampersand",
+        "hidden op_equals",
+        "hidden op_pipe",
+        "hidden op_plus_equals",
+        "hidden op_minus_equals",
+        "hidden op_star_equals",
+        "hidden op_slash_equals",
+        "hidden op_percent_equals",
+        "hidden op_caret_equals",
+        "hidden op_ampersand_equals",
+        "hidden op_pipe_equals",
+        "hidden op_equals_equals",
+        "hidden op_exclamation_equals",
+        "hidden op_less",
+        "hidden op_greater",
+        "hidden op_less_equals",
+        "hidden op_greater_equals",
+        "hidden op_spaceship",
+        "hidden op_ampersand_ampersand",
+        "hidden op_pipe_pipe",
+        "hidden op_less_less",
+        "hidden op_greater_greater",
+        "hidden op_less_less_equals",
+        "hidden op_greater_greater_equals",
+        "hidden op_plus_plus",
+        "hidden op_minus_minus",
+        "hidden op_comma"
+      }};
+#endif
+
+      struct iterator_alias {
+        std::optional<std::meta::info> alias;
+        bool defined_by_user = false; // otherwise, deduced (only relevant when !!alias)
+
+        constexpr bool operator==(iterator_alias const &) const noexcept = default;
+      };
+
+      struct iterator_aliases {
+        iterator_alias reference;
+        iterator_alias value_type;
+        iterator_alias pointer;
+        iterator_alias difference_type;
+      };
+
+      struct has_op_t;
+      consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op);
+
+      // BARRY NOTE: This is way too complicated, and everyone is going to
+      // have to write this over and over.  There needs to be some interface
+      // that actually tells you if you're looking at op-(T, T) vs. op-(T),
+      // and op++() vs. op++(int).
+      struct has_op_t {
+        consteval has_op_t(std::meta::info t) : ops_{} {
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+          std::constexpr_print_str("**** BEGIN detecting operators");
+#endif
+          std::vector members = members_of(t, std::meta::access_context::unchecked());
+          auto const non_aliases =
+              std::ranges::stable_partition(members, std::meta::is_type_alias);
+          auto const aliases = std::ranges::subrange(members.begin(), non_aliases.begin());
+          for (std::meta::info f : aliases) {
+            auto const id = identifier_of(f);
+            if (id == "reference") {
+              aliases_.reference = {dealias(f), true};
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+              std::constexpr_print_str("found 'using reference = ...;'");
+#endif
+            } else if (id == "value_type") {
+              aliases_.value_type = {dealias(f), true};
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+              std::constexpr_print_str("found 'using value_type = ...;'");
+#endif
+            } else if (id == "pointer") {
+              aliases_.pointer = {dealias(f), true};
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+              std::constexpr_print_str("found 'using pointer = ...;'");
+#endif
+            } else if (id == "difference_type") {
+              aliases_.difference_type = {dealias(f), true};
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+              std::constexpr_print_str("found 'using difference_type = ...;'");
+#endif
+            }
+          }
+          auto const record_operator = [this](std::meta::operators op, bool post) {
+            ops_[
+              static_cast<int>(op) - static_cast<int>(std::meta::operators::op_new)
+            ][post] = true;
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str(op_names[
+              static_cast<int>(op) -
+              static_cast<int>(std::meta::operators::op_new)].substr(7));
+#endif
+          };
+          for (std::meta::info f : non_aliases) {
+            if (!is_operator_function(f) || is_special_member_function(f))
+              continue;
+            auto const op = operator_of(f);
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str(op_names[
+              static_cast<int>(op) -
+              static_cast<int>(std::meta::operators::op_new)].substr(7));
+#endif
+            if (op == std::meta::operators::op_star) {
+              auto params = parameters_of(f);
+              if (!params.empty())
+                continue;
+              record_operator(op, false);
+              if (!aliases_.reference.alias)
+                aliases_.reference = {return_type_of(f), false};
+            } else if (op == std::meta::operators::op_plus ||
+                       op == std::meta::operators::op_minus) {
+              auto params = parameters_of(f);
+              if (params.size() != 1u)
+                continue;
+              record_operator(op, false);
+              if (op == std::meta::operators::op_minus &&
+                  remove_cvref(type_of(params[0])) == t &&
+                  !aliases_.difference_type.alias) {
+                aliases_.difference_type = {return_type_of(f), false};
+              }
+            } else if (op == std::meta::operators::op_plus_plus ||
+                       op == std::meta::operators::op_minus_minus) {
+              auto params = parameters_of(f);
+              if (params.empty())
+                record_operator(op, false);
+              else if (type_of(params[0]) == ^^int)
+                record_operator(op, true);
+            } else {
+              record_operator(op, false);
+            }
+          }
+          for (std::meta::info f : hidden_friends_of(t)) {
+            if (!is_operator_function(f))
+              continue;
+            auto const op = operator_of(f);
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str(op_names[
+              static_cast<int>(op) -
+              static_cast<int>(std::meta::operators::op_new)]);
+#endif
+            if (op == std::meta::operators::op_star) {
+              auto params = parameters_of(f);
+              if (params.size() != 1u || remove_cvref(type_of(params[0])) != t)
+                continue;
+              record_operator(op, false);
+              if (!aliases_.reference.alias)
+                aliases_.reference = {return_type_of(f), false};
+            } else if (op == std::meta::operators::op_plus ||
+                       op == std::meta::operators::op_minus) {
+              auto params = parameters_of(f);
+              if (params.size() != 2u)
+                continue;
+              record_operator(op, false);
+              if (op == std::meta::operators::op_minus &&
+                  remove_cvref(type_of(params[0])) == t &&
+                  remove_cvref(type_of(params[1])) == t &&
+                  !aliases_.difference_type.alias) {
+                aliases_.difference_type = {return_type_of(f), false};
+              }
+            } else if (op == std::meta::operators::op_plus_plus ||
+                       op == std::meta::operators::op_minus_minus) {
+              auto params = parameters_of(f);
+              if (params.empty() || remove_cvref(type_of(params[0])) != t)
+                continue;
+              if (params.size() == 1u)
+                record_operator(op, false);
+              else if (type_of(params[1]) == ^^int)
+                record_operator(op, true);
+            } else {
+              record_operator(op, false);
+            }
+          }
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+          std::constexpr_print_str("**** END detecting operators");
+#endif
+        }
+
+        consteval bool operator()(std::meta::operators op) const {
+          return ops_[static_cast<int>(op) -
+                      static_cast<int>(std::meta::operators::op_new)][0];
+        }
+
+        consteval bool operator()(std::meta::operators op, post_t) const {
+          return ops_[static_cast<int>(op) -
+                      static_cast<int>(std::meta::operators::op_new)][1];
+        }
+
+        constexpr iterator_aliases const& aliases() const { return aliases_; }
+
+        consteval void gained_op(std::meta::operators op) {
+          ops_[static_cast<int>(op) -
+               static_cast<int>(std::meta::operators::op_new)][0] = true;
+        }
+
+        consteval void gained_op(std::meta::operators op, post_t) {
+          ops_[static_cast<int>(op) -
+               static_cast<int>(std::meta::operators::op_new)][1] = true;
+        }
+
+      private:
+        static_assert(static_cast<int>(std::meta::operators::op_new) <
+              static_cast<int>(std::meta::operators::op_comma));
+        static_assert(static_cast<int>(std::meta::operators::op_comma) -
+              static_cast<int>(std::meta::operators::op_new) + 1 == 44);
+
+        std::array<std::array<bool, 2>, 44> ops_;
+        iterator_aliases aliases_;
+
+        friend consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op);
+      };
+
+      template <typename T>
+      constexpr bool adapted_iter_can_deref = requires(T const& x) { *x; };
+      template <typename T>
+      constexpr bool adapted_iter_can_eq =
+        requires(T const& x, T const& y) { { x == y } -> std::convertible_to<bool>; };
+      template <typename T>
+      constexpr bool adapted_iter_can_pre_incr = requires(T& x) { ++x; };
+      template <typename T>
+      constexpr bool adapted_iter_can_pre_decr = requires(T& x) { --x; };
+      template <typename T, typename DifferenceT>
+      constexpr bool adapted_iter_can_plus_eq = requires(T& x, DifferenceT n) { x += n; };
+      template<typename T, typename DifferenceT>
+      constexpr bool adapted_iter_can_subtract = requires (T const& x, T const& y) {
+        {x - y} -> std::convertible_to<DifferenceT>;
+      };
+      template<typename T>
+      constexpr bool adapted_iter_can_subtract_unknown_result = requires (T const& x, T const& y) {
+        {x - y};
+      };
+      template<typename T>
+      constexpr bool adapted_iter_can_equals = requires (T const& x, T const& y) {
+        {x == y} -> std::convertible_to<bool>;
+      };
+      template<typename T>
+      constexpr bool adapted_iter_can_spaceship = requires (T const& x, T const& y) {
+        {x <=> y};
+      };
+
+      template <typename T>
+      using adapted_iter_deref_result = decltype(*std::declval<T const&>());
+      template <typename T>
+      using adapted_iter_subtract_result =
+          decltype(std::declval<T const&>() - std::declval<T const&>());
+
+      template<typename IteratorConcept>
+      consteval void check_for_required_operators(has_op_t const& has_op) {
+        if constexpr (std::same_as<IteratorConcept, std::input_iterator_tag>) {
+          if (!has_op(std::meta::operators::op_star)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator* for input_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_equals_equals)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator== for input_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_plus_plus)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator++ for input_iterator_tag.");
+          }
+        } else if constexpr (std::same_as<IteratorConcept, std::output_iterator_tag>) {
+          if (!has_op(std::meta::operators::op_star)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator* for outut_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_plus_plus)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator++ for outut_iterator_tag.");
+          }
+        } else if constexpr (std::same_as<IteratorConcept, std::forward_iterator_tag>) {
+          if (!has_op(std::meta::operators::op_star)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator* for forward_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_equals_equals)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator== for forward_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_plus_plus)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator++ for forward_iterator_tag.");
+          }
+        } else if constexpr (std::same_as<IteratorConcept, std::bidirectional_iterator_tag>) {
+          if (!has_op(std::meta::operators::op_star)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator* for bidirectional_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_equals_equals)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator== for bidirectional_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_plus_plus)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator++ for bidirectional_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_minus_minus)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator-- for bidirectional_iterator_tag.");
+          }
+        } else if constexpr (std::same_as<IteratorConcept, std::random_access_iterator_tag> ||
+                             std::same_as<IteratorConcept, std::contiguous_iterator_tag>) {
+          if (!has_op(std::meta::operators::op_star)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator* for random_access_iterator_tag/"
+              "contiguous_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_minus)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator- for random_access_iterator_tag/"
+              "contiguous_iterator_tag.");
+          }
+          if (!has_op(std::meta::operators::op_plus_equals)) {
+            throw std::invalid_argument(
+              "You did not provide, directly or via .base_reference(), the "
+              "required operator+= for random_access_iterator_tag/"
+              "contiguous_iterator_tag.");
+          }
+        } else {
+          throw std::invalid_argument(
+              "Invalid IteratorConcept template argument (must be one of "
+              "std::*_iterator_tag).");
+        }
+      }
+
+      template<typename IteratorConcept>
+      consteval void iterator_interface_impl(
+        std::meta::info ref, std::meta::info vt, std::meta::info ptr,
+        std::meta::info dt, std::meta::info t, std::meta::info adapted,
+        v4_dtl::has_op_t& has_op) {
+        auto const& aliases = has_op.aliases();
+
+        // nested types
+        // BARRY NOTE: This is clunky.  I't like to have a way to refer to
+        // entities (especially types) by their names, without having to
+        // introduce reflections that only exist to be interpolated into a token
+        // sequence.  Even if I had to write \(^^IteratorConcept) or
+        // $^^IteratorConcept everywhere I use it, that's better than leaving
+        // the variable `ic` lying around (which is very un-c++-y).
+        auto const ic = ^^IteratorConcept;
+
+        if (ic == ^^std::output_iterator_tag)
+          ptr = ^^void;
+
+        auto tokens = ^^{
+          using iterator_concept = $ic;
+        };
+        if (!aliases.reference.alias || !aliases.reference.defined_by_user) {
+          tokens += ^^{
+            using reference = $ref;
+          };
+        }
+        if (!aliases.value_type.alias || !aliases.value_type.defined_by_user) {
+          tokens += ^^{
+            using value_type = std::remove_const_t<$vt>;
+          };
+        }
+        if (!aliases.pointer.alias || !aliases.pointer.defined_by_user) {
+          tokens += ^^{
+            using pointer = $ptr;
+          };
+        }
+        if (!aliases.difference_type.alias || !aliases.difference_type.defined_by_user) {
+          tokens += ^^{
+            using difference_type = $dt;
+          };
+        }
+        if (std::is_base_of_v<std::forward_iterator_tag, IteratorConcept>) {
+          std::meta::info iter_cat;
+          if (!is_reference_type(ref)) {
+            iter_cat = ^^std::input_iterator_tag;
+          } else if (std::is_base_of_v<std::random_access_iterator_tag, IteratorConcept>) {
+            iter_cat = ^^std::random_access_iterator_tag;
+          } else if (std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept>) {
+            iter_cat = ^^std::bidirectional_iterator_tag;
+          } else {
+            iter_cat = ^^std::forward_iterator_tag;
+          }
+          tokens += ^^{
+            using iterator_category = \(iter_cat);
+          };
+        }
+
+        // operators
+        constexpr bool is_random_access =
+            std::is_base_of_v<std::random_access_iterator_tag, IteratorConcept>;
+
+        // operators from adapted iterator
+        bool const is_adapting = adapted != std::meta::info();
+        if (is_adapting) {
+          auto adapted_t = type_of(adapted);
+          bool const adapted_deref =
+            extract<bool>(substitute(^^v4_dtl::adapted_iter_can_deref, {adapted_t}));
+          bool const adapted_equals =
+            extract<bool>(substitute(^^v4_dtl::adapted_iter_can_equals, {adapted_t}));
+          bool const adapted_spaceship =
+            extract<bool>(substitute(^^v4_dtl::adapted_iter_can_spaceship, {adapted_t}));
+          bool const adapted_plus_eq =
+            extract<bool>(substitute(^^v4_dtl::adapted_iter_can_plus_eq, {adapted_t, dt}));
+          bool const adapted_pre_incr =
+            extract<bool>(substitute(^^v4_dtl::adapted_iter_can_pre_incr, {adapted_t}));
+          bool const adapted_pre_decr =
+            extract<bool>(substitute(^^v4_dtl::adapted_iter_can_pre_decr, {adapted_t}));
+          bool const adapted_subtract =
+            extract<bool>(substitute(^^v4_dtl::adapted_iter_can_subtract, {adapted_t, dt}));
+
+          if (adapted_deref && !has_op(std::meta::operators::op_star)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator*(this auto&& self) {
+                return *boost::stl_interfaces::access::base(self);
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op* via adapted member");
+#endif
+            has_op.gained_op(std::meta::operators::op_star);
+          }
+          if (adapted_plus_eq && is_random_access && !has_op(std::meta::operators::op_plus_equals)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator+=(this auto& self, difference_type n) {
+                boost::stl_interfaces::access::base(self) += n;
+                return self;
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op+= via adapted member");
+#endif
+            has_op.gained_op(std::meta::operators::op_plus_equals);
+          }
+          if (adapted_pre_incr && !has_op(std::meta::operators::op_plus_equals) && !has_op(std::meta::operators::op_plus_plus)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator++(this auto& self) {
+                ++boost::stl_interfaces::access::base(self);
+                return self;
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op++ via adapted member");
+#endif
+            has_op.gained_op(std::meta::operators::op_plus_plus);
+          }
+          if (adapted_pre_decr && std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept>
+              && !has_op(std::meta::operators::op_plus_equals) && !has_op(std::meta::operators::op_minus_minus)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator--(this auto& self) {
+                --boost::stl_interfaces::access::base(self);
+                return self;
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op-- via adapted member");
+#endif
+            has_op.gained_op(std::meta::operators::op_minus_minus);
+          }
+          if (adapted_subtract && !has_op(std::meta::operators::op_minus)) {
+            tokens += ^^{
+              friend constexpr $dt operator-($t lhs, $t rhs) {
+                return static_cast<$dt>(
+                  boost::stl_interfaces::access::base(lhs) -
+                  boost::stl_interfaces::access::base(rhs));
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op- via adapted member");
+#endif
+            has_op.gained_op(std::meta::operators::op_minus);
+          }
+         if (adapted_equals && !std::same_as<std::output_iterator_tag, IteratorConcept> &&
+             !has_op(std::meta::operators::op_equals_equals)) {
+            tokens += ^^{
+              friend constexpr bool operator==($t const& lhs, $t const& rhs) {
+                return static_cast<bool>(
+                  boost::stl_interfaces::access::base(lhs) ==
+                  boost::stl_interfaces::access::base(rhs));
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op== via adapted member");
+#endif
+            has_op.gained_op(std::meta::operators::op_equals_equals);
+          }
+          if (adapted_spaceship && is_random_access && !has_op(std::meta::operators::op_spaceship)) {
+            tokens += ^^{
+              friend constexpr auto operator<=>($t const& lhs, $t const& rhs) {
+                return boost::stl_interfaces::access::base(lhs) <=>
+                       boost::stl_interfaces::access::base(rhs);
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op<=> via adapted member");
+#endif
+            has_op.gained_op(std::meta::operators::op_spaceship);
+          }
+        }
+
+        if ((ptr != ^^void) && is_reference_type(ref) && !has_op(std::meta::operators::op_arrow)) {
+          tokens += ^^{
+            constexpr auto operator->(this auto&& self) {
+              return boost::stl_interfaces::detail::make_pointer<pointer, reference>(*self);
+            }
+          };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op->");
+#endif
+        }
+
+        if (has_op(std::meta::operators::op_plus_equals)) {
+          if (!has_op(std::meta::operators::op_square_brackets)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator[](this auto const& self, difference_type n) {
+                auto retval = self;
+                retval += n;
+                return *retval;
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op[] via op+=");
+#endif
+          }
+          if (!has_op(std::meta::operators::op_plus_plus)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator++(this auto& self) {
+                return self += difference_type(1);
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op++ via op+=");
+#endif
+            has_op.gained_op(std::meta::operators::op_plus_plus);
+          }
+          if (!has_op(std::meta::operators::op_minus_minus)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator--(this auto& self) {
+                return self += -difference_type(1);
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op-- via op+=");
+#endif
+          }
+          if (!has_op(std::meta::operators::op_minus_equals)) {
+            tokens += ^^{
+              constexpr decltype(auto) operator-=(this auto& self, difference_type n) {
+                return self += -n;
+              }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op-= via op+=");
+#endif
+            has_op.gained_op(std::meta::operators::op_minus_minus);
+          }
+          if (!has_op(std::meta::operators::op_plus)) {
+            tokens += ^^{
+              friend constexpr auto operator+($t it, $t::difference_type n)
+                { return it += n; }
+              friend constexpr auto operator+($t::difference_type n, $t it)
+                { return it += n; }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op+ via op+=");
+#endif
+          }
+          tokens += ^^{
+            friend constexpr auto operator-($t it, $t::difference_type n)
+              { return it += -n; }
+          };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+          std::constexpr_print_str("Adding op-(it, n) via op+=");
+#endif
+          if (has_op(std::meta::operators::op_minus) && !has_op(std::meta::operators::op_spaceship)) {
+            tokens += ^^{
+              friend constexpr auto operator<=>($t lhs, $t rhs) {
+                $dt const diff = lhs - rhs;
+                return diff < $dt(0) ? std::strong_ordering::less :
+                  $dt(0) < diff ? std::strong_ordering::greater :
+                  std::strong_ordering::equal;
+                }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op<=> via op+=");
+#endif
+          }
+          if (!has_op(std::meta::operators::op_equals_equals)) {
+            tokens += ^^{
+              friend constexpr bool operator==($t lhs, $t rhs)
+                { return (lhs - rhs) == 0; }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op== via op+=");
+#endif
+          }
+          if (has_op(std::meta::operators::op_equals_equals) && !has_op(std::meta::operators::op_exclamation_equals)) {
+            tokens += ^^{
+              friend constexpr bool operator!=($t lhs, $t rhs)
+                { return !(lhs == rhs); }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op!= via op+=");
+#endif
+          }
+          if (has_op(std::meta::operators::op_minus) &&
+              !has_op(std::meta::operators::op_less)) {
+            tokens += ^^{
+              friend constexpr bool operator<($t lhs, $t rhs)
+                { return (lhs - rhs) < $dt(0); }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op< via op+=");
+#endif
+          }
+          if (has_op(std::meta::operators::op_minus) &&
+              !has_op(std::meta::operators::op_less_equals)) {
+            tokens += ^^{
+              friend constexpr bool operator<=($t lhs, $t rhs)
+                { return (lhs - rhs) <= $dt(0); }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op<= via op+=");
+#endif
+          }
+          if (has_op(std::meta::operators::op_minus) &&
+              !has_op(std::meta::operators::op_greater)) {
+            tokens += ^^{
+              friend constexpr bool operator>($t lhs, $t rhs)
+                { return (lhs - rhs) > $dt(0); }
+            };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op> via op+=");
+#endif
+          }
+          if (has_op(std::meta::operators::op_minus) &&
+              !has_op(std::meta::operators::op_greater_equals)) {
+            tokens += ^^{
+              friend constexpr bool operator>=($t lhs, $t rhs)
+                { return (lhs - rhs) >= $dt(0); }
+            };
+          }
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+            std::constexpr_print_str("Adding op>= via op+=");
+#endif
+        }
+
+        check_for_required_operators<IteratorConcept>(has_op);
+
+        if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::post)) {
+          if (std::is_same_v<IteratorConcept, std::input_iterator_tag>) {
+            tokens += ^^{
+              constexpr void operator++(this auto&& self, int) { ++self; }
+            };
+          } else {
+            tokens += ^^{
+              constexpr auto operator++(this auto&& self, int) {
+                auto retval = self;
+                ++self;
+                return retval;
+              }
+            };
+          }
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+          std::constexpr_print_str("Adding op++(int)");
+#endif
+        };
+
+        if (std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept> && !has_op(std::meta::operators::op_minus_minus, v4_dtl::post)) {
+          tokens += ^^{
+            constexpr auto operator--(this auto&& self, int) {
+              auto retval = self;
+              --self;
+              return retval;
+            }
+          };
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+          std::constexpr_print_str("Adding op--(int)");
+#endif
+        }
+
+        queue_injection(tokens);
+      }
+
+      consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op) {
+        auto& aliases = has_op.aliases_;
+        auto adapted_t = type_of(adapted);
+        if (!aliases.reference.alias) {
+          bool const adapted_deref =
+            extract<bool>(substitute(^^adapted_iter_can_deref, {adapted_t}));
+          if (adapted_deref) {
+            aliases.reference = {
+              dealias(substitute(^^adapted_iter_deref_result, {adapted_t})),
+              false
+            };
+          }
+        }
+        if (!aliases.difference_type.alias) {
+          bool const adapted_subtract = extract<bool>(
+            substitute(^^adapted_iter_can_subtract_unknown_result, {adapted_t}));
+          if (adapted_subtract) {
+            aliases.difference_type = {
+              dealias(substitute(^^adapted_iter_subtract_result, {adapted_t})),
+              false
+            };
+          }
+        }
+      }
+    }
+
+    template<typename IteratorConcept>
+    consteval void iterator_interface(IteratorConcept ic, std::meta::info t, std::meta::info adapted = std::meta::info()) {
+      v4_dtl::has_op_t has_op(t);
+      if (adapted != std::meta::info())
+        v4_dtl::detect_adapted_ops(adapted, has_op);
+
+      auto const& aliases = has_op.aliases();
+      std::meta::info reference = *aliases.reference.alias;
+      std::meta::info value_type =
+        aliases.value_type.alias ? *aliases.value_type.alias : remove_reference(reference);
+      std::meta::info pointer =
+        aliases.pointer.alias ? *aliases.pointer.alias : add_pointer(value_type);
+      std::meta::info difference_type =
+        aliases.difference_type.alias ? *aliases.difference_type.alias : ^^std::ptrdiff_t;
+      v4_dtl::iterator_interface_impl<IteratorConcept>(
+        reference, value_type, pointer, difference_type, t, adapted, has_op);
+    }
+
+    template<typename IteratorConcept>
+    consteval void proxy_iterator_interface(IteratorConcept ic, std::meta::info t, std::meta::info adapted = std::meta::info()) {
+      v4_dtl::has_op_t has_op(t);
+      if (adapted != std::meta::info())
+        v4_dtl::detect_adapted_ops(adapted, has_op);
+
+      auto const& aliases = has_op.aliases();
+      std::meta::info reference = *aliases.reference.alias;
+      std::meta::info value_type =
+        aliases.value_type.alias ? *aliases.value_type.alias : remove_reference(reference);
+      std::meta::info pointer = aliases.pointer.alias ?
+          *aliases.pointer.alias : substitute(^^proxy_arrow_result, {reference});
+      std::meta::info difference_type =
+        aliases.difference_type.alias ? *aliases.difference_type.alias : ^^std::ptrdiff_t;
+      v4_dtl::iterator_interface_impl<IteratorConcept>(
+        reference, value_type, pointer, difference_type, t, adapted, has_op);
+    }
 
 }}}
 

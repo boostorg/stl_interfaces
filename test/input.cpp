@@ -16,11 +16,13 @@
 
 
 struct basic_input_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           basic_input_iter,
 #endif
           std::input_iterator_tag, int>
+#endif
 {
     basic_input_iter() : it_(nullptr) {}
     basic_input_iter(int * it) : it_(it) {}
@@ -36,16 +38,32 @@ struct basic_input_iter
         return lhs.it_ == rhs.it_;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         basic_input_iter,
 #endif
         std::input_iterator_tag, int>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::input_iterator_tag{}, ^^basic_input_iter);
+    }
+#endif
 
 private:
     int * it_;
 };
+
+#if BOOST_STL_INTERFACES_USE_CONCEPTS
+template<typename T>
+concept has_iter_cat = requires { typename T::iterator_category; };
+static_assert(!has_iter_cat<basic_input_iter>);
+#endif
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
     basic_input_iter, std::input_iterator)
@@ -61,12 +79,15 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 #endif
 
 template<typename ValueType>
-struct input_iter : boost::stl_interfaces::iterator_interface<
+struct input_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                        input_iter<ValueType>,
+          input_iter<ValueType>,
 #endif
-                        std::input_iterator_tag,
-                        ValueType>
+          std::input_iterator_tag,
+          ValueType>
+#endif
 {
     input_iter() : it_(nullptr) {}
     input_iter(ValueType * it) : it_(it) {}
@@ -88,6 +109,7 @@ struct input_iter : boost::stl_interfaces::iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         input_iter<ValueType>,
@@ -95,6 +117,15 @@ struct input_iter : boost::stl_interfaces::iterator_interface<
         std::input_iterator_tag,
         ValueType>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::input_iterator_tag{}, ^^input_iter);
+    }
+#endif
 
 private:
     ValueType * it_;
@@ -121,12 +152,15 @@ using pair_input = input_iter<std::pair<int, int>>;
 using const_pair_input = input_iter<std::pair<int, int> const>;
 
 template<typename ValueType>
-struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
+struct proxy_input_iter
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    : boost::stl_interfaces::proxy_iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
-                              proxy_input_iter<ValueType>,
+          proxy_input_iter<ValueType>,
 #endif
-                              std::input_iterator_tag,
-                              ValueType>
+          std::input_iterator_tag,
+          ValueType>
+#endif
 {
     proxy_input_iter() : it_(nullptr) {}
     proxy_input_iter(ValueType * it) : it_(it) {}
@@ -148,6 +182,7 @@ struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
         return lhs.it_ == rhs.it_;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::proxy_iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         proxy_input_iter<ValueType>,
@@ -155,6 +190,15 @@ struct proxy_input_iter : boost::stl_interfaces::proxy_iterator_interface<
         std::input_iterator_tag,
         ValueType>;
     using base_type::operator++;
+#endif
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::proxy_iterator_interface(
+            std::input_iterator_tag{}, ^^proxy_input_iter);
+    }
+#endif
 
 private:
     ValueType * it_;
@@ -307,9 +351,11 @@ int main()
     const_int_input first_copy(first);
     const_int_input last_copy(last);
 #if __cplusplus < 202002L
-    std::equal(first, last, first_copy, last_copy);
+    [[maybe_unused]] auto _ =
+        std::equal(first, last, first_copy, last_copy);
 #else
-    std::ranges::equal(first, last, first_copy, last_copy);
+    [[maybe_unused]] auto _ =
+        std::ranges::equal(first, last, first_copy, last_copy);
 #endif
 }
 

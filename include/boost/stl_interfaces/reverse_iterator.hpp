@@ -216,6 +216,27 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V3 {
 
 }}}
 
+namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
+
+    /** A template alias for `std::reverse_iterator`.  This only exists to
+        make migration from Boost.STLInterfaces to C++20 easier; switch to the
+        one in `std` as soon as you can. */
+    template<typename BidiIter>
+    using reverse_iterator = std::reverse_iterator<BidiIter>;
+
+
+    /** Makes a `reverse_iterator<BidiIter>` from an iterator of type
+        `BidiIter`.  This only exists to make migration from
+        Boost.STLInterfaces to C++20 easier; switch to the one in `std` as
+        soon as you can. */
+    template<typename BidiIter>
+    auto make_reverse_iterator(BidiIter it)
+    {
+        return reverse_iterator<BidiIter>(it);
+    }
+
+}}}
+
 #endif
 
 #endif

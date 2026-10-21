@@ -17,11 +17,14 @@ struct node
 
 template<typename Node>
 struct iterator
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
           iterator<Node>,
 #endif
-          std::forward_iterator_tag, Node>
+          std::forward_iterator_tag,
+          Node>
+#endif
 {
     using value_type = typename Node::value_type;
 
@@ -52,6 +55,7 @@ struct iterator
         return *this;
     }
 
+#if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     using base_type = boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
         iterator<Node>,
@@ -59,11 +63,20 @@ struct iterator
         std::forward_iterator_tag,
         Node>;
     using base_type::operator++;
+#endif
 
     friend constexpr bool operator==(iterator lhs, iterator rhs) noexcept
     {
         return lhs.it_ == rhs.it_;
     }
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    consteval
+    {
+        boost::stl_interfaces::iterator_interface(
+            std::forward_iterator_tag{}, ^^iterator);
+    }
+#endif
 
 private:
     Node * it_;
