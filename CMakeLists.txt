@@ -44,6 +44,9 @@ if (MSVC)
   add_compile_options(/Zc:__cplusplus)
 endif()
 
+# Enforces -std=c++X instead of -std=gnu++X.
+set(CMAKE_CXX_EXTENSIONS false)
+
 ##################################################
 # Sanitizers
 ##################################################
