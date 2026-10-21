@@ -52,8 +52,12 @@ struct iterator
         return *this;
     }
 
-    using base_type = boost::stl_interfaces::
-        iterator_interface<iterator<Node>, std::forward_iterator_tag, Node>;
+    using base_type = boost::stl_interfaces::iterator_interface<
+#if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
+        iterator<Node>,
+#endif
+        std::forward_iterator_tag,
+        Node>;
     using base_type::operator++;
 
     friend constexpr bool operator==(iterator lhs, iterator rhs) noexcept
