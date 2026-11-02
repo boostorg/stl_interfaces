@@ -37,7 +37,6 @@ struct simple_random_access_iterator
         it_ += i;
         return *this;
     }
-    // TODO auto operator-(simple_random_access_iterator other) const noexcept
     std::ptrdiff_t operator-(simple_random_access_iterator other) const noexcept
     {
         return it_ - other.it_;

@@ -46,7 +46,7 @@ struct zip_iterator
         it2_ += i;
         return *this;
     }
-    constexpr std::ptrdiff_t /*TODO: auto*/ operator-(zip_iterator other) const noexcept
+    constexpr std::ptrdiff_t operator-(zip_iterator other) const noexcept
     {
         return it1_ - other.it1_;
     }

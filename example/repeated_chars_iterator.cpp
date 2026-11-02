@@ -40,7 +40,7 @@ struct repeated_chars_iterator
         n_ += i;
         return *this;
     }
-    constexpr difference_type // TODO: auto
+    constexpr difference_type
     operator-(repeated_chars_iterator other) const noexcept
     {
         return n_ - other.n_;
