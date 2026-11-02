@@ -121,6 +121,10 @@ struct member_binary_minus_only
 {
     int operator-(member_binary_minus_only) { return 42; }
 };
+struct member_binary_minus_only_auto_return
+{
+    auto operator-(member_binary_minus_only_auto_return) { return 42; }
+};
 struct nonmember_binary_minus_only
 {
     friend int
@@ -128,6 +132,21 @@ struct nonmember_binary_minus_only
     {
         return 42;
     }
+};
+struct nonmember_binary_minus_only_auto_return
+{
+    friend int operator-(
+        nonmember_binary_minus_only_auto_return,
+        nonmember_binary_minus_only_auto_return const &)
+    {
+        return 42;
+    }
+};
+
+template<typename T>
+struct template_member_binary_minus_only
+{
+    int operator-(template_member_binary_minus_only) { return 42; }
 };
 
 struct member_pre_post_incr
@@ -211,14 +230,143 @@ struct udt_zip_iter
     using value_type = std::tuple<int_t, int>;
 };
 
+struct params_of_nullary
+{
+    params_of_nullary & operator--() { return *this; }
+};
+
 #define CONSTEVAL_TEST(e)                                                      \
     do {                                                                       \
         if (!(e))                                                              \
             throw std::runtime_error(#e);                                      \
     } while (false)
 
+struct params_of_unary_1
+{
+    std::ptrdiff_t operator-(params_of_unary_1) { return 42; }
+    friend params_of_unary_1 operator+(params_of_unary_1) { return {}; }
+    params_of_unary_1 operator++(int) { return *this; }
+    std::ptrdiff_t operator/(std::ptrdiff_t) { return 42; }
+    std::ptrdiff_t operator%(std::size_t) { return 42; }
+
+    consteval
+    {
+        auto t = ^^params_of_unary_1;
+        for (std::meta::info f : hidden_friends_of(t)) {
+            if (!is_operator_function(f))
+                continue;
+            auto op = operator_of(f);
+            if (op != std::meta::operators::op_plus)
+                continue;
+            v4_dtl::op_params result =
+                v4_dtl::params_of(t, op, f, v4_dtl::member::no);
+            CONSTEVAL_TEST(result == v4_dtl::op_params::t);
+        }
+    }
+};
+
+struct params_of_unary_2
+{
+    params_of_unary_2 operator+(std::ptrdiff_t n) { return *this; }
+};
+
+struct params_of_binary
+{
+    friend std::ptrdiff_t operator-(params_of_binary, params_of_binary) { return 42; }
+    friend params_of_binary operator--(params_of_binary, int) { return {}; }
+    friend std::ptrdiff_t operator/(params_of_binary, std::ptrdiff_t) { return 42; }
+    friend std::ptrdiff_t operator%(std::ptrdiff_t, params_of_binary) { return 42; }
+
+    consteval
+    {
+        auto t = ^^params_of_unary_1;
+        for (std::meta::info f : hidden_friends_of(t)) {
+            if (!is_operator_function(f))
+                continue;
+            auto op = operator_of(f);
+            if (op == std::meta::operators::op_minus) {
+                v4_dtl::op_params result =
+                    v4_dtl::params_of(t, op, f, v4_dtl::member::no);
+                CONSTEVAL_TEST(result == v4_dtl::op_params::t_t);
+            }
+            if (op == std::meta::operators::op_minus_minus) {
+                v4_dtl::op_params result =
+                    v4_dtl::params_of(t, op, f, v4_dtl::member::no);
+                CONSTEVAL_TEST(result == v4_dtl::op_params::post);
+            }
+            if (op == std::meta::operators::op_slash) {
+                v4_dtl::op_params result =
+                    v4_dtl::params_of(t, op, f, v4_dtl::member::no);
+                CONSTEVAL_TEST(result == v4_dtl::op_params::t_n);
+            }
+            if (op == std::meta::operators::op_percent) {
+                v4_dtl::op_params result =
+                    v4_dtl::params_of(t, op, f, v4_dtl::member::no);
+                CONSTEVAL_TEST(result == v4_dtl::op_params::n_t);
+            }
+        }
+    }
+};
+
 int main()
 {
+    // params_of(), nullary
+    consteval
+    {
+        constexpr v4_dtl::op_params result = v4_dtl::params_of(
+            ^^params_of_nullary,
+            std::meta::operators::op_minus_minus,
+            ^^params_of_nullary::operator--,
+            v4_dtl::member::yes);
+        CONSTEVAL_TEST(result == v4_dtl::op_params::t);
+    }
+    // params_of(), unary
+    consteval
+    {
+        constexpr v4_dtl::op_params result = v4_dtl::params_of(
+            ^^params_of_unary_1,
+            std::meta::operators::op_minus,
+            ^^params_of_unary_1::operator-,
+            v4_dtl::member::yes);
+        CONSTEVAL_TEST(result == v4_dtl::op_params::t_t);
+    }
+    consteval
+    {
+        constexpr v4_dtl::op_params result = v4_dtl::params_of(
+            ^^params_of_unary_1,
+            std::meta::operators::op_plus_plus,
+            ^^params_of_unary_1::operator++,
+            v4_dtl::member::yes);
+        CONSTEVAL_TEST(result == v4_dtl::op_params::post);
+    }
+    consteval
+    {
+        constexpr v4_dtl::op_params result = v4_dtl::params_of(
+            ^^params_of_unary_1,
+            std::meta::operators::op_slash,
+            ^^params_of_unary_1::operator/,
+            v4_dtl::member::yes);
+        CONSTEVAL_TEST(result == v4_dtl::op_params::t_n);
+    }
+    consteval
+    {
+        constexpr v4_dtl::op_params result = v4_dtl::params_of(
+            ^^params_of_unary_1,
+            std::meta::operators::op_percent,
+            ^^params_of_unary_1::operator%,
+            v4_dtl::member::yes);
+        CONSTEVAL_TEST(result == v4_dtl::op_params::other);
+    }
+    consteval
+    {
+        constexpr v4_dtl::op_params result = v4_dtl::params_of(
+            ^^params_of_unary_2,
+            std::meta::operators::op_plus,
+            ^^params_of_unary_2::operator+,
+            v4_dtl::member::yes);
+        CONSTEVAL_TEST(result == v4_dtl::op_params::t_n);
+    }
+
     // empty
     consteval
     {
@@ -310,11 +458,11 @@ int main()
         CONSTEVAL_TEST(!has_op(std::meta::operators::op_minus));
         CONSTEVAL_TEST(!has_op(std::meta::operators::op_plus));
         CONSTEVAL_TEST(!has_op(std::meta::operators::op_plus_plus));
-        CONSTEVAL_TEST(
-            !has_op(std::meta::operators::op_plus_plus, v4_dtl::post));
+        CONSTEVAL_TEST(!has_op(
+            std::meta::operators::op_plus_plus, v4_dtl::op_params::post));
         CONSTEVAL_TEST(!has_op(std::meta::operators::op_minus_minus));
-        CONSTEVAL_TEST(
-            !has_op(std::meta::operators::op_minus_minus, v4_dtl::post));
+        CONSTEVAL_TEST(!has_op(
+            std::meta::operators::op_minus_minus, v4_dtl::op_params::post));
     }
 
     // binary op+ detected
@@ -387,7 +535,43 @@ int main()
     }
     consteval
     {
+        constexpr v4_dtl::has_op_t has_op(
+            ^^member_binary_minus_only_auto_return);
+        constexpr auto aliases = has_op.aliases();
+        CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(aliases.pointer == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(
+            aliases.difference_type == (v4_dtl::iterator_alias{^^int, false}));
+        CONSTEVAL_TEST(has_op(std::meta::operators::op_minus));
+    }
+    consteval
+    {
         constexpr v4_dtl::has_op_t has_op(^^nonmember_binary_minus_only);
+        constexpr auto aliases = has_op.aliases();
+        CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(aliases.pointer == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(
+            aliases.difference_type == (v4_dtl::iterator_alias{^^int, false}));
+        CONSTEVAL_TEST(has_op(std::meta::operators::op_minus));
+    }
+    consteval
+    {
+        constexpr v4_dtl::has_op_t has_op(
+            ^^nonmember_binary_minus_only_auto_return);
+        constexpr auto aliases = has_op.aliases();
+        CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(aliases.pointer == v4_dtl::iterator_alias{});
+        CONSTEVAL_TEST(
+            aliases.difference_type == (v4_dtl::iterator_alias{^^int, false}));
+        CONSTEVAL_TEST(has_op(std::meta::operators::op_minus));
+    }
+    consteval
+    {
+        constexpr v4_dtl::has_op_t has_op(
+            ^^template_member_binary_minus_only<int>);
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -406,9 +590,10 @@ int main()
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.pointer == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.difference_type == v4_dtl::iterator_alias{});
-        CONSTEVAL_TEST(has_op(std::meta::operators::op_plus_plus));
         CONSTEVAL_TEST(
-            has_op(std::meta::operators::op_plus_plus, v4_dtl::post));
+            has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre));
+        CONSTEVAL_TEST(has_op(
+            std::meta::operators::op_plus_plus, v4_dtl::op_params::post));
     }
     consteval
     {
@@ -419,8 +604,8 @@ int main()
         CONSTEVAL_TEST(aliases.pointer == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.difference_type == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(has_op(std::meta::operators::op_plus_plus));
-        CONSTEVAL_TEST(
-            has_op(std::meta::operators::op_plus_plus, v4_dtl::post));
+        CONSTEVAL_TEST(has_op(
+            std::meta::operators::op_plus_plus, v4_dtl::op_params::post));
     }
     consteval
     {
@@ -431,8 +616,8 @@ int main()
         CONSTEVAL_TEST(aliases.pointer == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.difference_type == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(has_op(std::meta::operators::op_minus_minus));
-        CONSTEVAL_TEST(
-            has_op(std::meta::operators::op_minus_minus, v4_dtl::post));
+        CONSTEVAL_TEST(has_op(
+            std::meta::operators::op_minus_minus, v4_dtl::op_params::post));
     }
     consteval
     {
@@ -443,8 +628,8 @@ int main()
         CONSTEVAL_TEST(aliases.pointer == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.difference_type == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(has_op(std::meta::operators::op_minus_minus));
-        CONSTEVAL_TEST(
-            has_op(std::meta::operators::op_minus_minus, v4_dtl::post));
+        CONSTEVAL_TEST(has_op(
+            std::meta::operators::op_minus_minus, v4_dtl::op_params::post));
     }
 
     // this tests parts of detect_adapted_ops()
@@ -456,21 +641,29 @@ int main()
 
         v4_dtl::detect_adapted_ops(adapted, has_op);
 
-        constexpr bool adapted_deref = extract<bool>(
-            substitute(^^v4_dtl::adapted_iter_can_deref, {adapted_t}));
+        constexpr bool adapted_deref = extract<bool>(substitute(
+            ^^v4_dtl::adapted_iter_can_deref,
+            {
+                adapted_t}));
         if (!adapted_deref)
             throw std::runtime_error("!adapted_deref");
-        constexpr bool adapted_subtract = extract<bool>(
-            substitute(^^v4_dtl::adapted_iter_can_subtract_unknown_result, {adapted_t}));
+        constexpr bool adapted_subtract = extract<bool>(substitute(
+            ^^v4_dtl::adapted_iter_can_subtract_unknown_result,
+            {
+                adapted_t}));
         if (!adapted_subtract)
             throw std::runtime_error("!adapted_subtract");
 
-        constexpr auto reference_alias =
-            dealias(substitute(^^v4_dtl::adapted_iter_deref_result, {adapted_t}));
+        constexpr auto reference_alias = dealias(substitute(
+            ^^v4_dtl::adapted_iter_deref_result,
+            {
+                adapted_t}));
         CONSTEVAL_TEST(reference_alias == ^^int &);
 
-        constexpr auto difference_type_alias =
-            dealias(substitute(^^v4_dtl::adapted_iter_subtract_result, {adapted_t}));
+        constexpr auto difference_type_alias = dealias(substitute(
+            ^^v4_dtl::adapted_iter_subtract_result,
+            {
+                adapted_t}));
         CONSTEVAL_TEST(difference_type_alias == dealias(^^std::ptrdiff_t));
     }
 

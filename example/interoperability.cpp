@@ -54,7 +54,7 @@ struct random_access_iterator
         it_ += i;
         return *this;
     }
-    constexpr std::ptrdiff_t // TODO: auto
+    constexpr std::ptrdiff_t
     operator-(random_access_iterator other) const noexcept
     {
         return it_ - other.it_;

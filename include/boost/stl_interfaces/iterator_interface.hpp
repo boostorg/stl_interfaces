@@ -1131,9 +1131,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
     // clang-format off
 
     namespace v4_dtl {
-      struct post_t {};
-      constexpr post_t post;
-
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
       constexpr std::array<std::string_view, 44> op_names = {{
         "hidden op_new",
@@ -1200,10 +1197,73 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
       struct has_op_t;
       consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op);
 
+      // Covers the patterns of operands taken by a given operator overload of type T.
+      enum struct op_params : unsigned int {
+        not_found = 0,   // type T does not contain this operator
+        t = 1 << 0,      // unary; takes a T
+        pre = t,         // pre-increment or pre-decrement
+        t_t = 1 << 1,    // binary; takes two Ts
+        n_t = 1 << 2,    // binary; takes a signed integral type and a T
+        t_n = 1 << 3,    // binary; takes a T and a signed integral type
+        post = 1 << 4,   // post-increment or post-decrement
+        other = 1 << 5,  // takes some set of parameters not covered above
+        any = 0xffffffff
+      };
+
+      enum struct member { yes, no };
+
+      consteval op_params params_of(
+        std::meta::info t, std::meta::operators op, std::meta::info f, member m) {
+        auto params = parameters_of(f);
+        if (params.empty() && m == member::yes) {
+          return op_params::t;
+        } else if (params.size() == 1u) {
+          auto const first_param_type = remove_cvref(type_of(params[0]));
+          bool const first_param_is_t = first_param_type == t;
+          if (first_param_is_t)
+            return m == member::yes ? op_params::t_t : op_params::t;
+          if (type_of(params[0]) == ^^int) {
+            if (op == std::meta::operators::op_plus_plus ||
+                op == std::meta::operators::op_minus_minus) {
+              return op_params::post;
+            }
+          }
+          if (is_integral_type(first_param_type) && is_signed_type(first_param_type))
+            return op_params::t_n;
+        } else if (params.size() == 2u) {
+          auto const first_param_type = remove_cvref(type_of(params[0]));
+          bool const first_param_is_t = first_param_type == t;
+          auto const second_param_type = remove_cvref(type_of(params[1]));
+          bool const second_param_is_t = second_param_type == t;
+          if (first_param_is_t) {
+            if (second_param_is_t)
+              return op_params::t_t;
+            if ((type_of(params[1]) == ^^int) &&
+                (op == std::meta::operators::op_plus_plus ||
+                 op == std::meta::operators::op_minus_minus)) {
+              return op_params::post;
+            }
+            if (is_integral_type(second_param_type) && is_signed_type(second_param_type))
+              return op_params::t_n;
+          } if (second_param_is_t) {
+            if (is_integral_type(first_param_type) && is_signed_type(first_param_type))
+              return op_params::n_t;
+          }
+        }
+        return op_params::other;
+      }
+
       // BARRY NOTE: This is way too complicated, and everyone is going to
-      // have to write this over and over.  There needs to be some interface
-      // that actually tells you if you're looking at op-(T, T) vs. op-(T),
-      // and op++() vs. op++(int).
+      // have to write something like this over and over.  There needs to be
+      // some interface that actually tells you if you're looking at unary
+      // vs. binary op-/op+/op*, etc., and pre- vs. post-increment/decrement.
+      // I had to do a whole lot more detailed bookkeeping here, but at a
+      // minimum I'd like to see some coverage of the patterns listed above
+      // (unary vs. binary, etc.), without having to do it myself.  It's
+      // especially complicated when I have to deal with the apparent (but
+      // fake!) difference in arity between member operators and hidden friend
+      // operators (since there is an implicit first parameter to member
+      // operators).
       struct has_op_t {
         consteval has_op_t(std::meta::info t) : ops_{} {
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
@@ -1237,16 +1297,27 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
             }
           }
-          auto const record_operator = [this](std::meta::operators op, bool post) {
-            ops_[
-              static_cast<int>(op) - static_cast<int>(std::meta::operators::op_new)
-            ][post] = true;
+          auto const record_operator =
+            [this](std::meta::operators op, op_params params = op_params::other) {
+              ops_[
+                static_cast<int>(op) - static_cast<int>(std::meta::operators::op_new)
+              ] |= (unsigned int)params;
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str(op_names[
-              static_cast<int>(op) -
-              static_cast<int>(std::meta::operators::op_new)].substr(7));
+              std::constexpr_print_str(op_names[
+                static_cast<int>(op) -
+                static_cast<int>(std::meta::operators::op_new)].substr(7));
+              switch (params) {
+              case op_params::not_found: std::constexpr_print_str("not_found"); break;
+              case op_params::t: std::constexpr_print_str("t"); break;
+              case op_params::t_t: std::constexpr_print_str("t_t"); break;
+              case op_params::n_t: std::constexpr_print_str("n_t"); break;
+              case op_params::t_n: std::constexpr_print_str("t_n"); break;
+              case op_params::post: std::constexpr_print_str("post"); break;
+              case op_params::other: std::constexpr_print_str("other"); break;
+              default: break;
+              }
 #endif
-          };
+            };
           for (std::meta::info f : non_aliases) {
             if (!is_operator_function(f) || is_special_member_function(f))
               continue;
@@ -1260,7 +1331,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               auto params = parameters_of(f);
               if (!params.empty())
                 continue;
-              record_operator(op, false);
+              record_operator(op, params_of(t, op, f, member::yes));
               if (!aliases_.reference.alias)
                 aliases_.reference = {return_type_of(f), false};
             } else if (op == std::meta::operators::op_plus ||
@@ -1268,21 +1339,14 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               auto params = parameters_of(f);
               if (params.size() != 1u)
                 continue;
-              record_operator(op, false);
+              record_operator(op, params_of(t, op, f, member::yes));
               if (op == std::meta::operators::op_minus &&
                   remove_cvref(type_of(params[0])) == t &&
                   !aliases_.difference_type.alias) {
                 aliases_.difference_type = {return_type_of(f), false};
               }
-            } else if (op == std::meta::operators::op_plus_plus ||
-                       op == std::meta::operators::op_minus_minus) {
-              auto params = parameters_of(f);
-              if (params.empty())
-                record_operator(op, false);
-              else if (type_of(params[0]) == ^^int)
-                record_operator(op, true);
             } else {
-              record_operator(op, false);
+              record_operator(op, params_of(t, op, f, member::yes));
             }
           }
           for (std::meta::info f : hidden_friends_of(t)) {
@@ -1298,7 +1362,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               auto params = parameters_of(f);
               if (params.size() != 1u || remove_cvref(type_of(params[0])) != t)
                 continue;
-              record_operator(op, false);
+              record_operator(op, params_of(t, op, f, member::no));
               if (!aliases_.reference.alias)
                 aliases_.reference = {return_type_of(f), false};
             } else if (op == std::meta::operators::op_plus ||
@@ -1306,7 +1370,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               auto params = parameters_of(f);
               if (params.size() != 2u)
                 continue;
-              record_operator(op, false);
+              record_operator(op, params_of(t, op, f, member::no));
               if (op == std::meta::operators::op_minus &&
                   remove_cvref(type_of(params[0])) == t &&
                   remove_cvref(type_of(params[1])) == t &&
@@ -1318,12 +1382,9 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               auto params = parameters_of(f);
               if (params.empty() || remove_cvref(type_of(params[0])) != t)
                 continue;
-              if (params.size() == 1u)
-                record_operator(op, false);
-              else if (type_of(params[1]) == ^^int)
-                record_operator(op, true);
+              record_operator(op, params_of(t, op, f, member::no));
             } else {
-              record_operator(op, false);
+              record_operator(op, params_of(t, op, f, member::no));
             }
           }
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
@@ -1331,26 +1392,20 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
         }
 
-        consteval bool operator()(std::meta::operators op) const {
+        consteval bool operator()(std::meta::operators op,
+                                  op_params params = op_params::any) const {
           return ops_[static_cast<int>(op) -
-                      static_cast<int>(std::meta::operators::op_new)][0];
-        }
-
-        consteval bool operator()(std::meta::operators op, post_t) const {
-          return ops_[static_cast<int>(op) -
-                      static_cast<int>(std::meta::operators::op_new)][1];
+                      static_cast<int>(std::meta::operators::op_new)] &
+            (unsigned int)params;
         }
 
         constexpr iterator_aliases const& aliases() const { return aliases_; }
 
-        consteval void gained_op(std::meta::operators op) {
+        consteval void gained_op(std::meta::operators op,
+                                 op_params params = op_params::other) {
           ops_[static_cast<int>(op) -
-               static_cast<int>(std::meta::operators::op_new)][0] = true;
-        }
-
-        consteval void gained_op(std::meta::operators op, post_t) {
-          ops_[static_cast<int>(op) -
-               static_cast<int>(std::meta::operators::op_new)][1] = true;
+               static_cast<int>(std::meta::operators::op_new)] |=
+            (unsigned int)params;
         }
 
       private:
@@ -1359,7 +1414,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         static_assert(static_cast<int>(std::meta::operators::op_comma) -
               static_cast<int>(std::meta::operators::op_new) + 1 == 44);
 
-        std::array<std::array<bool, 2>, 44> ops_;
+        std::array<unsigned char, 44> ops_;
         iterator_aliases aliases_;
 
         friend consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op);
@@ -1553,6 +1608,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         // operators
         constexpr bool is_random_access =
             std::is_base_of_v<std::random_access_iterator_tag, IteratorConcept>;
+        constexpr bool is_bidirectional =
+            std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept>;
 
         // operators from adapted iterator
         bool const is_adapting = adapted != std::meta::info();
@@ -1584,46 +1641,49 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
             has_op.gained_op(std::meta::operators::op_star);
           }
-          if (adapted_plus_eq && is_random_access && !has_op(std::meta::operators::op_plus_equals)) {
+          if (adapted_plus_eq && is_random_access &&
+              !has_op(std::meta::operators::op_plus_equals, v4_dtl::op_params::t_n)) {
             tokens += ^^{
-              constexpr decltype(auto) operator+=(this auto& self, difference_type n) {
-                boost::stl_interfaces::access::base(self) += n;
-                return self;
+              constexpr $t& operator+=(difference_type n) {
+                boost::stl_interfaces::access::base(*this) += n;
+                return *this;
               }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op+= via adapted member");
 #endif
-            has_op.gained_op(std::meta::operators::op_plus_equals);
+            has_op.gained_op(std::meta::operators::op_plus_equals, v4_dtl::op_params::t_n);
           }
-          if (adapted_pre_incr && !has_op(std::meta::operators::op_plus_equals) && !has_op(std::meta::operators::op_plus_plus)) {
+          if (adapted_pre_incr && !is_random_access &&
+              !has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre)) {
             tokens += ^^{
-              constexpr decltype(auto) operator++(this auto& self) {
-                ++boost::stl_interfaces::access::base(self);
-                return self;
+              constexpr $t& operator++() {
+                ++boost::stl_interfaces::access::base(*this);
+                return *this;
               }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op++ via adapted member");
 #endif
-            has_op.gained_op(std::meta::operators::op_plus_plus);
+            has_op.gained_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre);
           }
-          if (adapted_pre_decr && std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept>
-              && !has_op(std::meta::operators::op_plus_equals) && !has_op(std::meta::operators::op_minus_minus)) {
+          if (adapted_pre_decr && !is_random_access && is_bidirectional &&
+              !has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre)) {
             tokens += ^^{
-              constexpr decltype(auto) operator--(this auto& self) {
-                --boost::stl_interfaces::access::base(self);
-                return self;
+              constexpr $t& operator--() {
+                --boost::stl_interfaces::access::base(*this);
+                return *this;
               }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op-- via adapted member");
 #endif
-            has_op.gained_op(std::meta::operators::op_minus_minus);
+            has_op.gained_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre);
           }
-          if (adapted_subtract && !has_op(std::meta::operators::op_minus)) {
+          if (adapted_subtract && is_random_access &&
+              !has_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t)) {
             tokens += ^^{
-              friend constexpr $dt operator-($t lhs, $t rhs) {
+              friend constexpr difference_type operator-($t lhs, $t rhs) {
                 return static_cast<$dt>(
                   boost::stl_interfaces::access::base(lhs) -
                   boost::stl_interfaces::access::base(rhs));
@@ -1632,10 +1692,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op- via adapted member");
 #endif
-            has_op.gained_op(std::meta::operators::op_minus);
+            has_op.gained_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t);
           }
          if (adapted_equals && !std::same_as<std::output_iterator_tag, IteratorConcept> &&
-             !has_op(std::meta::operators::op_equals_equals)) {
+             !has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator==($t const& lhs, $t const& rhs) {
                 return static_cast<bool>(
@@ -1646,9 +1706,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op== via adapted member");
 #endif
-            has_op.gained_op(std::meta::operators::op_equals_equals);
+            has_op.gained_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t);
           }
-          if (adapted_spaceship && is_random_access && !has_op(std::meta::operators::op_spaceship)) {
+          if (adapted_spaceship && is_random_access &&
+              !has_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr auto operator<=>($t const& lhs, $t const& rhs) {
                 return boost::stl_interfaces::access::base(lhs) <=>
@@ -1658,11 +1719,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op<=> via adapted member");
 #endif
-            has_op.gained_op(std::meta::operators::op_spaceship);
+            has_op.gained_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t);
           }
         }
 
-        if ((ptr != ^^void) && is_reference_type(ref) && !has_op(std::meta::operators::op_arrow)) {
+        if ((ptr != ^^void) && is_reference_type(ref) &&
+            !has_op(std::meta::operators::op_arrow)) {
           tokens += ^^{
             constexpr auto operator->(this auto&& self) {
               return boost::stl_interfaces::detail::make_pointer<pointer, reference>(*self);
@@ -1674,10 +1736,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         }
 
         if (has_op(std::meta::operators::op_plus_equals)) {
-          if (!has_op(std::meta::operators::op_square_brackets)) {
+          if (!has_op(std::meta::operators::op_square_brackets, v4_dtl::op_params::t)) {
             tokens += ^^{
-              constexpr decltype(auto) operator[](this auto const& self, difference_type n) {
-                auto retval = self;
+              constexpr reference operator[](difference_type n) const {
+                auto retval = *this;
                 retval += n;
                 return *retval;
               }
@@ -1686,62 +1748,69 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
             std::constexpr_print_str("Adding op[] via op+=");
 #endif
           }
-          if (!has_op(std::meta::operators::op_plus_plus)) {
+          if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre)) {
             tokens += ^^{
-              constexpr decltype(auto) operator++(this auto& self) {
-                return self += difference_type(1);
+              constexpr $t& operator++() {
+                return *this += difference_type(1);
               }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op++ via op+=");
 #endif
-            has_op.gained_op(std::meta::operators::op_plus_plus);
+            has_op.gained_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre);
           }
-          if (!has_op(std::meta::operators::op_minus_minus)) {
+          if (!has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre)) {
             tokens += ^^{
-              constexpr decltype(auto) operator--(this auto& self) {
-                return self += -difference_type(1);
+              constexpr $t& operator--() {
+                return *this += -difference_type(1);
               }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op-- via op+=");
 #endif
           }
-          if (!has_op(std::meta::operators::op_minus_equals)) {
+          if (!has_op(std::meta::operators::op_minus_equals, v4_dtl::op_params::t_n)) {
             tokens += ^^{
-              constexpr decltype(auto) operator-=(this auto& self, difference_type n) {
-                return self += -n;
+              constexpr $t& operator-=(difference_type n) {
+                return *this += -n;
               }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op-= via op+=");
 #endif
-            has_op.gained_op(std::meta::operators::op_minus_minus);
+            has_op.gained_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::t_n);
           }
-          if (!has_op(std::meta::operators::op_plus)) {
+          if (!has_op(std::meta::operators::op_plus, v4_dtl::op_params::t_n)) {
             tokens += ^^{
-              friend constexpr auto operator+($t it, $t::difference_type n)
+              friend constexpr $t operator+($t it, $t::difference_type n)
                 { return it += n; }
-              friend constexpr auto operator+($t::difference_type n, $t it)
+            };
+          }
+          if (!has_op(std::meta::operators::op_plus, v4_dtl::op_params::n_t)) {
+            tokens += ^^{
+              friend constexpr $t operator+($t::difference_type n, $t it)
                 { return it += n; }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op+ via op+=");
 #endif
           }
-          tokens += ^^{
-            friend constexpr auto operator-($t it, $t::difference_type n)
-              { return it += -n; }
-          };
+          if (!has_op(std::meta::operators::op_minus, v4_dtl::op_params::t_n)) {
+            tokens += ^^{
+              friend constexpr $t operator-($t it, $t::difference_type n)
+                { return it += -n; }
+            };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-          std::constexpr_print_str("Adding op-(it, n) via op+=");
+            std::constexpr_print_str("Adding op-(it, n) via op+=");
 #endif
-          if (has_op(std::meta::operators::op_minus) && !has_op(std::meta::operators::op_spaceship)) {
+          }
+          if (has_op(std::meta::operators::op_minus) &&
+              !has_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr auto operator<=>($t lhs, $t rhs) {
-                $dt const diff = lhs - rhs;
-                return diff < $dt(0) ? std::strong_ordering::less :
-                  $dt(0) < diff ? std::strong_ordering::greater :
+                difference_type const diff = lhs - rhs;
+                return diff < difference_type(0) ? std::strong_ordering::less :
+                  difference_type(0) < diff ? std::strong_ordering::greater :
                   std::strong_ordering::equal;
                 }
             };
@@ -1749,7 +1818,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
             std::constexpr_print_str("Adding op<=> via op+=");
 #endif
           }
-          if (!has_op(std::meta::operators::op_equals_equals)) {
+          if (!has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator==($t lhs, $t rhs)
                 { return (lhs - rhs) == 0; }
@@ -1758,7 +1827,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
             std::constexpr_print_str("Adding op== via op+=");
 #endif
           }
-          if (has_op(std::meta::operators::op_equals_equals) && !has_op(std::meta::operators::op_exclamation_equals)) {
+          if (has_op(std::meta::operators::op_equals_equals) &&
+              !has_op(std::meta::operators::op_exclamation_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator!=($t lhs, $t rhs)
                 { return !(lhs == rhs); }
@@ -1768,40 +1838,40 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_less)) {
+              !has_op(std::meta::operators::op_less, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator<($t lhs, $t rhs)
-                { return (lhs - rhs) < $dt(0); }
+                { return (lhs - rhs) < difference_type(0); }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op< via op+=");
 #endif
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_less_equals)) {
+              !has_op(std::meta::operators::op_less_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator<=($t lhs, $t rhs)
-                { return (lhs - rhs) <= $dt(0); }
+                { return (lhs - rhs) <= difference_type(0); }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op<= via op+=");
 #endif
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_greater)) {
+              !has_op(std::meta::operators::op_greater, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator>($t lhs, $t rhs)
-                { return (lhs - rhs) > $dt(0); }
+                { return (lhs - rhs) > difference_type(0); }
             };
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
             std::constexpr_print_str("Adding op> via op+=");
 #endif
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_greater_equals)) {
+              !has_op(std::meta::operators::op_greater_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator>=($t lhs, $t rhs)
-                { return (lhs - rhs) >= $dt(0); }
+                { return (lhs - rhs) >= difference_type(0); }
             };
           }
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
@@ -1811,16 +1881,16 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 
         check_for_required_operators<IteratorConcept>(has_op);
 
-        if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::post)) {
+        if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::post)) {
           if (std::is_same_v<IteratorConcept, std::input_iterator_tag>) {
             tokens += ^^{
-              constexpr void operator++(this auto&& self, int) { ++self; }
+              constexpr void operator++(int) { ++*this; }
             };
           } else {
             tokens += ^^{
-              constexpr auto operator++(this auto&& self, int) {
-                auto retval = self;
-                ++self;
+              constexpr $t operator++(int) {
+                auto retval = *this;
+                ++*this;
                 return retval;
               }
             };
@@ -1830,11 +1900,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
         };
 
-        if (std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept> && !has_op(std::meta::operators::op_minus_minus, v4_dtl::post)) {
+        if (is_bidirectional &&
+            !has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::post)) {
           tokens += ^^{
-            constexpr auto operator--(this auto&& self, int) {
-              auto retval = self;
-              --self;
+            constexpr $t operator--(int) {
+              auto retval = *this;
+              --*this;
               return retval;
             }
           };
