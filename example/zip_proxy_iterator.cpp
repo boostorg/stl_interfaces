@@ -18,7 +18,11 @@
 // iterator writable, it needs to have a reference type that is not actually a
 // reference -- the reference type is a pair of references, std::tuple<int &,
 // int &>.
-struct zip_iterator
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::proxy_iterator_interface()]]
+#endif
+zip_iterator
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::proxy_iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -29,6 +33,9 @@ struct zip_iterator
           std::tuple<int &, int &>>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
     using reference = std::tuple<int &, int &>;
     using value_type = std::tuple<int, int>;
 
@@ -50,14 +57,6 @@ struct zip_iterator
     {
         return it1_ - other.it1_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{}, ^^zip_iterator);
-    }
-#endif
 
 private:
     int * it1_;

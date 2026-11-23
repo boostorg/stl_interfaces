@@ -20,7 +20,11 @@
 namespace boost { namespace stl_interfaces { namespace detail {
 
     template<typename T, typename SizeType>
-    struct n_iter
+    struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+        [[= boost::stl_interfaces::iterator_interface()]]
+#endif
+        n_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
         : iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -30,6 +34,10 @@ namespace boost { namespace stl_interfaces { namespace detail {
               T>
 #endif
     {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+        using iterator_concept = std::random_access_iterator_tag;
+#endif
+
         n_iter() : x_(nullptr), n_(0) {}
         n_iter(T const & x, SizeType n) : x_(&x), n_(n) {}
 
@@ -43,14 +51,6 @@ namespace boost { namespace stl_interfaces { namespace detail {
             n_ += offset;
             return *this;
         }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-        consteval
-        {
-            boost::stl_interfaces::iterator_interface(
-                std::random_access_iterator_tag{}, ^^n_iter);
-        }
-#endif
 
     private:
         T const * x_;

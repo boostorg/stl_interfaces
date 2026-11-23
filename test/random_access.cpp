@@ -17,7 +17,11 @@
 #include <type_traits>
 
 
-struct basic_random_access_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+basic_random_access_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -27,6 +31,10 @@ struct basic_random_access_iter
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
+
     basic_random_access_iter() {}
     basic_random_access_iter(int * it) : it_(it) {}
 
@@ -41,14 +49,6 @@ struct basic_random_access_iter
     {
         return lhs.it_ - rhs.it_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{}, ^^basic_random_access_iter);
-    }
-#endif
 
 private:
     int * it_;
@@ -74,7 +74,11 @@ static_assert(
 // derived iterator type when boost::stl_interfaces::iterator_interface<...>
 // is a dependent type.
 template<typename ValueType>
-struct basic_random_access_iter_dependent
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+basic_random_access_iter_dependent
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -84,6 +88,10 @@ struct basic_random_access_iter_dependent
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
+
     basic_random_access_iter_dependent() {}
     basic_random_access_iter_dependent(ValueType * it) : it_(it) {}
 
@@ -99,15 +107,6 @@ struct basic_random_access_iter_dependent
     {
         return lhs.it_ - rhs.it_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{},
-            ^^basic_random_access_iter_dependent);
-    }
-#endif
 
 private:
     ValueType * it_;
@@ -127,7 +126,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
-struct basic_adapted_random_access_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface("it_")]]
+#endif
+basic_adapted_random_access_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -137,6 +140,10 @@ struct basic_adapted_random_access_iter
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
+
     basic_adapted_random_access_iter() {}
     basic_adapted_random_access_iter(int * it) : it_(it) {}
 
@@ -146,17 +153,6 @@ private:
     int * base_reference() const noexcept { return it_; }
 
     int * it_;
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-public:
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{},
-            ^^basic_adapted_random_access_iter,
-            ^^it_);
-    }
-#endif
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
@@ -171,7 +167,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct adapted_random_access_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface("it_")]]
+#endif
+adapted_random_access_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -181,6 +181,10 @@ struct adapted_random_access_iter
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
+
     adapted_random_access_iter() {}
     adapted_random_access_iter(ValueType * it) : it_(it) {}
 
@@ -201,17 +205,6 @@ private:
     ValueType * base_reference() const noexcept { return it_; }
 
     ValueType * it_;
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-public:
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{},
-            ^^adapted_random_access_iter,
-            ^^it_);
-    }
-#endif
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
@@ -236,7 +229,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct random_access_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+random_access_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -246,6 +243,10 @@ struct random_access_iter
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
+
     random_access_iter() {}
     random_access_iter(ValueType * it) : it_(it) {}
     template<
@@ -266,14 +267,6 @@ struct random_access_iter
     {
         return lhs.it_ - rhs.it_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{}, ^^random_access_iter);
-    }
-#endif
 
 private:
     ValueType * it_;
@@ -307,7 +300,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int const *,
     std::ptrdiff_t)
 
-struct zip_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::proxy_iterator_interface()]]
+#endif
+zip_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::proxy_iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -318,6 +315,9 @@ struct zip_iter
           std::tuple<int &, int &>>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
     using reference = std::tuple<int &, int &>;
     using value_type = std::tuple<int, int>;
 
@@ -335,14 +335,6 @@ struct zip_iter
     {
         return lhs.it1_ - rhs.it1_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::proxy_iterator_interface(
-            std::random_access_iterator_tag{}, ^^zip_iter);
-    }
-#endif
 
 private:
     int * it1_;
@@ -380,7 +372,11 @@ struct int_t
     friend bool operator<(int lhs, int_t rhs) { return lhs < rhs.value_; }
 };
 
-struct udt_zip_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::proxy_iterator_interface()]]
+#endif
+udt_zip_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::proxy_iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -391,6 +387,9 @@ struct udt_zip_iter
           std::tuple<int_t &, int &>>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
     using reference = std::tuple<int_t &, int &>;
     using value_type = std::tuple<int_t, int>;
 
@@ -411,14 +410,6 @@ struct udt_zip_iter
     {
         return lhs.it1_ - rhs.it1_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::proxy_iterator_interface(
-            std::random_access_iterator_tag{}, ^^udt_zip_iter);
-    }
-#endif
 
 private:
     int_t * it1_;

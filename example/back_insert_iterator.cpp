@@ -18,7 +18,11 @@
 // implementation of std::back_insert_iterator, but it demonstrates that
 // iterator_interface is flexible enough to handle this odd kind of iterator.
 template<typename Container>
-struct back_insert_iterator
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+back_insert_iterator
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -29,6 +33,10 @@ struct back_insert_iterator
           back_insert_iterator<Container> &>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::output_iterator_tag;
+#endif
+
     // For concept requirements.
     back_insert_iterator() : c_(nullptr) {}
 
@@ -64,14 +72,6 @@ struct back_insert_iterator
         typename Container::value_type,
         back_insert_iterator<Container> &>;
     using base_type::operator++;
-#endif
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::output_iterator_tag{}, ^^back_insert_iterator);
-    }
 #endif
 
 private:

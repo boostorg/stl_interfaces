@@ -17,7 +17,11 @@
 // template parameter allows us easily to define const and non-const iterators
 // from the same template.
 template<typename ValueType>
-struct random_access_iterator
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+random_access_iterator
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -28,6 +32,10 @@ struct random_access_iterator
 #endif
 {
     static_assert(std::is_object<ValueType>::value, "");
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
 
     // Default constructor.
     constexpr random_access_iterator() noexcept {}
@@ -59,14 +67,6 @@ struct random_access_iterator
     {
         return it_ - other.it_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{}, ^^random_access_iterator);
-    }
-#endif
 
 private:
     ValueType * it_;

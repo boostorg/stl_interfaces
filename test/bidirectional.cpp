@@ -17,7 +17,11 @@
 #include <type_traits>
 
 
-struct basic_bidirectional_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+basic_bidirectional_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -27,6 +31,10 @@ struct basic_bidirectional_iter
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::bidirectional_iterator_tag;
+#endif
+
     basic_bidirectional_iter() : it_(nullptr) {}
     basic_bidirectional_iter(int * it) : it_(it) {}
 
@@ -58,14 +66,6 @@ struct basic_bidirectional_iter
     using base_type::operator--;
 #endif
 
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::bidirectional_iterator_tag{}, ^^basic_bidirectional_iter);
-    }
-#endif
-
 private:
     int * it_;
 };
@@ -86,7 +86,11 @@ static_assert(
         plus_eq<basic_bidirectional_iter, std::ptrdiff_t>::value,
     "");
 
-struct basic_adapted_bidirectional_ptr_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface(u8"it_")]]
+#endif
+basic_adapted_bidirectional_ptr_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -96,6 +100,10 @@ struct basic_adapted_bidirectional_ptr_iter
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::bidirectional_iterator_tag;
+#endif
+
     basic_adapted_bidirectional_ptr_iter() : it_(nullptr) {}
     basic_adapted_bidirectional_ptr_iter(int * it) : it_(it) {}
 
@@ -105,17 +113,6 @@ private:
     int * base_reference() const noexcept { return it_; }
 
     int * it_;
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-public:
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::bidirectional_iterator_tag{},
-            ^^basic_adapted_bidirectional_ptr_iter,
-            ^^it_);
-    }
-#endif
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
@@ -129,7 +126,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     int *,
     std::ptrdiff_t)
 
-struct basic_adapted_bidirectional_list_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface("it_")]]
+#endif
+basic_adapted_bidirectional_list_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -139,6 +140,10 @@ struct basic_adapted_bidirectional_list_iter
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::bidirectional_iterator_tag;
+#endif
+
     basic_adapted_bidirectional_list_iter() : it_() {}
     basic_adapted_bidirectional_list_iter(std::list<int>::iterator it) : it_(it)
     {}
@@ -149,17 +154,6 @@ private:
     std::list<int>::iterator base_reference() const noexcept { return it_; }
 
     std::list<int>::iterator it_;
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-public:
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::bidirectional_iterator_tag{},
-            ^^basic_adapted_bidirectional_list_iter,
-            ^^it_);
-    }
-#endif
 };
 
 BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
@@ -174,7 +168,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct adapted_bidirectional_ptr_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface("it_")]]
+#endif
+adapted_bidirectional_ptr_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -184,6 +182,10 @@ struct adapted_bidirectional_ptr_iter
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::bidirectional_iterator_tag;
+#endif
+
     adapted_bidirectional_ptr_iter() : it_(nullptr) {}
     adapted_bidirectional_ptr_iter(ValueType * it) : it_(it) {}
 
@@ -205,17 +207,6 @@ private:
     ValueType * base_reference() const noexcept { return it_; }
 
     ValueType * it_;
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-public:
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::bidirectional_iterator_tag{},
-            ^^adapted_bidirectional_ptr_iter,
-            ^^it_);
-    }
-#endif
 };
 
 static_assert(
@@ -249,7 +240,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
     std::ptrdiff_t)
 
 template<typename ValueType>
-struct bidirectional_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+bidirectional_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -259,6 +254,10 @@ struct bidirectional_iter
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::bidirectional_iterator_tag;
+#endif
+
     bidirectional_iter() : it_(nullptr) {}
     bidirectional_iter(ValueType * it) : it_(it) {}
     template<
@@ -294,14 +293,6 @@ struct bidirectional_iter
         ValueType>;
     using base_type::operator++;
     using base_type::operator--;
-#endif
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::bidirectional_iterator_tag{}, ^^bidirectional_iter);
-    }
 #endif
 
 private:

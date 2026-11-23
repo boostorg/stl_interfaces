@@ -1194,8 +1194,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         iterator_alias difference_type;
       };
 
-      struct has_op_t;
-      consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op);
+      struct detect_decls;
+      consteval void detect_adapted_ops(std::meta::info adapted, detect_decls& has_op);
 
       // Covers the patterns of operands taken by a given operator overload of type T.
       enum struct op_params : unsigned int {
@@ -1253,8 +1253,25 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         return op_params::other;
       }
 
-      struct has_op_t {
-        consteval has_op_t(std::meta::info t) : ops_{} {
+      struct detect_decls {
+        consteval detect_decls(std::meta::info t, std::string_view adapted_name, std::u8string_view u8_adapted_name) : ops_{} {
+          if (!adapted_name.empty() || !u8_adapted_name.empty()) {
+            for (std::meta::info m: std::meta::nonstatic_data_members_of(t, std::meta::access_context::unchecked())) {
+              if (adapted_name == identifier_of(m) || u8_adapted_name == u8identifier_of(m)) {
+                adapted_ = m;
+                break;
+              }
+            }
+            if (adapted_ == std::meta::info()) {
+              std::string msg = "could not find data member '";
+              auto const prev_size = msg.size();
+              msg.resize(prev_size + adapted_name.size() + u8_adapted_name.size());
+              auto it = std::ranges::copy(adapted_name, msg.data() + prev_size).out;
+              std::ranges::copy(u8_adapted_name, it);
+              msg += "' to adapt";
+              throw std::invalid_argument(msg);
+            }
+          }
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
           std::constexpr_print_str("**** BEGIN detecting operators");
 #endif
@@ -1264,7 +1281,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
           auto const aliases = std::ranges::subrange(members.begin(), non_aliases.begin());
           for (std::meta::info f : aliases) {
             auto const id = identifier_of(f);
-            if (id == "reference") {
+            if (id == "iterator_concept") {
+              ic_ = dealias(f);
+#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
+              std::constexpr_print_str("found 'using iterator_concept = ...;'");
+#endif
+            } else if (id == "reference") {
               aliases_.reference = {dealias(f), true};
 #if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
               std::constexpr_print_str("found 'using reference = ...;'");
@@ -1389,6 +1411,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         }
 
         constexpr iterator_aliases const& aliases() const { return aliases_; }
+        constexpr std::meta::info iterator_concept() const { return ic_; }
+        constexpr std::meta::info adapted() const { return adapted_; }
 
         consteval void gained_op(std::meta::operators op,
                                  op_params params = op_params::other) {
@@ -1405,8 +1429,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 
         std::array<unsigned char, 44> ops_;
         iterator_aliases aliases_;
+        std::meta::info ic_ = {};
+        std::meta::info adapted_ = {};
 
-        friend consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op);
+        friend consteval void detect_adapted_ops(std::meta::info adapted, detect_decls& has_op);
       };
 
       template <typename T>
@@ -1443,9 +1469,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
       using adapted_iter_subtract_result =
           decltype(std::declval<T const&>() - std::declval<T const&>());
 
-      template<typename IteratorConcept>
-      consteval void check_for_required_operators(has_op_t const& has_op) {
-        if constexpr (std::same_as<IteratorConcept, std::input_iterator_tag>) {
+      inline consteval void check_for_required_operators(std::meta::info ic, detect_decls const& has_op) {
+        if (ic == ^^std::input_iterator_tag) {
           if (!has_op(std::meta::operators::op_star)) {
             throw std::invalid_argument(
               "You did not provide, directly or via .base_reference(), the "
@@ -1461,7 +1486,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               "You did not provide, directly or via .base_reference(), the "
               "required operator++ for input_iterator_tag.");
           }
-        } else if constexpr (std::same_as<IteratorConcept, std::output_iterator_tag>) {
+        } else if (ic == ^^std::output_iterator_tag) {
           if (!has_op(std::meta::operators::op_star)) {
             throw std::invalid_argument(
               "You did not provide, directly or via .base_reference(), the "
@@ -1472,7 +1497,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               "You did not provide, directly or via .base_reference(), the "
               "required operator++ for outut_iterator_tag.");
           }
-        } else if constexpr (std::same_as<IteratorConcept, std::forward_iterator_tag>) {
+        } else if (ic == ^^std::forward_iterator_tag) {
           if (!has_op(std::meta::operators::op_star)) {
             throw std::invalid_argument(
               "You did not provide, directly or via .base_reference(), the "
@@ -1488,7 +1513,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               "You did not provide, directly or via .base_reference(), the "
               "required operator++ for forward_iterator_tag.");
           }
-        } else if constexpr (std::same_as<IteratorConcept, std::bidirectional_iterator_tag>) {
+        } else if (ic == ^^std::bidirectional_iterator_tag) {
           if (!has_op(std::meta::operators::op_star)) {
             throw std::invalid_argument(
               "You did not provide, directly or via .base_reference(), the "
@@ -1509,8 +1534,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               "You did not provide, directly or via .base_reference(), the "
               "required operator-- for bidirectional_iterator_tag.");
           }
-        } else if constexpr (std::same_as<IteratorConcept, std::random_access_iterator_tag> ||
-                             std::same_as<IteratorConcept, std::contiguous_iterator_tag>) {
+        } else if (ic == ^^std::random_access_iterator_tag ||
+                   ic == ^^std::contiguous_iterator_tag) {
           if (!has_op(std::meta::operators::op_star)) {
             throw std::invalid_argument(
               "You did not provide, directly or via .base_reference(), the "
@@ -1531,27 +1556,22 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
           }
         } else {
           throw std::invalid_argument(
-              "Invalid IteratorConcept template argument (must be one of "
-              "std::*_iterator_tag).");
+              "Invalid ic argument (must be one of std::*_iterator_tag).");
         }
       }
 
-      template<typename IteratorConcept>
-      consteval void iterator_interface_impl(
-        std::meta::info ref, std::meta::info vt, std::meta::info ptr,
-        std::meta::info dt, std::meta::info t, std::meta::info adapted,
-        v4_dtl::has_op_t& has_op) {
+      consteval std::meta::token_sequence iterator_interface_impl(
+        std::meta::info ic, std::meta::info ref, std::meta::info vt,
+        std::meta::info ptr, std::meta::info dt, std::meta::info t,
+        std::meta::info adapted, v4_dtl::detect_decls& has_op) {
         auto const& aliases = has_op.aliases();
 
         // nested types
-        auto const ic = ^^IteratorConcept;
-
         if (ic == ^^std::output_iterator_tag)
           ptr = ^^void;
 
-        auto tokens = ^^{
-          using iterator_concept = $ic;
-        };
+        auto tokens = ^^{public:};
+
         if (!aliases.reference.alias || !aliases.reference.defined_by_user) {
           tokens += ^^{
             using reference = $ref;
@@ -1572,13 +1592,13 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
             using difference_type = $dt;
           };
         }
-        if (std::is_base_of_v<std::forward_iterator_tag, IteratorConcept>) {
+        if (is_base_of_type(^^std::forward_iterator_tag, ic)) {
           std::meta::info iter_cat;
           if (!is_reference_type(ref)) {
             iter_cat = ^^std::input_iterator_tag;
-          } else if (std::is_base_of_v<std::random_access_iterator_tag, IteratorConcept>) {
+          } else if (is_base_of_type(^^std::random_access_iterator_tag, ic)) {
             iter_cat = ^^std::random_access_iterator_tag;
-          } else if (std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept>) {
+            } else if (is_base_of_type(^^std::bidirectional_iterator_tag, ic)) {
             iter_cat = ^^std::bidirectional_iterator_tag;
           } else {
             iter_cat = ^^std::forward_iterator_tag;
@@ -1589,10 +1609,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         }
 
         // operators
-        constexpr bool is_random_access =
-            std::is_base_of_v<std::random_access_iterator_tag, IteratorConcept>;
-        constexpr bool is_bidirectional =
-            std::is_base_of_v<std::bidirectional_iterator_tag, IteratorConcept>;
+        bool const is_random_access =
+          is_base_of_type(^^std::random_access_iterator_tag, ic);
+        bool const is_bidirectional =
+          is_base_of_type(^^std::bidirectional_iterator_tag, ic);
 
         // operators from adapted iterator
         bool const is_adapting = adapted != std::meta::info();
@@ -1677,8 +1697,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
             has_op.gained_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t);
           }
-         if (adapted_equals && !std::same_as<std::output_iterator_tag, IteratorConcept> &&
-             !has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
+          if (adapted_equals && (ic != ^^std::output_iterator_tag) &&
+              !has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator==($t const& lhs, $t const& rhs) {
                 return static_cast<bool>(
@@ -1862,10 +1882,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
         }
 
-        check_for_required_operators<IteratorConcept>(has_op);
+        check_for_required_operators(ic, has_op);
 
         if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::post)) {
-          if (std::is_same_v<IteratorConcept, std::input_iterator_tag>) {
+          if (ic == ^^std::input_iterator_tag) {
             tokens += ^^{
               constexpr void operator++(int) { ++*this; }
             };
@@ -1897,10 +1917,10 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 #endif
         }
 
-        queue_injection(tokens);
+        return tokens;
       }
 
-      consteval void detect_adapted_ops(std::meta::info adapted, has_op_t& has_op) {
+      consteval void detect_adapted_ops(std::meta::info adapted, detect_decls& has_op) {
         auto& aliases = has_op.aliases_;
         auto adapted_t = type_of(adapted);
         if (!aliases.reference.alias) {
@@ -1924,43 +1944,75 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
           }
         }
       }
+
+      consteval bool valid_iter_concept(std::meta::info ic) {
+        return ic == ^^std::input_iterator_tag || ic == ^^std::output_iterator_tag ||
+          ic == ^^std::forward_iterator_tag || ic == ^^std::bidirectional_iterator_tag ||
+          ic == ^^std::random_access_iterator_tag || ic == ^^std::contiguous_iterator_tag;
+      }
+
+      template<bool Proxy>
+      struct iterator_interface_t {
+        consteval iterator_interface_t() = default;
+        consteval iterator_interface_t(std::string_view adapted_name) :
+          adapted_name_(adapted_name)
+          {}
+        consteval iterator_interface_t(std::u8string_view adapted_name) :
+          u8_adapted_name_(adapted_name)
+          {}
+
+        consteval std::meta::token_sequence inject_members(std::meta::info t) const {
+          v4_dtl::detect_decls has_op(t, adapted_name_, u8_adapted_name_);
+          auto const ic = has_op.iterator_concept();
+          auto const adapted = has_op.adapted();
+          if (!v4_dtl::valid_iter_concept(ic)) {
+            throw std::invalid_argument("Invalid or missing iterator_concept; must be "
+                                        "one of std::*_iterator_tag.");
+          }
+          if (adapted != std::meta::info())
+            v4_dtl::detect_adapted_ops(adapted, has_op);
+
+          auto const& aliases = has_op.aliases();
+          std::meta::info reference = *aliases.reference.alias;
+          std::meta::info value_type =
+            aliases.value_type.alias ? *aliases.value_type.alias : remove_reference(reference);
+          std::meta::info pointer = aliases.pointer.alias ?
+            *aliases.pointer.alias :
+            (Proxy ?
+              substitute(^^proxy_arrow_result, {reference}) :
+              add_pointer(value_type));
+          std::meta::info difference_type =
+            aliases.difference_type.alias ? *aliases.difference_type.alias : ^^std::ptrdiff_t;
+          return v4_dtl::iterator_interface_impl(
+            ic, reference, value_type, pointer, difference_type, t, adapted, has_op);
+        }
+
+        std::string_view adapted_name_ = {};
+        std::u8string_view u8_adapted_name_ = {};
+      };
     }
 
-    template<typename IteratorConcept>
-    consteval void iterator_interface(IteratorConcept ic, std::meta::info t, std::meta::info adapted = std::meta::info()) {
-      v4_dtl::has_op_t has_op(t);
-      if (adapted != std::meta::info())
-        v4_dtl::detect_adapted_ops(adapted, has_op);
+    struct iterator_interface : v4_dtl::iterator_interface_t<false>
+    {
+      consteval iterator_interface() = default;
+      consteval iterator_interface(std::string_view adapted_name) :
+        v4_dtl::iterator_interface_t<false>(adapted_name)
+        {}
+      consteval iterator_interface(std::u8string_view adapted_name) :
+        v4_dtl::iterator_interface_t<false>(adapted_name)
+        {}
+    };
 
-      auto const& aliases = has_op.aliases();
-      std::meta::info reference = *aliases.reference.alias;
-      std::meta::info value_type =
-        aliases.value_type.alias ? *aliases.value_type.alias : remove_reference(reference);
-      std::meta::info pointer =
-        aliases.pointer.alias ? *aliases.pointer.alias : add_pointer(value_type);
-      std::meta::info difference_type =
-        aliases.difference_type.alias ? *aliases.difference_type.alias : ^^std::ptrdiff_t;
-      v4_dtl::iterator_interface_impl<IteratorConcept>(
-        reference, value_type, pointer, difference_type, t, adapted, has_op);
-    }
-
-    template<typename IteratorConcept>
-    consteval void proxy_iterator_interface(IteratorConcept ic, std::meta::info t, std::meta::info adapted = std::meta::info()) {
-      v4_dtl::has_op_t has_op(t);
-      if (adapted != std::meta::info())
-        v4_dtl::detect_adapted_ops(adapted, has_op);
-
-      auto const& aliases = has_op.aliases();
-      std::meta::info reference = *aliases.reference.alias;
-      std::meta::info value_type =
-        aliases.value_type.alias ? *aliases.value_type.alias : remove_reference(reference);
-      std::meta::info pointer = aliases.pointer.alias ?
-          *aliases.pointer.alias : substitute(^^proxy_arrow_result, {reference});
-      std::meta::info difference_type =
-        aliases.difference_type.alias ? *aliases.difference_type.alias : ^^std::ptrdiff_t;
-      v4_dtl::iterator_interface_impl<IteratorConcept>(
-        reference, value_type, pointer, difference_type, t, adapted, has_op);
-    }
+    struct proxy_iterator_interface : v4_dtl::iterator_interface_t<true>
+    {
+      consteval proxy_iterator_interface() = default;
+      consteval proxy_iterator_interface(std::string_view adapted_name) :
+        v4_dtl::iterator_interface_t<true>(adapted_name)
+        {}
+      consteval proxy_iterator_interface(std::u8string_view adapted_name) :
+        v4_dtl::iterator_interface_t<true>(adapted_name)
+        {}
+    };
 
 }}}
 

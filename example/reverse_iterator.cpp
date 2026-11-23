@@ -19,7 +19,11 @@
 // random access, and contiguous iterators.  We therefore need to provide all
 // the basis operations that might be needed.
 template<typename BidiIter>
-struct reverse_iterator
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+reverse_iterator
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -33,6 +37,10 @@ struct reverse_iterator
           typename std::iterator_traits<BidiIter>::value_type>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept =
+        boost::stl_interfaces::v2::v2_dtl::iter_concept_t<BidiIter>;
+#endif
     reverse_iterator() : it_() {}
     reverse_iterator(BidiIter it) : it_(it) {}
 
@@ -75,15 +83,6 @@ struct reverse_iterator
     // No need for a using declaration to make
     // iterator_interface::operator++(int) visible, because we're not defining
     // operator++() in this template.
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            boost::stl_interfaces::v2::v2_dtl::iter_concept_t<BidiIter>{},
-            ^^reverse_iterator);
-    }
-#endif
 
 private:
     BidiIter it_;

@@ -15,7 +15,11 @@
 #include <type_traits>
 
 
-struct basic_input_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+basic_input_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -24,6 +28,10 @@ struct basic_input_iter
           std::input_iterator_tag, int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::input_iterator_tag;
+#endif
+
     basic_input_iter() : it_(nullptr) {}
     basic_input_iter(int * it) : it_(it) {}
 
@@ -45,14 +53,6 @@ struct basic_input_iter
 #endif
         std::input_iterator_tag, int>;
     using base_type::operator++;
-#endif
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::input_iterator_tag{}, ^^basic_input_iter);
-    }
 #endif
 
 private:
@@ -79,7 +79,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 #endif
 
 template<typename ValueType>
-struct input_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+input_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -89,6 +93,10 @@ struct input_iter
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::input_iterator_tag;
+#endif
+
     input_iter() : it_(nullptr) {}
     input_iter(ValueType * it) : it_(it) {}
     template<
@@ -119,14 +127,6 @@ struct input_iter
     using base_type::operator++;
 #endif
 
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::input_iterator_tag{}, ^^input_iter);
-    }
-#endif
-
 private:
     ValueType * it_;
 
@@ -152,7 +152,11 @@ using pair_input = input_iter<std::pair<int, int>>;
 using const_pair_input = input_iter<std::pair<int, int> const>;
 
 template<typename ValueType>
-struct proxy_input_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::proxy_iterator_interface()]]
+#endif
+proxy_input_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::proxy_iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -162,6 +166,10 @@ struct proxy_input_iter
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::input_iterator_tag;
+#endif
+
     proxy_input_iter() : it_(nullptr) {}
     proxy_input_iter(ValueType * it) : it_(it) {}
     template<
@@ -190,14 +198,6 @@ struct proxy_input_iter
         std::input_iterator_tag,
         ValueType>;
     using base_type::operator++;
-#endif
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::proxy_iterator_interface(
-            std::input_iterator_tag{}, ^^proxy_input_iter);
-    }
 #endif
 
 private:

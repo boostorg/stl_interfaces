@@ -14,7 +14,11 @@
 
 //[ filtered_int_iterator_defn
 template<typename Pred>
-struct filtered_int_iterator
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface("it_")]]
+#endif
+filtered_int_iterator
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -24,6 +28,10 @@ struct filtered_int_iterator
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::bidirectional_iterator_tag;
+#endif
+
     filtered_int_iterator() : it_(nullptr) {}
     filtered_int_iterator(int * it, int * last, Pred pred) :
         it_(it),
@@ -66,15 +74,6 @@ private:
     int * it_;
     int * last_;
     Pred pred_;
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-public:
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::bidirectional_iterator_tag{}, ^^filtered_int_iterator, ^^it_);
-    }
-#endif
 };
 
 // A make-function makes it easier to deal with the Pred parameter.

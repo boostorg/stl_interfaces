@@ -23,7 +23,11 @@ struct node
 
 //[ node_iterator_class_head
 template<typename T>
-struct node_iterator
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+node_iterator
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -34,6 +38,10 @@ struct node_iterator
 #endif
 //]
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::forward_iterator_tag;
+#endif
+
     //[ node_iterator_ctors
     constexpr node_iterator() noexcept : it_(nullptr) {}
     constexpr node_iterator(node<T> * it) noexcept : it_(it) {}
@@ -64,14 +72,6 @@ struct node_iterator
     using base_type::operator++;
 #endif
     //]
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::forward_iterator_tag{}, ^^node_iterator);
-    }
-#endif
 
 private:
     node<T> * it_;

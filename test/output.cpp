@@ -13,7 +13,11 @@
 #include <type_traits>
 
 
-struct basic_output_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+basic_output_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -23,6 +27,10 @@ struct basic_output_iter
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::output_iterator_tag;
+#endif
+
     basic_output_iter() : it_(nullptr) {}
     basic_output_iter(int * it) : it_(it) {}
 
@@ -41,14 +49,6 @@ struct basic_output_iter
         std::output_iterator_tag,
         int>;
     using base_type::operator++;
-#endif
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::output_iterator_tag{}, ^^basic_output_iter);
-    }
 #endif
 
 private:
@@ -80,7 +80,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 
 
 template<typename Container>
-struct back_insert_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+back_insert_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -91,6 +95,10 @@ struct back_insert_iter
           back_insert_iter<Container> &>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::output_iterator_tag;
+#endif
+
     back_insert_iter() : c_(nullptr) {}
     back_insert_iter(Container & c) : c_(std::addressof(c)) {}
 
@@ -117,14 +125,6 @@ struct back_insert_iter
         typename Container::value_type,
         back_insert_iter<Container> &>;
     using base_type::operator++;
-#endif
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::output_iterator_tag{}, ^^back_insert_iter);
-    }
 #endif
 
 private:

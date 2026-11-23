@@ -18,7 +18,11 @@
 template<typename T>
 using decrementable_t = decltype(--std::declval<T &>());
 
-struct basic_forward_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+basic_forward_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -28,6 +32,10 @@ struct basic_forward_iter
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::forward_iterator_tag;
+#endif
+
     basic_forward_iter() : it_(nullptr) {}
     basic_forward_iter(int * it) : it_(it) {}
 
@@ -53,14 +61,6 @@ struct basic_forward_iter
     using base_type::operator++;
 #endif
 
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::forward_iterator_tag{}, ^^basic_forward_iter);
-    }
-#endif
-
 private:
     int * it_;
 };
@@ -79,7 +79,11 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 static_assert(ill_formed<decrementable_t, basic_forward_iter>::value, "");
 
 template<typename ValueType>
-struct forward_iter
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+forward_iter
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -89,6 +93,10 @@ struct forward_iter
           ValueType>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::forward_iterator_tag;
+#endif
+
     forward_iter() : it_(nullptr) {}
     forward_iter(ValueType * it) : it_(it) {}
     template<
@@ -117,14 +125,6 @@ struct forward_iter
         std::forward_iterator_tag,
         ValueType>;
     using base_type::operator++;
-#endif
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::forward_iterator_tag{}, ^^forward_iter);
-    }
 #endif
 
 private:

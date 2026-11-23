@@ -14,7 +14,11 @@
 
 // This is a minimal random access iterator.  It uses default template
 // parameters for most stl_interfaces template parameters.
-struct simple_random_access_iterator
+struct
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+[[=boost::stl_interfaces::iterator_interface()]]
+#endif
+simple_random_access_iterator
 #if !BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
     : boost::stl_interfaces::iterator_interface<
 #if !BOOST_STL_INTERFACES_USE_DEDUCED_THIS
@@ -24,6 +28,10 @@ struct simple_random_access_iterator
           int>
 #endif
 {
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    using iterator_concept = std::random_access_iterator_tag;
+#endif
+
     // This default constructor does not initialize it_, since that's how int *
     // works as well.  This allows optimum performance in code paths where
     // initializing a single pointer may be measurable.  It is also a
@@ -41,14 +49,6 @@ struct simple_random_access_iterator
     {
         return it_ - other.it_;
     }
-
-#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-    consteval
-    {
-        boost::stl_interfaces::iterator_interface(
-            std::random_access_iterator_tag{}, ^^simple_random_access_iterator);
-    }
-#endif
 
 private:
     int * it_;

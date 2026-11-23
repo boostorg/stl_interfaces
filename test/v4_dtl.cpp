@@ -370,7 +370,7 @@ int main()
     // empty
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^empty);
+        constexpr v4_dtl::detect_decls has_op(^^empty, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -381,7 +381,7 @@ int main()
     // type alias detection
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^reference_only_1);
+        constexpr v4_dtl::detect_decls has_op(^^reference_only_1, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(
             aliases.reference == (v4_dtl::iterator_alias{^^int &, true}));
@@ -391,7 +391,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^reference_only_2);
+        constexpr v4_dtl::detect_decls has_op(^^reference_only_2, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(
             aliases.reference ==
@@ -402,7 +402,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^value_type_only);
+        constexpr v4_dtl::detect_decls has_op(^^value_type_only, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(
@@ -412,7 +412,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^pointer_only);
+        constexpr v4_dtl::detect_decls has_op(^^pointer_only, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -422,7 +422,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^difference_type_only);
+        constexpr v4_dtl::detect_decls has_op(^^difference_type_only, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -433,7 +433,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^udt_zip_iter);
+        constexpr v4_dtl::detect_decls has_op(^^udt_zip_iter, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(
             aliases.reference ==
@@ -448,7 +448,7 @@ int main()
     // wrong-arity op*, op-, and op+ ignored
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^wrong_ops);
+        constexpr v4_dtl::detect_decls has_op(^^wrong_ops, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -468,7 +468,7 @@ int main()
     // binary op+ detected
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^member_binary_plus_only);
+        constexpr v4_dtl::detect_decls has_op(^^member_binary_plus_only, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -478,7 +478,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^nonmember_binary_plus_only);
+        constexpr v4_dtl::detect_decls has_op(^^nonmember_binary_plus_only, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -490,7 +490,7 @@ int main()
     // binary minus detected, but not the one that computes a difference
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^nondifference_member_binary_minus);
+        constexpr v4_dtl::detect_decls has_op(^^nondifference_member_binary_minus, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -500,8 +500,8 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(
-            ^^nondifference_nonmember_binary_minus_1);
+        constexpr v4_dtl::detect_decls has_op(
+            ^^nondifference_nonmember_binary_minus_1, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -511,8 +511,8 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(
-            ^^nondifference_nonmember_binary_minus_2);
+        constexpr v4_dtl::detect_decls has_op(
+            ^^nondifference_nonmember_binary_minus_2, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -524,7 +524,7 @@ int main()
     // binary minus detected
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^member_binary_minus_only);
+        constexpr v4_dtl::detect_decls has_op(^^member_binary_minus_only, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -535,8 +535,8 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(
-            ^^member_binary_minus_only_auto_return);
+        constexpr v4_dtl::detect_decls has_op(
+            ^^member_binary_minus_only_auto_return, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -547,7 +547,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^nonmember_binary_minus_only);
+        constexpr v4_dtl::detect_decls has_op(^^nonmember_binary_minus_only, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -558,8 +558,8 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(
-            ^^nonmember_binary_minus_only_auto_return);
+        constexpr v4_dtl::detect_decls has_op(
+            ^^nonmember_binary_minus_only_auto_return, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -570,8 +570,8 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(
-            ^^template_member_binary_minus_only<int>);
+        constexpr v4_dtl::detect_decls has_op(
+            ^^template_member_binary_minus_only<int>, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -584,7 +584,7 @@ int main()
     // pre-/post-incr-/decrement detected
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^member_pre_post_incr);
+        constexpr v4_dtl::detect_decls has_op(^^member_pre_post_incr, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -597,7 +597,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^nonmember_pre_post_incr);
+        constexpr v4_dtl::detect_decls has_op(^^nonmember_pre_post_incr, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -609,7 +609,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^member_pre_post_decr);
+        constexpr v4_dtl::detect_decls has_op(^^member_pre_post_decr, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -621,7 +621,7 @@ int main()
     }
     consteval
     {
-        constexpr v4_dtl::has_op_t has_op(^^nonmember_pre_post_decr);
+        constexpr v4_dtl::detect_decls has_op(^^nonmember_pre_post_decr, {}, {});
         constexpr auto aliases = has_op.aliases();
         CONSTEVAL_TEST(aliases.reference == v4_dtl::iterator_alias{});
         CONSTEVAL_TEST(aliases.value_type == v4_dtl::iterator_alias{});
@@ -635,7 +635,7 @@ int main()
     // this tests parts of detect_adapted_ops()
     consteval
     {
-        v4_dtl::has_op_t has_op(^^adapted_deref_subtract);
+        v4_dtl::detect_decls has_op(^^adapted_deref_subtract, {}, {});
         constexpr auto adapted = ^^adapted_deref_subtract::it_;
         constexpr auto adapted_t = type_of(adapted);
 
@@ -670,7 +670,7 @@ int main()
     // detect_adapted_ops()
     consteval
     {
-        v4_dtl::has_op_t has_op(^^adapted_deref_subtract);
+        v4_dtl::detect_decls has_op(^^adapted_deref_subtract, {}, {});
         v4_dtl::detect_adapted_ops(^^adapted_deref_subtract::it_, has_op);
         auto aliases = has_op.aliases();
         CONSTEVAL_TEST(
@@ -683,7 +683,7 @@ int main()
     }
     consteval
     {
-        v4_dtl::has_op_t has_op(^^adapted_deref_subtract_defined_reference);
+        v4_dtl::detect_decls has_op(^^adapted_deref_subtract_defined_reference, {}, {});
         v4_dtl::detect_adapted_ops(
             ^^adapted_deref_subtract_defined_reference::it_, has_op);
         auto aliases = has_op.aliases();
@@ -697,8 +697,8 @@ int main()
     }
     consteval
     {
-        v4_dtl::has_op_t has_op(
-            ^^adapted_deref_subtract_defined_difference_type);
+        v4_dtl::detect_decls has_op(
+            ^^adapted_deref_subtract_defined_difference_type, {}, {});
         v4_dtl::detect_adapted_ops(
             ^^adapted_deref_subtract_defined_difference_type::it_, has_op);
         auto aliases = has_op.aliases();
