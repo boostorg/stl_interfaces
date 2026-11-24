@@ -50,6 +50,51 @@ basic_random_access_iter
         return lhs.it_ - rhs.it_;
     }
 
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    // these should be ignored by iterator_interface
+    struct something {};
+
+    int operator[](something) { return 42; }
+    int operator[](std::ptrdiff_t, std::ptrdiff_t) { return 42; }
+
+    something operator-=(something) { return {}; }
+
+    something operator+(something) { return {}; }
+    friend something operator+(something, basic_random_access_iter)
+    {
+        return {};
+    }
+
+    something operator-(something) { return {}; }
+    friend something operator-(something, basic_random_access_iter)
+    {
+        return {};
+    }
+
+    bool operator==(something) { return true; }
+    friend bool operator==(something, basic_random_access_iter) { return true; }
+
+    bool operator!=(something) { return true; }
+    friend bool operator!=(something, basic_random_access_iter) { return true; }
+
+    std::strong_ordering operator<=>(something)
+    {
+        return std::strong_ordering::greater;
+    }
+
+    bool operator<(something) { return true; }
+    friend bool operator<(something, basic_random_access_iter) { return true; }
+
+    bool operator<=(something) { return true; }
+    friend bool operator<=(something, basic_random_access_iter) { return true; }
+
+    bool operator>(something) { return true; }
+    friend bool operator>(something, basic_random_access_iter) { return true; }
+
+    bool operator>=(something) { return true; }
+    friend bool operator>=(something, basic_random_access_iter) { return true; }
+#endif
+
 private:
     int * it_;
 };
@@ -69,6 +114,13 @@ static_assert(
     boost::stl_interfaces::v1::v1_dtl::
         plus_eq<basic_random_access_iter, std::ptrdiff_t>::value,
     "");
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+static_assert(requires(
+    basic_random_access_iter it, basic_random_access_iter::difference_type x) {
+    { it[x] } -> std::same_as<basic_random_access_iter::reference>;
+});
+#endif
 
 // This is here explicitly to check that the nested typedefs make it into the
 // derived iterator type when boost::stl_interfaces::iterator_interface<...>
@@ -146,6 +198,38 @@ basic_adapted_random_access_iter
 
     basic_adapted_random_access_iter() {}
     basic_adapted_random_access_iter(int * it) : it_(it) {}
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+    // these should be ignored by iterator_interface
+    struct something {};
+
+    friend something operator*(something, something) { return {}; }
+    something operator*(something) { return {}; }
+
+    basic_adapted_random_access_iter & operator+=(something) { return *this; }
+
+    something operator-(something) { return {}; }
+    friend something operator-(something, basic_adapted_random_access_iter)
+    {
+        return {};
+    }
+
+    bool operator==(something) { return true; }
+    friend bool operator==(something, basic_adapted_random_access_iter)
+    {
+        return true;
+    }
+
+    std::strong_ordering operator<=>(something)
+    {
+        return std::strong_ordering::greater;
+    }
+    friend std::strong_ordering
+    operator<=>(something, basic_adapted_random_access_iter)
+    {
+        return std::strong_ordering::greater;
+    }
+#endif
 
 private:
     friend boost::stl_interfaces::access;
