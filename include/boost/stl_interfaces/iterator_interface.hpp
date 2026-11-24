@@ -1570,27 +1570,19 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         if (ic == ^^std::output_iterator_tag)
           ptr = ^^void;
 
-        auto tokens = ^^{public:};
+        auto tokens = ^^{ public: };
 
         if (!aliases.reference.alias || !aliases.reference.defined_by_user) {
-          tokens += ^^{
-            using reference = $ref;
-          };
+          tokens += ^^{ using reference = $ref; };
         }
         if (!aliases.value_type.alias || !aliases.value_type.defined_by_user) {
-          tokens += ^^{
-            using value_type = std::remove_const_t<$vt>;
-          };
+          tokens += ^^{ using value_type = std::remove_const_t<$vt>; };
         }
         if (!aliases.pointer.alias || !aliases.pointer.defined_by_user) {
-          tokens += ^^{
-            using pointer = $ptr;
-          };
+          tokens += ^^{ using pointer = $ptr; };
         }
         if (!aliases.difference_type.alias || !aliases.difference_type.defined_by_user) {
-          tokens += ^^{
-            using difference_type = $dt;
-          };
+          tokens += ^^{ using difference_type = $dt; };
         }
         if (is_base_of_type(^^std::forward_iterator_tag, ic)) {
           std::meta::info iter_cat;
@@ -1603,16 +1595,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
           } else {
             iter_cat = ^^std::forward_iterator_tag;
           }
-          tokens += ^^{
-            using iterator_category = \(iter_cat);
-          };
+          tokens += ^^{ using iterator_category = \(iter_cat); };
         }
 
         // operators
-        bool const is_random_access =
-          is_base_of_type(^^std::random_access_iterator_tag, ic);
-        bool const is_bidirectional =
-          is_base_of_type(^^std::bidirectional_iterator_tag, ic);
+        bool const is_random_access = is_base_of_type(^^std::random_access_iterator_tag, ic);
+        bool const is_bidirectional = is_base_of_type(^^std::bidirectional_iterator_tag, ic);
 
         // operators from adapted iterator
         bool const is_adapting = adapted != std::meta::info();
