@@ -15,13 +15,9 @@
 #endif
 
 #if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
-#define BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION 0
 #include <algorithm>
 #include <exception>
 #include <meta>
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-#include <debugging>
-#endif
 #endif
 
 
@@ -1131,55 +1127,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
     // clang-format off
 
     namespace v4_dtl {
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-      constexpr std::array<std::string_view, 44> op_names = {{
-        "hidden op_new",
-        "hidden op_delete",
-        "hidden op_array_new",
-        "hidden op_array_delete",
-        "hidden op_co_await",
-        "hidden op_parentheses",
-        "hidden op_square_brackets",
-        "hidden op_arrow",
-        "hidden op_arrow_star",
-        "hidden op_tilde",
-        "hidden op_exclamation",
-        "hidden op_plus",
-        "hidden op_minus",
-        "hidden op_star",
-        "hidden op_slash",
-        "hidden op_percent",
-        "hidden op_caret",
-        "hidden op_ampersand",
-        "hidden op_equals",
-        "hidden op_pipe",
-        "hidden op_plus_equals",
-        "hidden op_minus_equals",
-        "hidden op_star_equals",
-        "hidden op_slash_equals",
-        "hidden op_percent_equals",
-        "hidden op_caret_equals",
-        "hidden op_ampersand_equals",
-        "hidden op_pipe_equals",
-        "hidden op_equals_equals",
-        "hidden op_exclamation_equals",
-        "hidden op_less",
-        "hidden op_greater",
-        "hidden op_less_equals",
-        "hidden op_greater_equals",
-        "hidden op_spaceship",
-        "hidden op_ampersand_ampersand",
-        "hidden op_pipe_pipe",
-        "hidden op_less_less",
-        "hidden op_greater_greater",
-        "hidden op_less_less_equals",
-        "hidden op_greater_greater_equals",
-        "hidden op_plus_plus",
-        "hidden op_minus_minus",
-        "hidden op_comma"
-      }};
-#endif
-
       struct iterator_alias {
         std::optional<std::meta::info> alias;
         bool defined_by_user = false; // otherwise, deduced (only relevant when !!alias)
@@ -1272,9 +1219,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               throw std::invalid_argument(msg);
             }
           }
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-          std::constexpr_print_str("**** BEGIN detecting operators");
-#endif
           std::vector members = members_of(t, std::meta::access_context::unchecked());
           auto const non_aliases =
               std::ranges::stable_partition(members, std::meta::is_type_alias);
@@ -1283,29 +1227,14 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
             auto const id = identifier_of(f);
             if (id == "iterator_concept") {
               ic_ = dealias(f);
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-              std::constexpr_print_str("found 'using iterator_concept = ...;'");
-#endif
             } else if (id == "reference") {
               aliases_.reference = {dealias(f), true};
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-              std::constexpr_print_str("found 'using reference = ...;'");
-#endif
             } else if (id == "value_type") {
               aliases_.value_type = {dealias(f), true};
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-              std::constexpr_print_str("found 'using value_type = ...;'");
-#endif
             } else if (id == "pointer") {
               aliases_.pointer = {dealias(f), true};
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-              std::constexpr_print_str("found 'using pointer = ...;'");
-#endif
             } else if (id == "difference_type") {
               aliases_.difference_type = {dealias(f), true};
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-              std::constexpr_print_str("found 'using difference_type = ...;'");
-#endif
             }
           }
           auto const record_operator =
@@ -1313,31 +1242,11 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               ops_[
                 static_cast<int>(op) - static_cast<int>(std::meta::operators::op_new)
               ] |= (unsigned int)params;
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-              std::constexpr_print_str(op_names[
-                static_cast<int>(op) -
-                static_cast<int>(std::meta::operators::op_new)].substr(7));
-              switch (params) {
-              case op_params::not_found: std::constexpr_print_str("not_found"); break;
-              case op_params::t: std::constexpr_print_str("t"); break;
-              case op_params::t_t: std::constexpr_print_str("t_t"); break;
-              case op_params::n_t: std::constexpr_print_str("n_t"); break;
-              case op_params::t_n: std::constexpr_print_str("t_n"); break;
-              case op_params::post: std::constexpr_print_str("post"); break;
-              case op_params::other: std::constexpr_print_str("other"); break;
-              default: break;
-              }
-#endif
             };
           for (std::meta::info f : non_aliases) {
             if (!is_operator_function(f) || is_special_member_function(f))
               continue;
             auto const op = operator_of(f);
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str(op_names[
-              static_cast<int>(op) -
-              static_cast<int>(std::meta::operators::op_new)].substr(7));
-#endif
             if (op == std::meta::operators::op_star) {
               auto params = parameters_of(f);
               if (!params.empty())
@@ -1364,11 +1273,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
             if (!is_operator_function(f))
               continue;
             auto const op = operator_of(f);
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str(op_names[
-              static_cast<int>(op) -
-              static_cast<int>(std::meta::operators::op_new)]);
-#endif
             if (op == std::meta::operators::op_star) {
               auto params = parameters_of(f);
               if (params.size() != 1u || remove_cvref(type_of(params[0])) != t)
@@ -1398,9 +1302,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               record_operator(op, params_of(t, op, f, member::no));
             }
           }
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-          std::constexpr_print_str("**** END detecting operators");
-#endif
         }
 
         consteval bool operator()(std::meta::operators op,
@@ -1627,9 +1528,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *boost::stl_interfaces::access::base(self);
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op* via adapted member");
-#endif
             has_op.gained_op(std::meta::operators::op_star);
           }
           if (adapted_plus_eq && is_random_access &&
@@ -1640,9 +1538,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *this;
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op+= via adapted member");
-#endif
             has_op.gained_op(std::meta::operators::op_plus_equals, v4_dtl::op_params::t_n);
           }
           if (adapted_pre_incr && !is_random_access &&
@@ -1653,9 +1548,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *this;
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op++ via adapted member");
-#endif
             has_op.gained_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre);
           }
           if (adapted_pre_decr && !is_random_access && is_bidirectional &&
@@ -1666,9 +1558,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *this;
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op-- via adapted member");
-#endif
             has_op.gained_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre);
           }
           if (adapted_subtract && is_random_access &&
@@ -1680,9 +1569,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                   boost::stl_interfaces::access::base(rhs));
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op- via adapted member");
-#endif
             has_op.gained_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t);
           }
           if (adapted_equals && (ic != ^^std::output_iterator_tag) &&
@@ -1694,9 +1580,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                   boost::stl_interfaces::access::base(rhs));
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op== via adapted member");
-#endif
             has_op.gained_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t);
           }
           if (adapted_spaceship && is_random_access &&
@@ -1707,9 +1590,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                        boost::stl_interfaces::access::base(rhs);
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op<=> via adapted member");
-#endif
             has_op.gained_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t);
           }
         }
@@ -1721,9 +1601,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               return boost::stl_interfaces::detail::make_pointer<pointer, reference>(*self);
             }
           };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op->");
-#endif
         }
 
         if (has_op(std::meta::operators::op_plus_equals)) {
@@ -1735,9 +1612,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *retval;
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op[] via op+=");
-#endif
           }
           if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre)) {
             tokens += ^^{
@@ -1745,9 +1619,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *this += difference_type(1);
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op++ via op+=");
-#endif
             has_op.gained_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre);
           }
           if (!has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre)) {
@@ -1756,9 +1627,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *this += -difference_type(1);
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op-- via op+=");
-#endif
           }
           if (!has_op(std::meta::operators::op_minus_equals, v4_dtl::op_params::t_n)) {
             tokens += ^^{
@@ -1766,9 +1634,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 return *this += -n;
               }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op-= via op+=");
-#endif
             has_op.gained_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::t_n);
           }
           if (!has_op(std::meta::operators::op_plus, v4_dtl::op_params::t_n)) {
@@ -1782,18 +1647,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               friend constexpr $t operator+($t::difference_type n, $t it)
                 { return it += n; }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op+ via op+=");
-#endif
           }
           if (!has_op(std::meta::operators::op_minus, v4_dtl::op_params::t_n)) {
             tokens += ^^{
               friend constexpr $t operator-($t it, $t::difference_type n)
                 { return it += -n; }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op-(it, n) via op+=");
-#endif
           }
           if (has_op(std::meta::operators::op_minus) &&
               !has_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t)) {
@@ -1805,18 +1664,12 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                   std::strong_ordering::equal;
                 }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op<=> via op+=");
-#endif
           }
           if (!has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator==($t lhs, $t rhs)
                 { return (lhs - rhs) == 0; }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op== via op+=");
-#endif
           }
           if (has_op(std::meta::operators::op_equals_equals) &&
               !has_op(std::meta::operators::op_exclamation_equals, v4_dtl::op_params::t_t)) {
@@ -1824,9 +1677,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               friend constexpr bool operator!=($t lhs, $t rhs)
                 { return !(lhs == rhs); }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op!= via op+=");
-#endif
           }
           if (has_op(std::meta::operators::op_minus) &&
               !has_op(std::meta::operators::op_less, v4_dtl::op_params::t_t)) {
@@ -1834,9 +1684,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               friend constexpr bool operator<($t lhs, $t rhs)
                 { return (lhs - rhs) < difference_type(0); }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op< via op+=");
-#endif
           }
           if (has_op(std::meta::operators::op_minus) &&
               !has_op(std::meta::operators::op_less_equals, v4_dtl::op_params::t_t)) {
@@ -1844,9 +1691,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               friend constexpr bool operator<=($t lhs, $t rhs)
                 { return (lhs - rhs) <= difference_type(0); }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op<= via op+=");
-#endif
           }
           if (has_op(std::meta::operators::op_minus) &&
               !has_op(std::meta::operators::op_greater, v4_dtl::op_params::t_t)) {
@@ -1854,9 +1698,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               friend constexpr bool operator>($t lhs, $t rhs)
                 { return (lhs - rhs) > difference_type(0); }
             };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op> via op+=");
-#endif
           }
           if (has_op(std::meta::operators::op_minus) &&
               !has_op(std::meta::operators::op_greater_equals, v4_dtl::op_params::t_t)) {
@@ -1865,9 +1706,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 { return (lhs - rhs) >= difference_type(0); }
             };
           }
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-            std::constexpr_print_str("Adding op>= via op+=");
-#endif
         }
 
         check_for_required_operators(ic, has_op);
@@ -1886,9 +1724,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               }
             };
           }
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-          std::constexpr_print_str("Adding op++(int)");
-#endif
         };
 
         if (is_bidirectional &&
@@ -1900,9 +1735,6 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               return retval;
             }
           };
-#if BOOST_STL_INTERFACES_INSTRUMENT_TOKEN_SEQUENCE_INJECTION
-          std::constexpr_print_str("Adding op--(int)");
-#endif
         }
 
         return tokens;
