@@ -1473,18 +1473,18 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 
         auto tokens = ^^{ public: };
 
-        if (!aliases.reference.alias || !aliases.reference.defined_by_user) {
+        if (!aliases.reference.alias || !aliases.reference.defined_by_user)
           tokens += ^^{ using reference = $ref; };
-        }
-        if (!aliases.value_type.alias || !aliases.value_type.defined_by_user) {
+
+        if (!aliases.value_type.alias || !aliases.value_type.defined_by_user)
           tokens += ^^{ using value_type = std::remove_const_t<$vt>; };
-        }
-        if (!aliases.pointer.alias || !aliases.pointer.defined_by_user) {
+
+        if (!aliases.pointer.alias || !aliases.pointer.defined_by_user)
           tokens += ^^{ using pointer = $ptr; };
-        }
-        if (!aliases.difference_type.alias || !aliases.difference_type.defined_by_user) {
+
+        if (!aliases.difference_type.alias || !aliases.difference_type.defined_by_user)
           tokens += ^^{ using difference_type = $dt; };
-        }
+
         if (is_base_of_type(^^std::forward_iterator_tag, ic)) {
           std::meta::info iter_cat;
           if (!is_reference_type(ref)) {
