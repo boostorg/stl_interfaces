@@ -164,6 +164,71 @@ BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
 std::array<int, 10> ints = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
 
+// Check that oteratpr templates work with reflection-based
+// iterator_interface.
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+template<typename T, bool Const>
+using maybe_const = std::conditional_t<Const, T const, T>;
+
+template<bool Const>
+struct[[= boost::stl_interfaces::iterator_interface()]] template_forward_iter
+{
+    using iterator_concept = std::forward_iterator_tag;
+
+    template_forward_iter() : it_(nullptr) {}
+    template_forward_iter(maybe_const<int, Const> * it) : it_(it) {}
+    template<bool Const2>
+        requires(Const == true && Const2 == false)
+    template_forward_iter(template_forward_iter<Const2> const & other) :
+        it_(other.it_)
+    {}
+
+    maybe_const<int, Const> & operator*() const { return *it_; }
+    template_forward_iter & operator++()
+    {
+        ++it_;
+        return *this;
+    }
+    friend bool
+    operator==(template_forward_iter lhs, template_forward_iter rhs) noexcept
+    {
+        return lhs.it_ == rhs.it_;
+    }
+
+private:
+    maybe_const<int, Const> * it_;
+
+    template<bool Const2>
+    friend struct template_forward_iter;
+};
+
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    template_forward_iter<true>, std::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    template_forward_iter<true>,
+    std::forward_iterator_tag,
+    std::forward_iterator_tag,
+    int,
+    const int &,
+    const int *,
+    std::ptrdiff_t)
+BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(
+    template_forward_iter<false>, std::forward_iterator)
+BOOST_STL_INTERFACES_STATIC_ASSERT_ITERATOR_TRAITS(
+    template_forward_iter<false>,
+    std::forward_iterator_tag,
+    std::forward_iterator_tag,
+    int,
+    int &,
+    int *,
+    std::ptrdiff_t)
+
+static_assert(
+    ill_formed<decrementable_t, template_forward_iter<true>>::value, "");
+static_assert(
+    ill_formed<decrementable_t, template_forward_iter<false>>::value, "");
+#endif
+
 
 ////////////////////
 // view_interface //
@@ -374,6 +439,27 @@ int main()
         BOOST_TEST(cr.front() == 0);
     }
 }
+
+#if BOOST_STL_INTERFACES_USE_TOKEN_SEQUENCE_INJECTION
+{
+    template_forward_iter<false> first(ints.data());
+    template_forward_iter<false> last(ints.data() + ints.size());
+
+    template_forward_iter<true> cfirst(first);
+    template_forward_iter<true> clast(
+        const_cast<int const *>(ints.data()) + ints.size());
+
+    BOOST_TEST(first == cfirst);
+    BOOST_TEST(cfirst == first);
+    BOOST_TEST(last == clast);
+    BOOST_TEST(clast == last);
+
+    BOOST_TEST(first != clast);
+    BOOST_TEST(clast != first);
+    BOOST_TEST(last != cfirst);
+    BOOST_TEST(cfirst != last);
+}
+#endif
 
     return boost::report_errors();
 }
