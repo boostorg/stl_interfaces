@@ -1525,7 +1525,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
           if (adapted_deref && !has_op(std::meta::operators::op_star)) {
             tokens += ^^{
               constexpr decltype(auto) operator*(this auto&& self) {
-                return *boost::stl_interfaces::access::base(self);
+                return *self.base_reference();
               }
             };
             has_op.gained_op(std::meta::operators::op_star);
@@ -1534,7 +1534,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               !has_op(std::meta::operators::op_plus_equals, v4_dtl::op_params::t_n)) {
             tokens += ^^{
               constexpr $t& operator+=(difference_type n) {
-                boost::stl_interfaces::access::base(*this) += n;
+                base_reference() += n;
                 return *this;
               }
             };
@@ -1544,7 +1544,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               !has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre)) {
             tokens += ^^{
               constexpr $t& operator++() {
-                ++boost::stl_interfaces::access::base(*this);
+                ++base_reference();
                 return *this;
               }
             };
@@ -1554,7 +1554,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               !has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre)) {
             tokens += ^^{
               constexpr $t& operator--() {
-                --boost::stl_interfaces::access::base(*this);
+                --base_reference();
                 return *this;
               }
             };
@@ -1564,9 +1564,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               !has_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr difference_type operator-($t lhs, $t rhs) {
-                return static_cast<$dt>(
-                  boost::stl_interfaces::access::base(lhs) -
-                  boost::stl_interfaces::access::base(rhs));
+                return static_cast<$dt>(lhs.base_reference() - rhs.base_reference());
               }
             };
             has_op.gained_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t);
@@ -1575,9 +1573,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               !has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator==($t const& lhs, $t const& rhs) {
-                return static_cast<bool>(
-                  boost::stl_interfaces::access::base(lhs) ==
-                  boost::stl_interfaces::access::base(rhs));
+                return static_cast<bool>(lhs.base_reference() == rhs.base_reference());
               }
             };
             has_op.gained_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t);
@@ -1586,8 +1582,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               !has_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t)) {
             tokens += ^^{
               friend constexpr auto operator<=>($t const& lhs, $t const& rhs) {
-                return boost::stl_interfaces::access::base(lhs) <=>
-                       boost::stl_interfaces::access::base(rhs);
+                return lhs.base_reference() <=> rhs.base_reference();
               }
             };
             has_op.gained_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t);
