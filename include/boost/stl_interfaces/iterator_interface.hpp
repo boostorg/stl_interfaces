@@ -1142,7 +1142,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
       };
 
       struct detect_decls;
-      consteval void detect_adapted_ops(std::meta::info adapted, detect_decls& has_op);
+      consteval void detect_adapted_ops(std::meta::info, detect_decls&);
 
       // Covers the patterns of operands taken by a given operator overload of type T.
       enum struct op_params : unsigned int {
@@ -1333,7 +1333,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         std::meta::info ic_ = {};
         std::meta::info adapted_ = {};
 
-        friend consteval void detect_adapted_ops(std::meta::info adapted, detect_decls& has_op);
+        friend consteval void detect_adapted_ops(std::meta::info, detect_decls&);
       };
 
       template <typename T>
@@ -1531,61 +1531,61 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
             has_op.gained_op(std::meta::operators::op_star);
           }
           if (adapted_plus_eq && is_random_access &&
-              !has_op(std::meta::operators::op_plus_equals, v4_dtl::op_params::t_n)) {
+              !has_op(std::meta::operators::op_plus_equals, op_params::t_n)) {
             tokens += ^^{
               constexpr $t& operator+=(difference_type n) {
                 base_reference() += n;
                 return *this;
               }
             };
-            has_op.gained_op(std::meta::operators::op_plus_equals, v4_dtl::op_params::t_n);
+            has_op.gained_op(std::meta::operators::op_plus_equals, op_params::t_n);
           }
           if (adapted_pre_incr && !is_random_access &&
-              !has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre)) {
+              !has_op(std::meta::operators::op_plus_plus, op_params::pre)) {
             tokens += ^^{
               constexpr $t& operator++() {
                 ++base_reference();
                 return *this;
               }
             };
-            has_op.gained_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre);
+            has_op.gained_op(std::meta::operators::op_plus_plus, op_params::pre);
           }
           if (adapted_pre_decr && !is_random_access && is_bidirectional &&
-              !has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre)) {
+              !has_op(std::meta::operators::op_minus_minus, op_params::pre)) {
             tokens += ^^{
               constexpr $t& operator--() {
                 --base_reference();
                 return *this;
               }
             };
-            has_op.gained_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre);
+            has_op.gained_op(std::meta::operators::op_minus_minus, op_params::pre);
           }
           if (adapted_subtract && is_random_access &&
-              !has_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_minus, op_params::t_t)) {
             tokens += ^^{
               friend constexpr difference_type operator-($t lhs, $t rhs) {
                 return static_cast<$dt>(lhs.base_reference() - rhs.base_reference());
               }
             };
-            has_op.gained_op(std::meta::operators::op_minus, v4_dtl::op_params::t_t);
+            has_op.gained_op(std::meta::operators::op_minus, op_params::t_t);
           }
           if (adapted_equals && (ic != ^^std::output_iterator_tag) &&
-              !has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_equals_equals, op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator==($t const& lhs, $t const& rhs) {
                 return static_cast<bool>(lhs.base_reference() == rhs.base_reference());
               }
             };
-            has_op.gained_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t);
+            has_op.gained_op(std::meta::operators::op_equals_equals, op_params::t_t);
           }
           if (adapted_spaceship && is_random_access &&
-              !has_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_spaceship, op_params::t_t)) {
             tokens += ^^{
               friend constexpr auto operator<=>($t const& lhs, $t const& rhs) {
                 return lhs.base_reference() <=> rhs.base_reference();
               }
             };
-            has_op.gained_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t);
+            has_op.gained_op(std::meta::operators::op_spaceship, op_params::t_t);
           }
         }
 
@@ -1599,7 +1599,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         }
 
         if (has_op(std::meta::operators::op_plus_equals)) {
-          if (!has_op(std::meta::operators::op_square_brackets, v4_dtl::op_params::t_n)) {
+          if (!has_op(std::meta::operators::op_square_brackets, op_params::t_n)) {
             tokens += ^^{
               constexpr reference operator[](difference_type n) const {
                 auto retval = *this;
@@ -1608,49 +1608,49 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
               }
             };
           }
-          if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre)) {
+          if (!has_op(std::meta::operators::op_plus_plus, op_params::pre)) {
             tokens += ^^{
               constexpr $t& operator++() {
                 return *this += difference_type(1);
               }
             };
-            has_op.gained_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::pre);
+            has_op.gained_op(std::meta::operators::op_plus_plus, op_params::pre);
           }
-          if (!has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::pre)) {
+          if (!has_op(std::meta::operators::op_minus_minus, op_params::pre)) {
             tokens += ^^{
               constexpr $t& operator--() {
                 return *this += -difference_type(1);
               }
             };
           }
-          if (!has_op(std::meta::operators::op_minus_equals, v4_dtl::op_params::t_n)) {
+          if (!has_op(std::meta::operators::op_minus_equals, op_params::t_n)) {
             tokens += ^^{
               constexpr $t& operator-=(difference_type n) {
                 return *this += -n;
               }
             };
-            has_op.gained_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::t_n);
+            has_op.gained_op(std::meta::operators::op_minus_minus, op_params::t_n);
           }
-          if (!has_op(std::meta::operators::op_plus, v4_dtl::op_params::t_n)) {
+          if (!has_op(std::meta::operators::op_plus, op_params::t_n)) {
             tokens += ^^{
               friend constexpr $t operator+($t it, $t::difference_type n)
                 { return it += n; }
             };
           }
-          if (!has_op(std::meta::operators::op_plus, v4_dtl::op_params::n_t)) {
+          if (!has_op(std::meta::operators::op_plus, op_params::n_t)) {
             tokens += ^^{
               friend constexpr $t operator+($t::difference_type n, $t it)
                 { return it += n; }
             };
           }
-          if (!has_op(std::meta::operators::op_minus, v4_dtl::op_params::t_n)) {
+          if (!has_op(std::meta::operators::op_minus, op_params::t_n)) {
             tokens += ^^{
               friend constexpr $t operator-($t it, $t::difference_type n)
                 { return it += -n; }
             };
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_spaceship, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_spaceship, op_params::t_t)) {
             tokens += ^^{
               friend constexpr auto operator<=>($t lhs, $t rhs) {
                 difference_type const diff = lhs - rhs;
@@ -1660,42 +1660,42 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
                 }
             };
           }
-          if (!has_op(std::meta::operators::op_equals_equals, v4_dtl::op_params::t_t)) {
+          if (!has_op(std::meta::operators::op_equals_equals, op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator==($t lhs, $t rhs)
                 { return (lhs - rhs) == 0; }
             };
           }
           if (has_op(std::meta::operators::op_equals_equals) &&
-              !has_op(std::meta::operators::op_exclamation_equals, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_exclamation_equals, op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator!=($t lhs, $t rhs)
                 { return !(lhs == rhs); }
             };
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_less, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_less, op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator<($t lhs, $t rhs)
                 { return (lhs - rhs) < difference_type(0); }
             };
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_less_equals, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_less_equals, op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator<=($t lhs, $t rhs)
                 { return (lhs - rhs) <= difference_type(0); }
             };
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_greater, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_greater, op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator>($t lhs, $t rhs)
                 { return (lhs - rhs) > difference_type(0); }
             };
           }
           if (has_op(std::meta::operators::op_minus) &&
-              !has_op(std::meta::operators::op_greater_equals, v4_dtl::op_params::t_t)) {
+              !has_op(std::meta::operators::op_greater_equals, op_params::t_t)) {
             tokens += ^^{
               friend constexpr bool operator>=($t lhs, $t rhs)
                 { return (lhs - rhs) >= difference_type(0); }
@@ -1705,7 +1705,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
 
         check_for_required_operators(ic, has_op);
 
-        if (!has_op(std::meta::operators::op_plus_plus, v4_dtl::op_params::post)) {
+        if (!has_op(std::meta::operators::op_plus_plus, op_params::post)) {
           if (ic == ^^std::input_iterator_tag) {
             tokens += ^^{
               constexpr void operator++(int) { ++*this; }
@@ -1722,7 +1722,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         };
 
         if (is_bidirectional &&
-            !has_op(std::meta::operators::op_minus_minus, v4_dtl::op_params::post)) {
+            !has_op(std::meta::operators::op_minus_minus, op_params::post)) {
           tokens += ^^{
             constexpr $t operator--(int) {
               auto retval = *this;
@@ -1735,8 +1735,8 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
         return tokens;
       }
 
-      consteval void detect_adapted_ops(std::meta::info adapted, detect_decls& has_op) {
-        auto& aliases = has_op.aliases_;
+      consteval void detect_adapted_ops(std::meta::info adapted, detect_decls& decls) {
+        auto& aliases = decls.aliases_;
         auto adapted_t = type_of(adapted);
         if (!aliases.reference.alias) {
           bool const adapted_deref =
@@ -1777,17 +1777,17 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
           {}
 
         consteval std::meta::token_sequence inject_members(std::meta::info t) const {
-          v4_dtl::detect_decls has_op(t, adapted_name_, u8_adapted_name_);
-          auto const ic = has_op.iterator_concept();
-          auto const adapted = has_op.adapted();
+          v4_dtl::detect_decls decls(t, adapted_name_, u8_adapted_name_);
+          auto const ic = decls.iterator_concept();
+          auto const adapted = decls.adapted();
           if (!v4_dtl::valid_iter_concept(ic)) {
             throw std::invalid_argument("Invalid or missing iterator_concept; must be "
                                         "one of std::*_iterator_tag.");
           }
           if (adapted != std::meta::info())
-            v4_dtl::detect_adapted_ops(adapted, has_op);
+            v4_dtl::detect_adapted_ops(adapted, decls);
 
-          auto const& aliases = has_op.aliases();
+          auto const& aliases = decls.aliases();
           std::meta::info reference = *aliases.reference.alias;
           std::meta::info value_type =
             aliases.value_type.alias ? *aliases.value_type.alias : remove_reference(reference);
@@ -1799,7 +1799,7 @@ namespace boost { namespace stl_interfaces { BOOST_STL_INTERFACES_NAMESPACE_V4 {
           std::meta::info difference_type =
             aliases.difference_type.alias ? *aliases.difference_type.alias : ^^std::ptrdiff_t;
           return v4_dtl::iterator_interface_impl(
-            ic, reference, value_type, pointer, difference_type, t, adapted, has_op);
+            ic, reference, value_type, pointer, difference_type, t, adapted, decls);
         }
 
         std::string_view adapted_name_ = {};
